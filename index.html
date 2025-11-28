@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAMDCOIN - Майнинг Игра</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary-color: #0f1422;
+            --secondary-color: #1a2035;
+            --accent-color: #00d4ff;
+            --success-color: #00d68f;
+            --danger-color: #ff3d71;
+            --warning-color: #ffaa00;
+            --text-color: #ffffff;
+            --text-secondary: #8f9bb3;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .warning-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .warning-content {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 500px;
+            border: 2px solid var(--warning-color);
+        }
+
+        .warning-icon {
+            font-size: 48px;
+            color: var(--warning-color);
+            margin-bottom: 20px;
+        }
+
+        .warning-title {
+            font-size: 24px;
+            color: var(--warning-color);
+            margin-bottom: 15px;
+        }
+
+        .warning-text {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--secondary-color);
+            padding: 12px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .balance {
+            background-color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 6px;
+            margin: 16px 0;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-tab.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* База - Mining */
+        .mining-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .base-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .base-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .mining-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: var(--primary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .mine-btn {
+            background: linear-gradient(135deg, var(--success-color), #00b87d);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .mine-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 214, 143, 0.3);
+        }
+
+        .mine-btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Магазин */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .shop-card {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .shop-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .card-price {
+            background-color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .buy-btn {
+            width: 100%;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .buy-btn:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* NFT Магазин */
+        .nft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .nft-card {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .nft-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .nft-image {
+            width: 100%;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        .nft-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nft-info {
+            padding: 15px;
+        }
+
+        .nft-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nft-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .nft-current-price {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .nft-stock {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Мини-игры */
+        .minigame-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-container {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .coin-game {
+            text-align: center;
+        }
+
+        .coin {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .coin:hover {
+            transform: scale(1.05);
+        }
+
+        .coin:active {
+            transform: scale(0.95);
+        }
+
+        .game-timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .game-score {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .start-game-btn {
+            background-color: var(--warning-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        /* Профиль */
+        .profile-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 5px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stat {
+            background-color: var(--primary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .mobile-menu {
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--secondary-color);
+            padding: 10px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+            z-index: 99;
+        }
+
+        .mobile-nav {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 6px;
+            border-radius: 8px;
+            min-width: 60px;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent-color);
+            background-color: rgba(0, 212, 255, 0.1);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 18px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transform: translateX(150%);
+            transition: var(--transition);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Предупреждение -->
+    <div class="warning-modal" id="warningModal">
+        <div class="warning-content">
+            <div class="warning-icon">⚠️</div>
+            <h2 class="warning-title">ВНИМАНИЕ</h2>
+            <p class="warning-text">
+                Данный app создан ИСКЛЮЧИТЕЛЬНО в развлекательных целях. 
+                "SAMD" является вымышленной монетой и ничего не стоит в реальном мире.
+            </p>
+            <button class="mine-btn" id="acceptWarning">Понятно</button>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-coins"></i>
+                    <span>SAMDCOIN</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-profile" id="userProfile" style="display: none;">
+                        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+                        <span id="userName" class="user-name"></span>
+                    </div>
+                    <div class="balance">
+                        <span>SAMD: </span>
+                        <span id="balanceSAMD">0</span>
+                    </div>
+                    <div class="balance">
+                        <span>🎟️ </span>
+                        <span id="balanceTickets">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="base">База</div>
+            <div class="nav-tab" data-tab="shop">Магазин</div>
+            <div class="nav-tab" data-tab="nft">NFT Магазин</div>
+            <div class="nav-tab" data-tab="games">Мини-игры</div>
+            <div class="nav-tab" data-tab="profile">Профиль</div>
+        </div>
+
+        <!-- Вкладка База -->
+        <div class="tab-content active" id="base-content">
+            <div class="mining-section">
+                <h2 class="base-title" id="baseTitle">База |Загрузка...|</h2>
+                <p class="base-subtitle">Майните SAMDCOIN и улучшайте свою ферму</p>
+                
+                <div class="mining-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentSAMD">0</div>
+                        <div class="stat-label">Текущий SAMD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="maxSAMD">500</div>
+                        <div class="stat-label">Максимум SAMD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="incomePerSec">0.1</div>
+                        <div class="stat-label">Доход в секунду</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="ticketsCount">0</div>
+                        <div class="stat-label">Билеты 🎟️</div>
+                    </div>
+                </div>
+
+                <button class="mine-btn" id="mineBtn">
+                    <i class="fas fa-digging"></i>
+                    Майнить SAMD
+                </button>
+                <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                    Майнинг работает даже когда приложение закрыто!
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Магазин -->
+        <div class="tab-content" id="shop-content">
+            <div class="shop-grid" id="shopItems">
+                <div class="loading">Загрузка магазина...</div>
+            </div>
+        </div>
+
+        <!-- Вкладка NFT Магазин -->
+        <div class="tab-content" id="nft-content">
+            <div class="nft-grid" id="nftMarketplace">
+                <div class="loading">Загрузка NFT...</div>
+            </div>
+        </div>
+
+        <!-- Вкладка Мини-игры -->
+        <div class="tab-content" id="games-content">
+            <div class="minigame-section">
+                <h2>Мини-игры</h2>
+                <p>Используйте билеты 🎟️ для игры в мини-игры</p>
+                
+                <div class="game-container">
+                    <div class="coin-game">
+                        <h3>Кликер Монеты</h3>
+                        <p>Кликайте по монете как можно больше раз за 30 секунд!</p>
+                        <p>Стоимость: 1 🎟️</p>
+                        
+                        <div class="game-timer" id="gameTimer">30</div>
+                        <div class="game-score" id="gameScore">Кликов: 0</div>
+                        <div class="coin" id="coin">
+                            💰
+                        </div>
+                        
+                        <button class="start-game-btn" id="startGameBtn">
+                            Начать игру (1 🎟️)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Профиль -->
+        <div class="tab-content" id="profile-content">
+            <div class="profile-section">
+                <div class="profile-header">
+                    <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar">
+                    <div class="profile-info">
+                        <h2 id="profileName">Загрузка...</h2>
+                        <p id="profileUsername"></p>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileSAMD">0</div>
+                        <div class="stat-label">Всего SAMD</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileTickets">0</div>
+                        <div class="stat-label">Билеты 🎟️</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileIncome">0.1</div>
+                        <div class="stat-label">Доход/сек</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileMax">500</div>
+                        <div class="stat-label">Макс. SAMD</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Настройки</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                        ID пользователя: <span id="userId"></span>
+                    </p>
+                    <button class="buy-btn" onclick="resetProgress()" style="background-color: var(--danger-color);">
+                        Сбросить прогресс
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-menu">
+        <div class="mobile-nav">
+            <div class="mobile-nav-item active" data-tab="base">
+                <i class="fas fa-home"></i>
+                <span>База</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="shop">
+                <i class="fas fa-store"></i>
+                <span>Магазин</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="nft">
+                <i class="fas fa-palette"></i>
+                <span>NFT</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="games">
+                <i class="fas fa-gamepad"></i>
+                <span>Игры</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="profile">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
+
+    <script>
+        // ==================== КОНФИГУРАЦИЯ FIREBASE ====================
+        const firebaseConfig = {
+            apiKey: "ВАШ_API_KEY",
+            authDomain: "ВАШ_PROJECT.firebaseapp.com",
+            projectId: "ВАШ_PROJECT_ID",
+            storageBucket: "ВАШ_PROJECT.appspot.com",
+            messagingSenderId: "ВАШ_SENDER_ID",
+            appId: "ВАШ_APP_ID"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ==================== TELEGRAM WEB APP ====================
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const user = tg.initDataUnsafe.user;
+        const USER_ID = user ? user.id.toString() : 'demo-user';
+        const USERNAME = user?.username || 'user';
+
+        // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
+        let userData = {
+            samd: 0,
+            tickets: 0,
+            currentMining: 0,
+            maxMining: 500,
+            incomePerSecond: 0.1,
+            lastMiningUpdate: new Date().toISOString(),
+            upgrades: [],
+            nfts: []
+        };
+
+        let shopItems = [];
+        let nftItems = [];
+        let isMining = false;
+        let lastSave = Date.now();
+
+        // ==================== FIREBASE ФУНКЦИИ ====================
+
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            try {
+                const doc = await db.collection('users').doc(USER_ID).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    userData = { ...userData, ...data };
+                    
+                    // Расчет офлайн майнинга
+                    calculateOfflineMining();
+                } else {
+                    // Создаем нового пользователя
+                    await saveUserData();
+                }
+                
+                updateUI();
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+            }
+        }
+
+        // Сохранение данных пользователя
+        async function saveUserData() {
+            try {
+                userData.lastMiningUpdate = new Date().toISOString();
+                
+                await db.collection('users').doc(USER_ID).set({
+                    ...userData,
+                    telegramData: user,
+                    username: USERNAME,
+                    lastActive: new Date().toISOString()
+                }, { merge: true });
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+            }
+        }
+
+        // Расчет офлайн майнинга
+        function calculateOfflineMining() {
+            const lastUpdate = new Date(userData.lastMiningUpdate);
+            const now = new Date();
+            const diffSeconds = (now - lastUpdate) / 1000;
+            
+            if (diffSeconds > 0) {
+                const mined = diffSeconds * userData.incomePerSecond;
+                userData.currentMining = Math.min(userData.currentMining + mined, userData.maxMining);
+                showNotification(`За время отсутствия намайнено: ${mined.toFixed(1)} SAMD`);
+            }
+        }
+
+        // Загрузка товаров магазина
+        async function loadShopItems() {
+            try {
+                const snapshot = await db.collection('shopItems').get();
+                shopItems = [];
+                
+                snapshot.forEach(doc => {
+                    shopItems.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                if (shopItems.length === 0) {
+                    await createDefaultShopItems();
+                }
+                
+                updateShopUI();
+            } catch (error) {
+                console.error('Ошибка загрузки магазина:', error);
+            }
+        }
+
+        // Загрузка NFT
+        async function loadNFTItems() {
+            try {
+                const snapshot = await db.collection('nftItems').get();
+                nftItems = [];
+                
+                snapshot.forEach(doc => {
+                    nftItems.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                if (nftItems.length === 0) {
+                    await createDefaultNFTItems();
+                }
+                
+                updateNFTUI();
+            } catch (error) {
+                console.error('Ошибка загрузки NFT:', error);
+            }
+        }
+
+        // Создание товаров по умолчанию
+        async function createDefaultShopItems() {
+            const defaultItems = [
+                {
+                    name: "Улучшение дохода",
+                    description: "Увеличивает доход на 0.1 SAMD в секунду",
+                    type: "income",
+                    value: 0.1,
+                    price: 100,
+                    globalStock: 1000,
+                    currentStock: 1000
+                },
+                {
+                    name: "Улучшение максимума",
+                    description: "Увеличивает максимальный запас SAMD на 100",
+                    type: "max",
+                    value: 100,
+                    price: 150,
+                    globalStock: 500,
+                    currentStock: 500
+                },
+                {
+                    name: "Билеты x10",
+                    description: "10 билетов для мини-игр",
+                    type: "tickets",
+                    value: 10,
+                    price: 50,
+                    globalStock: 10000,
+                    currentStock: 10000
+                }
+            ];
+
+            for (const item of defaultItems) {
+                try {
+                    await db.collection('shopItems').add(item);
+                } catch (error) {
+                    console.error('Ошибка создания товара:', error);
+                }
+            }
+            
+            await loadShopItems();
+        }
+
+        // Создание NFT по умолчанию
+        async function createDefaultNFTItems() {
+            const defaultNFTs = [
+                {
+                    name: "Золотой майнер",
+                    description: "Редкий NFT для настоящих майнеров",
+                    imageUrl: "https://images.unsplash.com/photo-1620336655055-bd87c797d062?w=400&h=300&fit=crop",
+                    price: 1000,
+                    globalStock: 100,
+                    currentStock: 100,
+                    rarity: "rare"
+                },
+                {
+                    name: "Кибер-ферма", 
+                    description: "Футуристический NFT для продвинутых",
+                    imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop",
+                    price: 500,
+                    globalStock: 500,
+                    currentStock: 500,
+                    rarity: "common"
+                }
+            ];
+
+            for (const nft of defaultNFTs) {
+                try {
+                    await db.collection('nftItems').add(nft);
+                } catch (error) {
+                    console.error('Ошибка создания NFT:', error);
+                }
+            }
+            
+            await loadNFTItems();
+        }
+
+        // Покупка товара
+        async function buyShopItem(itemId) {
+            const item = shopItems.find(i => i.id === itemId);
+            if (!item) return showNotification('Товар не найден', true);
+            
+            if (userData.samd < item.price) {
+                return showNotification('Недостаточно SAMD', true);
+            }
+            
+            if (item.currentStock <= 0) {
+                return showNotification('Товар закончился', true);
+            }
+            
+            try {
+                // Обновляем глобальный запас
+                await db.collection('shopItems').doc(itemId).update({
+                    currentStock: firebase.firestore.FieldValue.increment(-1)
+                });
+                
+                // Обновляем данные пользователя
+                userData.samd -= item.price;
+                
+                if (item.type === 'income') {
+                    userData.incomePerSecond += item.value;
+                } else if (item.type === 'max') {
+                    userData.maxMining += item.value;
+                } else if (item.type === 'tickets') {
+                    userData.tickets += item.value;
+                }
+                
+                userData.upgrades.push({
+                    itemId: itemId,
+                    type: item.type,
+                    value: item.value,
+                    purchasedAt: new Date().toISOString()
+                });
+                
+                await saveUserData();
+                await loadShopItems();
+                showNotification(`Куплено: ${item.name}`);
+                
+            } catch (error) {
+                console.error('Ошибка покупки:', error);
+                showNotification('Ошибка покупки', true);
+            }
+        }
+
+        // Покупка NFT
+        async function buyNFTItem(nftId) {
+            const nft = nftItems.find(i => i.id === nftId);
+            if (!nft) return showNotification('NFT не найдено', true);
+            
+            if (userData.samd < nft.price) {
+                return showNotification('Недостаточно SAMD', true);
+            }
+            
+            if (nft.currentStock <= 0) {
+                return showNotification('NFT закончилось', true);
+            }
+            
+            try {
+                // Обновляем глобальный запас
+                await db.collection('nftItems').doc(nftId).update({
+                    currentStock: firebase.firestore.FieldValue.increment(-1)
+                });
+                
+                // Обновляем данные пользователя
+                userData.samd -= nft.price;
+                userData.nfts.push({
+                    nftId: nftId,
+                    ...nft,
+                    purchasedAt: new Date().toISOString()
+                });
+                
+                await saveUserData();
+                await loadNFTItems();
+                showNotification(`Куплено NFT: ${nft.name}`);
+                
+            } catch (error) {
+                console.error('Ошибка покупки NFT:', error);
+                showNotification('Ошибка покупки NFT', true);
+            }
+        }
+
+        // ==================== ИГРОВЫЕ ФУНКЦИИ ====================
+
+        // Майнинг
+        function startMining() {
+            if (isMining) return;
+            
+            isMining = true;
+            mineBtn.disabled = true;
+            mineBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Майнинг...';
+            
+            const mineInterval = setInterval(() => {
+                if (userData.currentMining < userData.maxMining) {
+                    userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
+                    updateMiningUI();
+                } else {
+                    clearInterval(mineInterval);
+                    isMining = false;
+                    mineBtn.disabled = false;
+                    mineBtn.innerHTML = '<i class="fas fa-digging"></i> Майнить SAMD';
+                    showNotification('Достигнут максимум майнинга!');
+                }
+            }, 1000);
+        }
+
+        // Сбор майнинга
+        function collectMining() {
+            if (userData.currentMining > 0) {
+                userData.samd += userData.currentMining;
+                const collected = userData.currentMining;
+                userData.currentMining = 0;
+                
+                updateUI();
+                showNotification(`Собрано: ${collected.toFixed(1)} SAMD`);
+                saveUserData();
+            }
+        }
+
+        // Мини-игра: Кликер
+        let gameActive = false;
+        let gameTime = 30;
+        let gameScore = 0;
+        let gameTimer;
+
+        function startCoinGame() {
+            if (userData.tickets < 1) {
+                return showNotification('Недостаточно билетов!', true);
+            }
+            
+            userData.tickets -= 1;
+            gameActive = true;
+            gameTime = 30;
+            gameScore = 0;
+            
+            updateUI();
+            updateGameUI();
+            
+            startGameBtn.disabled = true;
+            startGameBtn.textContent = 'Игра идет...';
+            
+            gameTimer = setInterval(() => {
+                gameTime--;
+                updateGameUI();
+                
+                if (gameTime <= 0) {
+                    endCoinGame();
+                }
+            }, 1000);
+        }
+
+        function coinClick() {
+            if (!gameActive) return;
+            
+            gameScore++;
+            updateGameUI();
+            
+            // Анимация клика
+            coin.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                coin.style.transform = 'scale(1.05)';
+            }, 50);
+        }
+
+        function endCoinGame() {
+            gameActive = false;
+            clearInterval(gameTimer);
+            
+            const reward = Math.floor(gameScore / 2); // 0.5 SAMD за клик
+            userData.samd += reward;
+            
+            startGameBtn.disabled = false;
+            startGameBtn.textContent = 'Начать игру (1 🎟️)';
+            
+            showNotification(`Игра окончена! Результат: ${gameScore} кликов. Награда: ${reward} SAMD`);
+            saveUserData();
+            updateUI();
+        }
+
+        // ==================== UI ФУНКЦИИ ====================
+
+        function updateUI() {
+            // Баланс
+            balanceSAMD.textContent = Math.floor(userData.samd);
+            balanceTickets.textContent = userData.tickets;
+            
+            // База
+            baseTitle.textContent = `База ${USERNAME}`;
+            currentSAMD.textContent = userData.currentMining.toFixed(1);
+            maxSAMD.textContent = userData.maxMining;
+            incomePerSec.textContent = userData.incomePerSecond.toFixed(1);
+            ticketsCount.textContent = userData.tickets;
+            
+            // Профиль
+            profileName.textContent = user.first_name || USERNAME;
+            profileUsername.textContent = user.username ? `@${user.username}` : '';
+            profileSAMD.textContent = Math.floor(userData.samd);
+            profileTickets.textContent = userData.tickets;
+            profileIncome.textContent = userData.incomePerSecond.toFixed(1);
+            profileMax.textContent = userData.maxMining;
+            userId.textContent = USER_ID;
+            
+            if (user.photo_url) {
+                profileAvatar.src = user.photo_url;
+            }
+        }
+
+        function updateMiningUI() {
+            currentSAMD.textContent = userData.currentMining.toFixed(1);
+        }
+
+        function updateShopUI() {
+            const shopContainer = document.getElementById('shopItems');
+            shopContainer.innerHTML = '';
+            
+            shopItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-price">${item.price} SAMD</div>
+                    </div>
+                    <div class="card-description">${item.description}</div>
+                    <div class="card-stats">
+                        <span>Осталось: ${item.currentStock}</span>
+                        <span>+${item.value} ${getItemUnit(item.type)}</span>
+                    </div>
+                    <button class="buy-btn" onclick="buyShopItem('${item.id}')" 
+                            ${userData.samd < item.price || item.currentStock <= 0 ? 'disabled' : ''}>
+                        ${userData.samd < item.price ? 'Недостаточно SAMD' : 
+                          item.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
+                    </button>
+                `;
+                shopContainer.appendChild(card);
+            });
+        }
+
+        function updateNFTUI() {
+            const nftContainer = document.getElementById('nftMarketplace');
+            nftContainer.innerHTML = '';
+            
+            nftItems.forEach(nft => {
+                const card = document.createElement('div');
+                card.className = 'nft-card';
+                card.innerHTML = `
+                    <div class="nft-image">
+                        <img src="${nft.imageUrl}" alt="${nft.name}">
+                    </div>
+                    <div class="nft-info">
+                        <div class="nft-name">${nft.name}</div>
+                        <div class="nft-price">
+                            <div class="nft-current-price">${nft.price} SAMD</div>
+                            <div class="nft-stock">Осталось: ${nft.currentStock}</div>
+                        </div>
+                        <button class="buy-btn" onclick="buyNFTItem('${nft.id}')" 
+                                ${userData.samd < nft.price || nft.currentStock <= 0 ? 'disabled' : ''}>
+                            ${userData.samd < nft.price ? 'Недостаточно SAMD' : 
+                              nft.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
+                        </button>
+                    </div>
+                `;
+                nftContainer.appendChild(card);
+            });
+        }
+
+        function updateGameUI() {
+            gameTimer.textContent = gameTime;
+            gameScore.textContent = `Кликов: ${gameScore}`;
+        }
+
+        function getItemUnit(type) {
+            switch(type) {
+                case 'income': return 'SAMD/сек';
+                case 'max': return 'SAMD макс';
+                case 'tickets': return '🎟️';
+                default: return '';
+            }
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = 'notification' + (isError ? ' error' : '');
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function displayUserProfile() {
+            if (user) {
+                const userNameEl = document.getElementById('userName');
+                const userAvatarEl = document.getElementById('userAvatar');
+                const userProfileEl = document.getElementById('userProfile');
+                
+                let displayName = user.first_name || user.username || 'User';
+                userNameEl.textContent = displayName;
+                
+                if (user.photo_url) {
+                    userAvatarEl.src = user.photo_url;
+                }
+                
+                userProfileEl.style.display = 'flex';
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.querySelector(`#${tabName}-content`).classList.add('active');
+        }
+
+        function resetProgress() {
+            if (confirm('Вы уверены что хотите сбросить весь прогресс? Это действие нельзя отменить!')) {
+                userData = {
+                    samd: 0,
+                    tickets: 0,
+                    currentMining: 0,
+                    maxMining: 500,
+                    incomePerSecond: 0.1,
+                    lastMiningUpdate: new Date().toISOString(),
+                    upgrades: [],
+                    nfts: []
+                };
+                saveUserData();
+                updateUI();
+                showNotification('Прогресс сброшен');
+            }
+        }
+
+        // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
+
+        document.getElementById('acceptWarning').addEventListener('click', () => {
+            document.getElementById('warningModal').style.display = 'none';
+        });
+
+        document.getElementById('mineBtn').addEventListener('click', () => {
+            if (userData.currentMining >= userData.maxMining) {
+                collectMining();
+            } else {
+                startMining();
+            }
+        });
+
+        document.getElementById('startGameBtn').addEventListener('click', startCoinGame);
+        document.getElementById('coin').addEventListener('click', coinClick);
+
+        // Назначение обработчиков вкладок
+        document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(element => {
+            element.addEventListener('click', () => switchTab(element.dataset.tab));
+        });
+
+        // Авто-сохранение каждые 30 секунд
+        setInterval(() => {
+            if (Date.now() - lastSave > 30000) {
+                saveUserData();
+                lastSave = Date.now();
+            }
+        }, 10000);
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            displayUserProfile();
+            await loadUserData();
+            await loadShopItems();
+            await loadNFTItems();
+            
+            // Обновление майнинга в реальном времени
+            setInterval(() => {
+                if (isMining && userData.currentMining < userData.maxMining) {
+                    userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
+                    updateMiningUI();
+                }
+            }, 1000);
+        });
+
+    </script>
+</body>
+</html>
