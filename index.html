@@ -595,6 +595,36 @@
             padding: 20px;
         }
 
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .inventory-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -606,10 +636,23 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             transition: var(--transition);
+            border: 2px solid transparent;
         }
 
         .inventory-card:hover {
             transform: translateY(-3px);
+        }
+
+        .inventory-card.rare {
+            border-color: #00d4ff;
+        }
+
+        .inventory-card.epic {
+            border-color: #ff00ff;
+        }
+
+        .inventory-card.legendary {
+            border-color: #ffaa00;
         }
 
         .inventory-image {
@@ -637,8 +680,8 @@
             text-overflow: ellipsis;
         }
 
-        .inventory-price {
-            font-size: 12px;
+        .inventory-details {
+            font-size: 11px;
             color: var(--text-secondary);
             margin-bottom: 8px;
         }
@@ -838,6 +881,11 @@
                 flex-direction: column;
                 text-align: center;
             }
+            
+            .inventory-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
         @media (max-width: 480px) {
@@ -858,6 +906,10 @@
             .mine-btn {
                 padding: 12px 16px;
                 font-size: 14px;
+            }
+            
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             }
         }
     </style>
@@ -1041,9 +1093,18 @@
         <!-- Вкладка Инвентарь -->
         <div class="tab-content" id="inventory-content">
             <div class="inventory-section">
-                <h2>Ваши NFT</h2>
+                <div class="inventory-header">
+                    <h2>Ваши NFT</h2>
+                    <div class="inventory-filters">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="common">Обычные</button>
+                        <button class="filter-btn" data-filter="rare">Редкие</button>
+                        <button class="filter-btn" data-filter="epic">Эпические</button>
+                        <button class="filter-btn" data-filter="legendary">Легендарные</button>
+                    </div>
+                </div>
                 <div class="inventory-grid" id="inventoryItems">
-                    <div class="empty-state">У вас пока нет NFT</div>
+                    <div class="loading">Загрузка инвентаря...</div>
                 </div>
             </div>
         </div>
@@ -1167,6 +1228,7 @@
         let nftItems = [];
         let cases = [];
         let lastSave = Date.now();
+        let currentInventoryFilter = 'all';
 
         // Модальные окна
         let selectedNFT = null;
@@ -1177,10 +1239,12 @@
         // Загрузка данных пользователя
         async function loadUserData() {
             try {
+                console.log('Загрузка данных пользователя...');
                 const doc = await db.collection('users').doc(USER_ID).get();
                 
                 if (doc.exists) {
                     const data = doc.data();
+                    console.log('Данные пользователя:', data);
                     userData = { ...userData, ...data };
                     
                     // Расчет офлайн майнинга
@@ -1190,6 +1254,7 @@
                     updateMiningStatus();
                 } else {
                     // Создаем нового пользователя
+                    console.log('Создание нового пользователя');
                     await saveUserData();
                 }
                 
@@ -1210,6 +1275,8 @@
                     username: USERNAME,
                     lastActive: new Date().toISOString()
                 }, { merge: true });
+                
+                console.log('Данные пользователя сохранены');
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
             }
@@ -1688,6 +1755,21 @@
             selectedNFT = null;
         }
 
+        // ==================== ИНВЕНТАРЬ ФУНКЦИИ ====================
+
+        // Фильтрация инвентаря
+        function filterInventory(filter) {
+            currentInventoryFilter = filter;
+            
+            // Обновляем активные кнопки фильтров
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            updateInventoryUI();
+        }
+
         // ==================== UI ФУНКЦИИ ====================
 
         function updateUI() {
@@ -1817,22 +1899,38 @@
             const inventoryContainer = document.getElementById('inventoryItems');
             inventoryContainer.innerHTML = '';
             
-            if (userData.nfts.length === 0) {
+            console.log('Обновление инвентаря. NFT пользователя:', userData.nfts);
+            
+            if (!userData.nfts || userData.nfts.length === 0) {
                 inventoryContainer.innerHTML = '<div class="empty-state">У вас пока нет NFT</div>';
                 return;
             }
             
-            userData.nfts.forEach(nft => {
+            // Фильтрация NFT
+            let filteredNFTs = userData.nfts;
+            if (currentInventoryFilter !== 'all') {
+                filteredNFTs = userData.nfts.filter(nft => nft.rarity === currentInventoryFilter);
+            }
+            
+            if (filteredNFTs.length === 0) {
+                inventoryContainer.innerHTML = '<div class="empty-state">Нет NFT с выбранной редкостью</div>';
+                return;
+            }
+            
+            filteredNFTs.forEach(nft => {
                 const sellPrice = Math.floor(nft.price * 0.7);
                 const card = document.createElement('div');
-                card.className = 'inventory-card';
+                card.className = `inventory-card ${nft.rarity || 'common'}`;
                 card.innerHTML = `
                     <div class="inventory-image">
                         <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
                     </div>
                     <div class="inventory-info">
                         <div class="inventory-name">${nft.name}</div>
-                        <div class="inventory-price">${nft.fromCase ? 'Из кейса' : 'Куплено за: ' + nft.price + ' SAMD'}</div>
+                        <div class="inventory-details">
+                            ${nft.fromCase ? 'Из кейса' : `Куплено за: ${nft.price} SAMD`}
+                            <br>Редкость: ${getRarityName(nft.rarity)}
+                        </div>
                         <div class="inventory-actions">
                             <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
                                 Отправить
@@ -1845,6 +1943,16 @@
                 `;
                 inventoryContainer.appendChild(card);
             });
+        }
+
+        function getRarityName(rarity) {
+            switch(rarity) {
+                case 'common': return 'Обычная';
+                case 'rare': return 'Редкая';
+                case 'epic': return 'Эпическая';
+                case 'legendary': return 'Легендарная';
+                default: return rarity;
+            }
         }
 
         function getItemUnit(type) {
@@ -1893,6 +2001,11 @@
             
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
             document.querySelector(`#${tabName}-content`).classList.add('active');
+            
+            // Особые действия при переключении вкладок
+            if (tabName === 'inventory') {
+                updateInventoryUI();
+            }
         }
 
         function resetProgress() {
@@ -1958,6 +2071,11 @@
             element.addEventListener('click', () => switchTab(element.dataset.tab));
         });
 
+        // Обработчики фильтров инвентаря
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => filterInventory(btn.dataset.filter));
+        });
+
         // Авто-сохранение и майнинг
         setInterval(() => {
             if (userData.isMining && userData.currentMining < userData.maxMining) {
@@ -1974,11 +2092,13 @@
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Инициализация приложения...');
             displayUserProfile();
             await loadUserData();
             await loadShopItems();
             await loadNFTItems();
             await loadCases();
+            console.log('Приложение инициализировано');
         });
 
     </script>
