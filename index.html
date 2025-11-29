@@ -97,6 +97,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .logo {
@@ -106,18 +108,24 @@
             font-size: 18px;
             font-weight: bold;
             color: var(--accent-color);
+            flex-shrink: 0;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            flex: 1;
+            min-width: 0;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .user-avatar {
@@ -125,22 +133,35 @@
             height: 36px;
             border-radius: 50%;
             object-fit: cover;
+            flex-shrink: 0;
         }
 
         .user-name {
             font-size: 14px;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
         }
 
         .balance {
             background-color: var(--primary-color);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: var(--border-radius);
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            flex-shrink: 0;
+            min-width: 0;
+        }
+
+        .balance span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .nav-tabs {
@@ -150,18 +171,20 @@
             padding: 6px;
             margin: 16px 0;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .nav-tab {
             flex: 1;
             text-align: center;
-            padding: 10px 12px;
+            padding: 10px 8px;
             cursor: pointer;
             border-radius: 8px;
             transition: var(--transition);
             white-space: nowrap;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
+            min-width: 60px;
         }
 
         .nav-tab.active {
@@ -193,7 +216,7 @@
         }
 
         .base-title {
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 10px;
             color: var(--accent-color);
         }
@@ -201,48 +224,53 @@
         .base-subtitle {
             color: var(--text-secondary);
             margin-bottom: 20px;
+            font-size: 14px;
         }
 
         .mining-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         .stat-card {
             background-color: var(--primary-color);
-            padding: 15px;
+            padding: 12px;
             border-radius: var(--border-radius);
             text-align: center;
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: var(--accent-color);
         }
 
         .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         .mine-btn {
             background: linear-gradient(135deg, var(--success-color), #00b87d);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px 20px;
             border-radius: var(--border-radius);
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: var(--transition);
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .mine-btn:hover {
+        .mine-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 214, 143, 0.3);
         }
@@ -253,6 +281,14 @@
             transform: none;
         }
 
+        .mine-btn.mining {
+            background: linear-gradient(135deg, var(--accent-color), #0099cc);
+        }
+
+        .mine-btn.collect {
+            background: linear-gradient(135deg, var(--warning-color), #cc8800);
+        }
+
         /* Магазин */
         .shop-grid {
             display: grid;
@@ -260,10 +296,16 @@
             gap: 16px;
         }
 
+        @media (max-width: 480px) {
+            .shop-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .shop-card {
             background-color: var(--secondary-color);
             border-radius: var(--border-radius);
-            padding: 20px;
+            padding: 16px;
             transition: var(--transition);
         }
 
@@ -273,36 +315,37 @@
 
         .card-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .card-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: var(--accent-color);
         }
 
         .card-price {
             background-color: var(--primary-color);
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .card-description {
             color: var(--text-secondary);
-            margin-bottom: 15px;
-            font-size: 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.4;
         }
 
         .card-stats {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 12px;
+            margin-bottom: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
         }
 
@@ -315,6 +358,7 @@
             border-radius: var(--border-radius);
             cursor: pointer;
             transition: var(--transition);
+            font-size: 14px;
         }
 
         .buy-btn:disabled {
@@ -325,8 +369,14 @@
         /* NFT Магазин */
         .nft-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .nft-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
         }
 
         .nft-card {
@@ -342,7 +392,7 @@
 
         .nft-image {
             width: 100%;
-            height: 150px;
+            height: 120px;
             overflow: hidden;
         }
 
@@ -353,13 +403,13 @@
         }
 
         .nft-info {
-            padding: 15px;
+            padding: 12px;
         }
 
         .nft-name {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -369,16 +419,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .nft-current-price {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .nft-stock {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
         }
 
@@ -387,14 +437,59 @@
             background-color: var(--secondary-color);
             border-radius: var(--border-radius);
             padding: 20px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .game-card {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
             text-align: center;
+        }
+
+        .game-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .game-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .game-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .game-cost {
+            background-color: var(--secondary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: inline-block;
         }
 
         .game-container {
             background-color: var(--primary-color);
             border-radius: var(--border-radius);
-            padding: 30px;
-            margin: 20px 0;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .game-container.active {
+            display: block;
         }
 
         .coin-game {
@@ -402,18 +497,19 @@
         }
 
         .coin {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             background: linear-gradient(135deg, #FFD700, #FFA500);
             border-radius: 50%;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 40px;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+            user-select: none;
         }
 
         .coin:hover {
@@ -436,16 +532,61 @@
             margin-bottom: 20px;
         }
 
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
         .start-game-btn {
             background-color: var(--warning-color);
             color: var(--primary-color);
             border: none;
-            padding: 12px 30px;
+            padding: 12px 24px;
             border-radius: var(--border-radius);
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: var(--transition);
+        }
+
+        .collect-game-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .confirm-modal.active {
+            display: flex;
+        }
+
+        .confirm-content {
+            background: var(--secondary-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
         }
 
         /* Профиль */
@@ -463,20 +604,21 @@
         }
 
         .profile-avatar {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
         }
 
         .profile-info h2 {
             margin-bottom: 5px;
+            font-size: 18px;
         }
 
         .profile-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
             margin-bottom: 20px;
         }
 
@@ -516,7 +658,7 @@
             transition: var(--transition);
             padding: 6px;
             border-radius: 8px;
-            min-width: 60px;
+            min-width: 50px;
         }
 
         .mobile-nav-item.active {
@@ -561,6 +703,49 @@
             padding: 40px;
             color: var(--text-secondary);
         }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .user-info {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .mining-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .nav-tab {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+            
+            .balance {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+            
+            .mine-btn {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -574,6 +759,19 @@
                 "SAMD" является вымышленной монетой и ничего не стоит в реальном мире.
             </p>
             <button class="mine-btn" id="acceptWarning">Понятно</button>
+        </div>
+    </div>
+
+    <!-- Подтверждение игры -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-content">
+            <h3>Начать игру?</h3>
+            <p>Стоимость: 1 🎟️</p>
+            <p>У вас останется: <span id="remainingTickets">0</span> 🎟️</p>
+            <div class="game-controls">
+                <button class="start-game-btn" id="confirmGameBtn">Играть</button>
+                <button class="buy-btn" onclick="closeConfirmModal()" style="background-color: var(--danger-color);">Отмена</button>
+            </div>
         </div>
     </div>
 
@@ -666,21 +864,34 @@
                 <h2>Мини-игры</h2>
                 <p>Используйте билеты 🎟️ для игры в мини-игры</p>
                 
-                <div class="game-container">
+                <div class="games-grid">
+                    <div class="game-card">
+                        <div class="game-icon">💰</div>
+                        <div class="game-title">Кликер Монеты</div>
+                        <div class="game-description">
+                            Кликайте по монете как можно больше раз за 30 секунд!
+                            Награда: 0.5 SAMD за каждый клик
+                        </div>
+                        <div class="game-cost">1 🎟️</div>
+                        <button class="start-game-btn" onclick="openConfirmModal('coin')">
+                            Играть
+                        </button>
+                    </div>
+                </div>
+
+                <div class="game-container" id="coinGame">
                     <div class="coin-game">
                         <h3>Кликер Монеты</h3>
-                        <p>Кликайте по монете как можно больше раз за 30 секунд!</p>
-                        <p>Стоимость: 1 🎟️</p>
-                        
                         <div class="game-timer" id="gameTimer">30</div>
                         <div class="game-score" id="gameScore">Кликов: 0</div>
                         <div class="coin" id="coin">
                             💰
                         </div>
-                        
-                        <button class="start-game-btn" id="startGameBtn">
-                            Начать игру (1 🎟️)
-                        </button>
+                        <div class="game-controls">
+                            <button class="collect-game-btn" id="collectGameBtn" style="display: none;">
+                                Забрать награду
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -762,14 +973,12 @@
     <script>
         // ==================== КОНФИГУРАЦИЯ FIREBASE ====================
         const firebaseConfig = {
-            apiKey: "AIzaSyCcxotG6DNpkUxTXplC4DURNe-S02otuc4",
-    authDomain: "samdcoin-e65a5.firebaseapp.com",
-    databaseURL: "https://samdcoin-e65a5-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "samdcoin-e65a5",
-    storageBucket: "samdcoin-e65a5.firebasestorage.app",
-    messagingSenderId: "30873122562",
-    appId: "1:30873122562:web:5243417cc6ebc5abe4341b",
-    measurementId: "G-BBPFLK9DMS"
+            apiKey: "ВАШ_API_KEY",
+            authDomain: "ВАШ_PROJECT.firebaseapp.com",
+            projectId: "ВАШ_PROJECT_ID",
+            storageBucket: "ВАШ_PROJECT.appspot.com",
+            messagingSenderId: "ВАШ_SENDER_ID",
+            appId: "ВАШ_APP_ID"
         };
 
         // Инициализация Firebase
@@ -792,14 +1001,21 @@
             maxMining: 500,
             incomePerSecond: 0.1,
             lastMiningUpdate: new Date().toISOString(),
+            isMining: false,
             upgrades: [],
             nfts: []
         };
 
         let shopItems = [];
         let nftItems = [];
-        let isMining = false;
         let lastSave = Date.now();
+
+        // Мини-игры
+        let currentGame = null;
+        let gameActive = false;
+        let gameTime = 30;
+        let gameScore = 0;
+        let gameTimer;
 
         // ==================== FIREBASE ФУНКЦИИ ====================
 
@@ -814,6 +1030,9 @@
                     
                     // Расчет офлайн майнинга
                     calculateOfflineMining();
+                    
+                    // Обновляем статус майнинга при загрузке
+                    updateMiningStatus();
                 } else {
                     // Создаем нового пользователя
                     await saveUserData();
@@ -847,10 +1066,35 @@
             const now = new Date();
             const diffSeconds = (now - lastUpdate) / 1000;
             
-            if (diffSeconds > 0) {
+            if (diffSeconds > 0 && userData.isMining) {
                 const mined = diffSeconds * userData.incomePerSecond;
                 userData.currentMining = Math.min(userData.currentMining + mined, userData.maxMining);
-                showNotification(`За время отсутствия намайнено: ${mined.toFixed(1)} SAMD`);
+                if (mined > 0) {
+                    showNotification(`За время отсутствия намайнено: ${mined.toFixed(1)} SAMD`);
+                }
+            }
+        }
+
+        // Обновление статуса майнинга
+        function updateMiningStatus() {
+            const mineBtn = document.getElementById('mineBtn');
+            if (!mineBtn) return;
+
+            if (userData.isMining && userData.currentMining < userData.maxMining) {
+                // Майнинг идет
+                mineBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Майнинг...';
+                mineBtn.className = 'mine-btn mining';
+                mineBtn.disabled = true;
+            } else if (userData.currentMining >= userData.maxMining) {
+                // Можно собрать
+                mineBtn.innerHTML = '<i class="fas fa-coins"></i> Забрать SAMD';
+                mineBtn.className = 'mine-btn collect';
+                mineBtn.disabled = false;
+            } else {
+                // Можно начать майнинг
+                mineBtn.innerHTML = '<i class="fas fa-digging"></i> Майнить SAMD';
+                mineBtn.className = 'mine-btn';
+                mineBtn.disabled = false;
             }
         }
 
@@ -1061,28 +1305,17 @@
             }
         }
 
-        // ==================== ИГРОВЫЕ ФУНКЦИИ ====================
+        // ==================== МАЙНИНГ ФУНКЦИИ ====================
 
-        // Майнинг
+        // Начало майнинга
         function startMining() {
-            if (isMining) return;
+            if (userData.isMining) return;
             
-            isMining = true;
-            mineBtn.disabled = true;
-            mineBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Майнинг...';
+            userData.isMining = true;
+            updateMiningStatus();
+            saveUserData();
             
-            const mineInterval = setInterval(() => {
-                if (userData.currentMining < userData.maxMining) {
-                    userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
-                    updateMiningUI();
-                } else {
-                    clearInterval(mineInterval);
-                    isMining = false;
-                    mineBtn.disabled = false;
-                    mineBtn.innerHTML = '<i class="fas fa-digging"></i> Майнить SAMD';
-                    showNotification('Достигнут максимум майнинга!');
-                }
-            }, 1000);
+            showNotification('Майнинг начат!');
         }
 
         // Сбор майнинга
@@ -1091,6 +1324,7 @@
                 userData.samd += userData.currentMining;
                 const collected = userData.currentMining;
                 userData.currentMining = 0;
+                userData.isMining = false;
                 
                 updateUI();
                 showNotification(`Собрано: ${collected.toFixed(1)} SAMD`);
@@ -1098,27 +1332,63 @@
             }
         }
 
-        // Мини-игра: Кликер
-        let gameActive = false;
-        let gameTime = 30;
-        let gameScore = 0;
-        let gameTimer;
+        // Обработчик кнопки майнинга
+        function handleMiningClick() {
+            if (userData.currentMining >= userData.maxMining) {
+                collectMining();
+            } else if (!userData.isMining) {
+                startMining();
+            }
+        }
 
-        function startCoinGame() {
+        // ==================== МИНИ-ИГРЫ ФУНКЦИИ ====================
+
+        // Открытие подтверждения игры
+        function openConfirmModal(gameType) {
             if (userData.tickets < 1) {
                 return showNotification('Недостаточно билетов!', true);
             }
             
+            currentGame = gameType;
+            document.getElementById('remainingTickets').textContent = userData.tickets - 1;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        // Закрытие подтверждения
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            currentGame = null;
+        }
+
+        // Начало игры
+        function startGame() {
+            if (userData.tickets < 1) {
+                showNotification('Недостаточно билетов!', true);
+                return;
+            }
+            
             userData.tickets -= 1;
+            closeConfirmModal();
+            
+            if (currentGame === 'coin') {
+                startCoinGame();
+            }
+            
+            saveUserData();
+            updateUI();
+        }
+
+        // Игра: Кликер монеты
+        function startCoinGame() {
             gameActive = true;
             gameTime = 30;
             gameScore = 0;
             
-            updateUI();
-            updateGameUI();
+            // Показываем игровое поле
+            document.getElementById('coinGame').classList.add('active');
+            document.getElementById('collectGameBtn').style.display = 'none';
             
-            startGameBtn.disabled = true;
-            startGameBtn.textContent = 'Игра идет...';
+            updateGameUI();
             
             gameTimer = setInterval(() => {
                 gameTime--;
@@ -1137,6 +1407,7 @@
             updateGameUI();
             
             // Анимация клика
+            const coin = document.getElementById('coin');
             coin.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 coin.style.transform = 'scale(1.05)';
@@ -1147,15 +1418,25 @@
             gameActive = false;
             clearInterval(gameTimer);
             
+            document.getElementById('collectGameBtn').style.display = 'block';
+            showNotification(`Игра окончена! Результат: ${gameScore} кликов`);
+        }
+
+        function collectGameReward() {
             const reward = Math.floor(gameScore / 2); // 0.5 SAMD за клик
             userData.samd += reward;
             
-            startGameBtn.disabled = false;
-            startGameBtn.textContent = 'Начать игру (1 🎟️)';
+            document.getElementById('coinGame').classList.remove('active');
+            document.getElementById('collectGameBtn').style.display = 'none';
             
-            showNotification(`Игра окончена! Результат: ${gameScore} кликов. Награда: ${reward} SAMD`);
+            showNotification(`Награда: ${reward} SAMD за ${gameScore} кликов!`);
             saveUserData();
             updateUI();
+        }
+
+        function updateGameUI() {
+            document.getElementById('gameTimer').textContent = gameTime;
+            document.getElementById('gameScore').textContent = `Кликов: ${gameScore}`;
         }
 
         // ==================== UI ФУНКЦИИ ====================
@@ -1166,7 +1447,7 @@
             balanceTickets.textContent = userData.tickets;
             
             // База
-            baseTitle.textContent = `База ${USERNAME}`;
+            baseTitle.textContent = `База |${USERNAME}|`;
             currentSAMD.textContent = userData.currentMining.toFixed(1);
             maxSAMD.textContent = userData.maxMining;
             incomePerSec.textContent = userData.incomePerSecond.toFixed(1);
@@ -1183,11 +1464,16 @@
             
             if (user.photo_url) {
                 profileAvatar.src = user.photo_url;
+                userAvatar.src = user.photo_url;
             }
+            
+            // Обновляем статус майнинга
+            updateMiningStatus();
         }
 
         function updateMiningUI() {
             currentSAMD.textContent = userData.currentMining.toFixed(1);
+            updateMiningStatus();
         }
 
         function updateShopUI() {
@@ -1226,7 +1512,7 @@
                 card.className = 'nft-card';
                 card.innerHTML = `
                     <div class="nft-image">
-                        <img src="${nft.imageUrl}" alt="${nft.name}">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop'">
                     </div>
                     <div class="nft-info">
                         <div class="nft-name">${nft.name}</div>
@@ -1243,11 +1529,6 @@
                 `;
                 nftContainer.appendChild(card);
             });
-        }
-
-        function updateGameUI() {
-            gameTimer.textContent = gameTime;
-            gameScore.textContent = `Кликов: ${gameScore}`;
         }
 
         function getItemUnit(type) {
@@ -1307,6 +1588,7 @@
                     maxMining: 500,
                     incomePerSecond: 0.1,
                     lastMiningUpdate: new Date().toISOString(),
+                    isMining: false,
                     upgrades: [],
                     nfts: []
                 };
@@ -1322,29 +1604,28 @@
             document.getElementById('warningModal').style.display = 'none';
         });
 
-        document.getElementById('mineBtn').addEventListener('click', () => {
-            if (userData.currentMining >= userData.maxMining) {
-                collectMining();
-            } else {
-                startMining();
-            }
-        });
-
-        document.getElementById('startGameBtn').addEventListener('click', startCoinGame);
+        document.getElementById('mineBtn').addEventListener('click', handleMiningClick);
+        document.getElementById('confirmGameBtn').addEventListener('click', startGame);
         document.getElementById('coin').addEventListener('click', coinClick);
+        document.getElementById('collectGameBtn').addEventListener('click', collectGameReward);
 
         // Назначение обработчиков вкладок
         document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(element => {
             element.addEventListener('click', () => switchTab(element.dataset.tab));
         });
 
-        // Авто-сохранение каждые 30 секунд
+        // Авто-сохранение и майнинг
         setInterval(() => {
+            if (userData.isMining && userData.currentMining < userData.maxMining) {
+                userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
+                updateMiningUI();
+            }
+            
             if (Date.now() - lastSave > 30000) {
                 saveUserData();
                 lastSave = Date.now();
             }
-        }, 10000);
+        }, 1000);
 
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 
@@ -1353,14 +1634,6 @@
             await loadUserData();
             await loadShopItems();
             await loadNFTItems();
-            
-            // Обновление майнинга в реальном времени
-            setInterval(() => {
-                if (isMining && userData.currentMining < userData.maxMining) {
-                    userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
-                    updateMiningUI();
-                }
-            }, 1000);
         });
 
     </script>
