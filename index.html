@@ -432,46 +432,46 @@
             color: var(--text-secondary);
         }
 
-        /* Мини-игры */
-        .minigame-section {
+        /* Кейсы */
+        .cases-section {
             background-color: var(--secondary-color);
             border-radius: var(--border-radius);
             padding: 20px;
         }
 
-        .games-grid {
+        .cases-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 16px;
             margin-bottom: 20px;
         }
 
-        .game-card {
+        .case-card {
             background-color: var(--primary-color);
             border-radius: var(--border-radius);
             padding: 20px;
             text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
         }
 
-        .game-icon {
+        .case-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .case-icon {
             font-size: 48px;
             margin-bottom: 15px;
         }
 
-        .game-title {
-            font-size: 18px;
+        .case-title {
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 10px;
             color: var(--accent-color);
         }
 
-        .game-description {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .game-cost {
+        .case-cost {
             background-color: var(--secondary-color);
             padding: 8px 16px;
             border-radius: 20px;
@@ -480,129 +480,72 @@
             display: inline-block;
         }
 
-        /* Игра на весь экран */
-        .fullscreen-game {
+        .case-rewards {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        /* Анимация открытия кейса */
+        .case-opening {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: rgba(0, 0, 0, 0.9);
             z-index: 1000;
             display: none;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            flex-direction: column;
         }
 
-        .fullscreen-game.active {
+        .case-opening.active {
             display: flex;
         }
 
-        .game-header {
+        .case-reward {
+            background: var(--secondary-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
             text-align: center;
-            margin-bottom: 30px;
+            max-width: 300px;
+            width: 90%;
+            animation: pulse 2s infinite;
         }
 
-        .game-timer {
-            font-size: 48px;
+        .reward-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .reward-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reward-name {
+            font-size: 20px;
             font-weight: bold;
+            margin-bottom: 10px;
             color: var(--accent-color);
+        }
+
+        .reward-rarity {
+            font-size: 14px;
+            color: var(--text-secondary);
             margin-bottom: 20px;
         }
 
-        .game-score {
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-
-        .game-area {
-            width: 100%;
-            height: 60vh;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: var(--border-radius);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .tap-target {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: var(--primary-color);
-            transform: translate(-50%, -50%);
-            transition: all 0.1s ease;
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
-            user-select: none;
-        }
-
-        .tap-target:active {
-            transform: translate(-50%, -50%) scale(0.9);
-        }
-
-        .game-controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .start-game-btn {
-            background-color: var(--warning-color);
-            color: var(--primary-color);
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .collect-game-btn {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .confirm-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .confirm-modal.active {
-            display: flex;
-        }
-
-        .confirm-content {
-            background: var(--secondary-color);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         /* Профиль */
@@ -730,7 +673,7 @@
         }
 
         /* Модальные окна */
-        .send-modal, .sell-modal, .buy-confirm-modal {
+        .send-modal, .sell-modal, .buy-confirm-modal, .case-confirm-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -744,11 +687,11 @@
             padding: 20px;
         }
 
-        .send-modal.active, .sell-modal.active, .buy-confirm-modal.active {
+        .send-modal.active, .sell-modal.active, .buy-confirm-modal.active, .case-confirm-modal.active {
             display: flex;
         }
 
-        .send-content, .sell-content, .buy-confirm-content {
+        .send-content, .sell-content, .buy-confirm-content, .case-confirm-content {
             background: var(--secondary-color);
             padding: 25px;
             border-radius: var(--border-radius);
@@ -933,19 +876,6 @@
         </div>
     </div>
 
-    <!-- Подтверждение игры -->
-    <div class="confirm-modal" id="confirmModal">
-        <div class="confirm-content">
-            <h3>Начать игру?</h3>
-            <p>Стоимость: 1 🎟️</p>
-            <p>У вас останется: <span id="remainingTickets">0</span> 🎟️</p>
-            <div class="modal-buttons">
-                <button class="confirm-btn" id="confirmGameBtn">Играть</button>
-                <button class="cancel-btn" onclick="closeConfirmModal()">Отмена</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Подтверждение покупки NFT -->
     <div class="buy-confirm-modal" id="buyConfirmModal">
         <div class="buy-confirm-content">
@@ -957,6 +887,32 @@
                 <button class="confirm-btn" id="confirmBuyBtn">Купить</button>
                 <button class="cancel-btn" onclick="closeBuyConfirmModal()">Отмена</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Подтверждение открытия кейса -->
+    <div class="case-confirm-modal" id="caseConfirmModal">
+        <div class="case-confirm-content">
+            <h3>Открыть кейс?</h3>
+            <p id="caseConfirmName">Название кейса</p>
+            <p>Стоимость: <span id="caseConfirmCost">0</span> 🎟️</p>
+            <p>У вас останется: <span id="remainingTicketsCase">0</span> 🎟️</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmCaseBtn">Открыть</button>
+                <button class="cancel-btn" onclick="closeCaseConfirmModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Открытие кейса -->
+    <div class="case-opening" id="caseOpening">
+        <div class="case-reward">
+            <div class="reward-image">
+                <img id="rewardImage" src="" alt="Reward">
+            </div>
+            <div class="reward-name" id="rewardName">Название награды</div>
+            <div class="reward-rarity" id="rewardRarity">Редкость</div>
+            <button class="confirm-btn" onclick="closeCaseOpening()">Забрать</button>
         </div>
     </div>
 
@@ -983,23 +939,6 @@
                 <button class="confirm-btn" id="confirmSellBtn">Продать</button>
                 <button class="cancel-btn" onclick="closeSellModal()">Отмена</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Игра на весь экран -->
-    <div class="fullscreen-game" id="coinGame">
-        <div class="game-header">
-            <h2>Кликер Монеты</h2>
-            <div class="game-timer" id="gameTimer">30</div>
-            <div class="game-score" id="gameScore">Кликов: 0</div>
-        </div>
-        <div class="game-area" id="gameArea">
-            <!-- Тапы будут создаваться динамически -->
-        </div>
-        <div class="game-controls">
-            <button class="collect-game-btn" id="collectGameBtn" style="display: none;">
-                Забрать награду
-            </button>
         </div>
     </div>
 
@@ -1033,7 +972,7 @@
             <div class="nav-tab active" data-tab="base">База</div>
             <div class="nav-tab" data-tab="shop">Магазин</div>
             <div class="nav-tab" data-tab="nft">NFT Магазин</div>
-            <div class="nav-tab" data-tab="games">Мини-игры</div>
+            <div class="nav-tab" data-tab="cases">Кейсы</div>
             <div class="nav-tab" data-tab="inventory">Инвентарь</div>
             <div class="nav-tab" data-tab="profile">Профиль</div>
         </div>
@@ -1087,25 +1026,14 @@
             </div>
         </div>
 
-        <!-- Вкладка Мини-игры -->
-        <div class="tab-content" id="games-content">
-            <div class="minigame-section">
-                <h2>Мини-игры</h2>
-                <p>Используйте билеты 🎟️ для игры в мини-игры</p>
+        <!-- Вкладка Кейсы -->
+        <div class="tab-content" id="cases-content">
+            <div class="cases-section">
+                <h2>Кейсы</h2>
+                <p>Открывайте кейсы за билеты 🎟️ и получайте редкие NFT!</p>
                 
-                <div class="games-grid">
-                    <div class="game-card">
-                        <div class="game-icon">💰</div>
-                        <div class="game-title">Кликер Монеты</div>
-                        <div class="game-description">
-                            Тапайте по золотым монетам как можно больше раз за 30 секунд!
-                            Награда: 0.5 SAMD за каждый клик
-                        </div>
-                        <div class="game-cost">1 🎟️</div>
-                        <button class="start-game-btn" onclick="openConfirmModal('coin')">
-                            Играть
-                        </button>
-                    </div>
+                <div class="cases-grid" id="casesGrid">
+                    <div class="loading">Загрузка кейсов...</div>
                 </div>
             </div>
         </div>
@@ -1177,9 +1105,9 @@
                 <i class="fas fa-palette"></i>
                 <span>NFT</span>
             </div>
-            <div class="mobile-nav-item" data-tab="games">
-                <i class="fas fa-gamepad"></i>
-                <span>Игры</span>
+            <div class="mobile-nav-item" data-tab="cases">
+                <i class="fas fa-gift"></i>
+                <span>Кейсы</span>
             </div>
             <div class="mobile-nav-item" data-tab="inventory">
                 <i class="fas fa-box"></i>
@@ -1237,19 +1165,12 @@
 
         let shopItems = [];
         let nftItems = [];
+        let cases = [];
         let lastSave = Date.now();
-
-        // Мини-игры
-        let currentGame = null;
-        let gameActive = false;
-        let gameTime = 30;
-        let gameScore = 0;
-        let gameTimer;
-        let tapInterval;
 
         // Модальные окна
         let selectedNFT = null;
-        let selectedShopItem = null;
+        let selectedCase = null;
 
         // ==================== FIREBASE ФУНКЦИИ ====================
 
@@ -1370,6 +1291,25 @@
             }
         }
 
+        // Загрузка кейсов
+        async function loadCases() {
+            try {
+                const snapshot = await db.collection('cases').get();
+                cases = [];
+                
+                snapshot.forEach(doc => {
+                    cases.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                updateCasesUI();
+            } catch (error) {
+                console.error('Ошибка загрузки кейсов:', error);
+            }
+        }
+
         // Покупка товара
         async function buyShopItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
@@ -1440,9 +1380,15 @@
                 
                 // Обновляем данные пользователя
                 userData.samd -= nft.price;
+                
+                // Сохраняем полную информацию о NFT
+                const nftCopy = JSON.parse(JSON.stringify(nft));
+                delete nftCopy.currentStock;
+                delete nftCopy.globalStock;
+                
                 userData.nfts.push({
                     nftId: nftId,
-                    ...nft,
+                    ...nftCopy,
                     purchasedAt: new Date().toISOString()
                 });
                 
@@ -1459,6 +1405,68 @@
             }
         }
 
+        // Открытие кейса
+        async function openCase(caseId) {
+            const caseItem = cases.find(c => c.id === caseId);
+            if (!caseItem) return showNotification('Кейс не найден', true);
+            
+            if (userData.tickets < caseItem.cost) {
+                return showNotification('Недостаточно билетов!', true);
+            }
+            
+            try {
+                // Выбираем случайную награду из кейса
+                const rewards = caseItem.rewards || [];
+                if (rewards.length === 0) {
+                    return showNotification('В кейсе нет наград', true);
+                }
+                
+                // Взвешенный случайный выбор на основе редкости
+                const totalWeight = rewards.reduce((sum, reward) => sum + (reward.weight || 1), 0);
+                let random = Math.random() * totalWeight;
+                let selectedReward = null;
+                
+                for (const reward of rewards) {
+                    random -= (reward.weight || 1);
+                    if (random <= 0) {
+                        selectedReward = reward;
+                        break;
+                    }
+                }
+                
+                if (!selectedReward) {
+                    selectedReward = rewards[0];
+                }
+                
+                // Обновляем данные пользователя
+                userData.tickets -= caseItem.cost;
+                
+                // Добавляем NFT в инвентарь
+                userData.nfts.push({
+                    nftId: selectedReward.id || 'case_reward_' + Date.now(),
+                    name: selectedReward.name,
+                    imageUrl: selectedReward.imageUrl,
+                    rarity: selectedReward.rarity,
+                    price: selectedReward.price || 0,
+                    fromCase: caseItem.name,
+                    receivedAt: new Date().toISOString()
+                });
+                
+                await saveUserData();
+                
+                // Показываем анимацию открытия
+                showCaseReward(selectedReward);
+                
+                // Обновляем UI
+                updateUI();
+                updateInventoryUI();
+                
+            } catch (error) {
+                console.error('Ошибка открытия кейса:', error);
+                showNotification('Ошибка открытия кейса', true);
+            }
+        }
+
         // Продажа NFT
         async function sellNFT(nftId) {
             const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
@@ -1470,11 +1478,6 @@
             const sellPrice = Math.floor(nft.price * 0.7); // 70% от стоимости
             
             try {
-                // Увеличиваем глобальный запас
-                await db.collection('nftItems').doc(nftId).update({
-                    currentStock: firebase.firestore.FieldValue.increment(1)
-                });
-                
                 // Обновляем данные пользователя
                 userData.samd += sellPrice;
                 userData.nfts.splice(nftIndex, 1);
@@ -1482,7 +1485,6 @@
                 await saveUserData();
                 // Мгновенно обновляем UI
                 updateUI();
-                updateNFTUI();
                 updateInventoryUI();
                 showNotification(`NFT "${nft.name}" продано за ${sellPrice} SAMD`);
                 
@@ -1593,144 +1595,42 @@
             }
         }
 
-        // ==================== МИНИ-ИГРЫ ФУНКЦИИ ====================
+        // ==================== КЕЙСЫ ФУНКЦИИ ====================
 
-        // Открытие подтверждения игры
-        function openConfirmModal(gameType) {
-            if (userData.tickets < 1) {
+        // Открытие подтверждения кейса
+        function openCaseConfirmModal(caseId) {
+            const caseItem = cases.find(c => c.id === caseId);
+            if (!caseItem) return;
+            
+            if (userData.tickets < caseItem.cost) {
                 return showNotification('Недостаточно билетов!', true);
             }
             
-            currentGame = gameType;
-            document.getElementById('remainingTickets').textContent = userData.tickets - 1;
-            document.getElementById('confirmModal').classList.add('active');
+            selectedCase = caseItem;
+            document.getElementById('caseConfirmName').textContent = caseItem.name;
+            document.getElementById('caseConfirmCost').textContent = caseItem.cost;
+            document.getElementById('remainingTicketsCase').textContent = userData.tickets - caseItem.cost;
+            document.getElementById('caseConfirmModal').classList.add('active');
         }
 
-        // Закрытие подтверждения
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-            currentGame = null;
+        // Закрытие подтверждения кейса
+        function closeCaseConfirmModal() {
+            document.getElementById('caseConfirmModal').classList.remove('active');
+            selectedCase = null;
         }
 
-        // Начало игры
-        function startGame() {
-            if (userData.tickets < 1) {
-                showNotification('Недостаточно билетов!', true);
-                return;
-            }
-            
-            userData.tickets -= 1;
-            closeConfirmModal();
-            
-            if (currentGame === 'coin') {
-                startCoinGame();
-            }
-            
-            saveUserData();
-            updateUI();
+        // Показ награды из кейса
+        function showCaseReward(reward) {
+            document.getElementById('rewardImage').src = reward.imageUrl;
+            document.getElementById('rewardName').textContent = reward.name;
+            document.getElementById('rewardRarity').textContent = `Редкость: ${reward.rarity}`;
+            document.getElementById('caseOpening').classList.add('active');
         }
 
-        // Игра: Кликер монеты
-        function startCoinGame() {
-            gameActive = true;
-            gameTime = 30;
-            gameScore = 0;
-            
-            // Показываем игровое поле на весь экран
-            document.getElementById('coinGame').classList.add('active');
-            document.getElementById('collectGameBtn').style.display = 'none';
-            
-            updateGameUI();
-            createTapTarget();
-            
-            gameTimer = setInterval(() => {
-                gameTime--;
-                updateGameUI();
-                
-                if (gameTime <= 0) {
-                    endCoinGame();
-                }
-            }, 1000);
-            
-            // Создаем новые таргеты каждые 0.5 секунды
-            tapInterval = setInterval(createTapTarget, 500);
-        }
-
-        function createTapTarget() {
-            if (!gameActive) return;
-            
-            const gameArea = document.getElementById('gameArea');
-            const tapTarget = document.createElement('div');
-            tapTarget.className = 'tap-target';
-            tapTarget.innerHTML = '💰';
-            
-            // Случайная позиция
-            const x = Math.random() * 80 + 10; // 10-90%
-            const y = Math.random() * 80 + 10; // 10-90%
-            
-            tapTarget.style.left = x + '%';
-            tapTarget.style.top = y + '%';
-            
-            // Обработчик клика
-            tapTarget.addEventListener('click', function(e) {
-                if (!gameActive) return;
-                
-                gameScore++;
-                updateGameUI();
-                
-                // Анимация клика
-                this.style.transform = 'translate(-50%, -50%) scale(0.9)';
-                setTimeout(() => {
-                    this.style.transform = 'translate(-50%, -50%) scale(1)';
-                }, 100);
-                
-                // Удаляем через короткое время
-                setTimeout(() => {
-                    if (this.parentNode) {
-                        this.parentNode.removeChild(this);
-                    }
-                }, 150);
-                
-                e.stopPropagation();
-            });
-            
-            gameArea.appendChild(tapTarget);
-            
-            // Автоматическое удаление через 1.5 секунды
-            setTimeout(() => {
-                if (tapTarget.parentNode) {
-                    tapTarget.parentNode.removeChild(tapTarget);
-                }
-            }, 1500);
-        }
-
-        function endCoinGame() {
-            gameActive = false;
-            clearInterval(gameTimer);
-            clearInterval(tapInterval);
-            
-            // Очищаем игровое поле
-            document.getElementById('gameArea').innerHTML = '';
-            
-            document.getElementById('collectGameBtn').style.display = 'block';
-            showNotification(`Игра окончена! Результат: ${gameScore} кликов`);
-        }
-
-        function collectGameReward() {
-            const reward = Math.floor(gameScore / 2); // 0.5 SAMD за клик
-            userData.samd += reward;
-            
-            document.getElementById('coinGame').classList.remove('active');
-            document.getElementById('collectGameBtn').style.display = 'none';
-            
-            showNotification(`Награда: ${reward} SAMD за ${gameScore} кликов!`);
-            saveUserData();
-            updateUI();
-        }
-
-        function updateGameUI() {
-            document.getElementById('gameTimer').textContent = gameTime;
-            document.getElementById('gameScore').textContent = `Кликов: ${gameScore}`;
+        // Закрытие анимации кейса
+        function closeCaseOpening() {
+            document.getElementById('caseOpening').classList.remove('active');
+            closeCaseConfirmModal();
         }
 
         // ==================== NFT ФУНКЦИИ ====================
@@ -1890,6 +1790,29 @@
             });
         }
 
+        function updateCasesUI() {
+            const casesContainer = document.getElementById('casesGrid');
+            casesContainer.innerHTML = '';
+            
+            if (cases.length === 0) {
+                casesContainer.innerHTML = '<div class="empty-state">Кейсы пока не добавлены</div>';
+                return;
+            }
+            
+            cases.forEach(caseItem => {
+                const card = document.createElement('div');
+                card.className = 'case-card';
+                card.onclick = () => openCaseConfirmModal(caseItem.id);
+                card.innerHTML = `
+                    <div class="case-icon">🎁</div>
+                    <div class="case-title">${caseItem.name}</div>
+                    <div class="case-cost">${caseItem.cost} 🎟️</div>
+                    <div class="case-rewards">${caseItem.rewards ? caseItem.rewards.length : 0} возможных наград</div>
+                `;
+                casesContainer.appendChild(card);
+            });
+        }
+
         function updateInventoryUI() {
             const inventoryContainer = document.getElementById('inventoryItems');
             inventoryContainer.innerHTML = '';
@@ -1909,14 +1832,14 @@
                     </div>
                     <div class="inventory-info">
                         <div class="inventory-name">${nft.name}</div>
-                        <div class="inventory-price">Куплено за: ${nft.price} SAMD</div>
+                        <div class="inventory-price">${nft.fromCase ? 'Из кейса' : 'Куплено за: ' + nft.price + ' SAMD'}</div>
                         <div class="inventory-actions">
                             <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
                                 Отправить
                             </button>
-                            <button class="sell-nft-btn" onclick="openSellModal('${nft.nftId}')">
+                            ${!nft.fromCase ? `<button class="sell-nft-btn" onclick="openSellModal('${nft.nftId}')">
                                 Продать (${sellPrice})
-                            </button>
+                            </button>` : ''}
                         </div>
                     </div>
                 `;
@@ -1998,14 +1921,19 @@
         });
 
         document.getElementById('mineBtn').addEventListener('click', handleMiningClick);
-        document.getElementById('confirmGameBtn').addEventListener('click', startGame);
-        document.getElementById('collectGameBtn').addEventListener('click', collectGameReward);
 
         // Подтверждение покупки NFT
         document.getElementById('confirmBuyBtn').addEventListener('click', () => {
             if (selectedNFT) {
                 buyNFTItem(selectedNFT.id);
                 closeBuyConfirmModal();
+            }
+        });
+
+        // Подтверждение открытия кейса
+        document.getElementById('confirmCaseBtn').addEventListener('click', () => {
+            if (selectedCase) {
+                openCase(selectedCase.id);
             }
         });
 
@@ -2050,6 +1978,7 @@
             await loadUserData();
             await loadShopItems();
             await loadNFTItems();
+            await loadCases();
         });
 
     </script>
