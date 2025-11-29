@@ -370,7 +370,7 @@
         .nft-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
+            gap: 16px;
         }
 
         @media (max-width: 480px) {
@@ -392,7 +392,7 @@
 
         .nft-image {
             width: 100%;
-            height: 120px;
+            aspect-ratio: 1/1;
             overflow: hidden;
         }
 
@@ -480,62 +480,78 @@
             display: inline-block;
         }
 
-        .game-container {
-            background-color: var(--primary-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-top: 20px;
+        /* Игра на весь экран */
+        .fullscreen-game {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            z-index: 1000;
             display: none;
-        }
-
-        .game-container.active {
-            display: block;
-        }
-
-        .coin-game {
-            text-align: center;
-        }
-
-        .coin {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            font-size: 40px;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
-            user-select: none;
+            align-items: center;
+            padding: 20px;
         }
 
-        .coin:hover {
-            transform: scale(1.05);
+        .fullscreen-game.active {
+            display: flex;
         }
 
-        .coin:active {
-            transform: scale(0.95);
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         .game-timer {
-            font-size: 24px;
+            font-size: 48px;
             font-weight: bold;
             color: var(--accent-color);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .game-score {
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .game-area {
+            width: 100%;
+            height: 60vh;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .tap-target {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary-color);
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+            user-select: none;
+        }
+
+        .tap-target:active {
+            transform: translate(-50%, -50%) scale(0.9);
         }
 
         .game-controls {
             display: flex;
-            gap: 10px;
-            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
         }
 
         .start-game-btn {
@@ -639,7 +655,7 @@
         .inventory-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
+            gap: 16px;
         }
 
         .inventory-card {
@@ -655,7 +671,7 @@
 
         .inventory-image {
             width: 100%;
-            height: 120px;
+            aspect-ratio: 1/1;
             overflow: hidden;
         }
 
@@ -678,6 +694,12 @@
             text-overflow: ellipsis;
         }
 
+        .inventory-price {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
         .inventory-actions {
             display: flex;
             gap: 5px;
@@ -695,8 +717,20 @@
             font-size: 11px;
         }
 
-        /* Модальное окно отправки NFT */
-        .send-modal {
+        .sell-nft-btn {
+            flex: 1;
+            background-color: var(--warning-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Модальные окна */
+        .send-modal, .sell-modal, .buy-confirm-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -710,11 +744,11 @@
             padding: 20px;
         }
 
-        .send-modal.active {
+        .send-modal.active, .sell-modal.active, .buy-confirm-modal.active {
             display: flex;
         }
 
-        .send-content {
+        .send-content, .sell-content, .buy-confirm-content {
             background: var(--secondary-color);
             padding: 25px;
             border-radius: var(--border-radius);
@@ -734,13 +768,14 @@
             font-size: 16px;
         }
 
-        .send-buttons {
+        .modal-buttons {
             display: flex;
             gap: 10px;
             justify-content: center;
+            margin-top: 20px;
         }
 
-        .send-confirm-btn {
+        .confirm-btn {
             background-color: var(--success-color);
             color: white;
             border: none;
@@ -752,7 +787,7 @@
             transition: var(--transition);
         }
 
-        .send-cancel-btn {
+        .cancel-btn {
             background-color: var(--danger-color);
             color: white;
             border: none;
@@ -837,6 +872,7 @@
             text-align: center;
             padding: 40px;
             color: var(--text-secondary);
+            font-size: 16px;
         }
 
         /* Адаптивность */
@@ -903,9 +939,23 @@
             <h3>Начать игру?</h3>
             <p>Стоимость: 1 🎟️</p>
             <p>У вас останется: <span id="remainingTickets">0</span> 🎟️</p>
-            <div class="game-controls">
-                <button class="start-game-btn" id="confirmGameBtn">Играть</button>
-                <button class="buy-btn" onclick="closeConfirmModal()" style="background-color: var(--danger-color);">Отмена</button>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmGameBtn">Играть</button>
+                <button class="cancel-btn" onclick="closeConfirmModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подтверждение покупки NFT -->
+    <div class="buy-confirm-modal" id="buyConfirmModal">
+        <div class="buy-confirm-content">
+            <h3>Купить NFT?</h3>
+            <p id="buyNftName">Название NFT</p>
+            <p>Стоимость: <span id="buyNftPrice">0</span> SAMD</p>
+            <p>У вас есть: <span id="userCurrentBalance">0</span> SAMD</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmBuyBtn">Купить</button>
+                <button class="cancel-btn" onclick="closeBuyConfirmModal()">Отмена</button>
             </div>
         </div>
     </div>
@@ -916,10 +966,40 @@
             <h3>Отправить NFT</h3>
             <p id="sendNftName">Название NFT</p>
             <input type="text" class="send-input" id="sendUsername" placeholder="Введите никнейм получателя">
-            <div class="send-buttons">
-                <button class="send-confirm-btn" id="confirmSendBtn">Отправить</button>
-                <button class="send-cancel-btn" onclick="closeSendModal()">Отмена</button>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmSendBtn">Отправить</button>
+                <button class="cancel-btn" onclick="closeSendModal()">Отмена</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно продажи NFT -->
+    <div class="sell-modal" id="sellModal">
+        <div class="sell-content">
+            <h3>Продать NFT?</h3>
+            <p id="sellNftName">Название NFT</p>
+            <p>Вы получите: <span id="sellNftPrice">0</span> SAMD (70% от стоимости)</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmSellBtn">Продать</button>
+                <button class="cancel-btn" onclick="closeSellModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Игра на весь экран -->
+    <div class="fullscreen-game" id="coinGame">
+        <div class="game-header">
+            <h2>Кликер Монеты</h2>
+            <div class="game-timer" id="gameTimer">30</div>
+            <div class="game-score" id="gameScore">Кликов: 0</div>
+        </div>
+        <div class="game-area" id="gameArea">
+            <!-- Тапы будут создаваться динамически -->
+        </div>
+        <div class="game-controls">
+            <button class="collect-game-btn" id="collectGameBtn" style="display: none;">
+                Забрать награду
+            </button>
         </div>
     </div>
 
@@ -996,14 +1076,14 @@
         <!-- Вкладка Магазин -->
         <div class="tab-content" id="shop-content">
             <div class="shop-grid" id="shopItems">
-                <div class="loading">Загрузка магазина...</div>
+                <div class="empty-state">В магазине пока что ничего нет</div>
             </div>
         </div>
 
         <!-- Вкладка NFT Магазин -->
         <div class="tab-content" id="nft-content">
             <div class="nft-grid" id="nftMarketplace">
-                <div class="loading">Загрузка NFT...</div>
+                <div class="empty-state">В NFT магазине пока что ничего нет</div>
             </div>
         </div>
 
@@ -1018,29 +1098,13 @@
                         <div class="game-icon">💰</div>
                         <div class="game-title">Кликер Монеты</div>
                         <div class="game-description">
-                            Кликайте по монете как можно больше раз за 30 секунд!
+                            Тапайте по золотым монетам как можно больше раз за 30 секунд!
                             Награда: 0.5 SAMD за каждый клик
                         </div>
                         <div class="game-cost">1 🎟️</div>
                         <button class="start-game-btn" onclick="openConfirmModal('coin')">
                             Играть
                         </button>
-                    </div>
-                </div>
-
-                <div class="game-container" id="coinGame">
-                    <div class="coin-game">
-                        <h3>Кликер Монеты</h3>
-                        <div class="game-timer" id="gameTimer">30</div>
-                        <div class="game-score" id="gameScore">Кликов: 0</div>
-                        <div class="coin" id="coin">
-                            💰
-                        </div>
-                        <div class="game-controls">
-                            <button class="collect-game-btn" id="collectGameBtn" style="display: none;">
-                                Забрать награду
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1051,7 +1115,7 @@
             <div class="inventory-section">
                 <h2>Ваши NFT</h2>
                 <div class="inventory-grid" id="inventoryItems">
-                    <div class="loading">Загрузка инвентаря...</div>
+                    <div class="empty-state">У вас пока нет NFT</div>
                 </div>
             </div>
         </div>
@@ -1181,9 +1245,11 @@
         let gameTime = 30;
         let gameScore = 0;
         let gameTimer;
+        let tapInterval;
 
-        // Отправка NFT
+        // Модальные окна
         let selectedNFT = null;
+        let selectedShopItem = null;
 
         // ==================== FIREBASE ФУНКЦИИ ====================
 
@@ -1279,11 +1345,6 @@
                     });
                 });
                 
-                // Создаем товары по умолчанию только если их нет
-                if (shopItems.length === 0) {
-                    await createDefaultShopItems();
-                }
-                
                 updateShopUI();
             } catch (error) {
                 console.error('Ошибка загрузки магазина:', error);
@@ -1303,92 +1364,10 @@
                     });
                 });
                 
-                // Создаем NFT по умолчанию только если их нет
-                if (nftItems.length === 0) {
-                    await createDefaultNFTItems();
-                }
-                
                 updateNFTUI();
             } catch (error) {
                 console.error('Ошибка загрузки NFT:', error);
             }
-        }
-
-        // Создание товаров по умолчанию
-        async function createDefaultShopItems() {
-            const defaultItems = [
-                {
-                    name: "Улучшение дохода",
-                    description: "Увеличивает доход на 0.1 SAMD в секунду",
-                    type: "income",
-                    value: 0.1,
-                    price: 100,
-                    globalStock: 1000,
-                    currentStock: 1000
-                },
-                {
-                    name: "Улучшение максимума",
-                    description: "Увеличивает максимальный запас SAMD на 100",
-                    type: "max",
-                    value: 100,
-                    price: 150,
-                    globalStock: 500,
-                    currentStock: 500
-                },
-                {
-                    name: "Билеты x10",
-                    description: "10 билетов для мини-игр",
-                    type: "tickets",
-                    value: 10,
-                    price: 50,
-                    globalStock: 10000,
-                    currentStock: 10000
-                }
-            ];
-
-            for (const item of defaultItems) {
-                try {
-                    await db.collection('shopItems').add(item);
-                } catch (error) {
-                    console.error('Ошибка создания товара:', error);
-                }
-            }
-            
-            await loadShopItems();
-        }
-
-        // Создание NFT по умолчанию
-        async function createDefaultNFTItems() {
-            const defaultNFTs = [
-                {
-                    name: "Золотой майнер",
-                    description: "Редкий NFT для настоящих майнеров",
-                    imageUrl: "https://images.unsplash.com/photo-1620336655055-bd87c797d062?w=400&h=300&fit=crop",
-                    price: 1000,
-                    globalStock: 100,
-                    currentStock: 100,
-                    rarity: "rare"
-                },
-                {
-                    name: "Кибер-ферма", 
-                    description: "Футуристический NFT для продвинутых",
-                    imageUrl: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop",
-                    price: 500,
-                    globalStock: 500,
-                    currentStock: 500,
-                    rarity: "common"
-                }
-            ];
-
-            for (const nft of defaultNFTs) {
-                try {
-                    await db.collection('nftItems').add(nft);
-                } catch (error) {
-                    console.error('Ошибка создания NFT:', error);
-                }
-            }
-            
-            await loadNFTItems();
         }
 
         // Покупка товара
@@ -1429,7 +1408,9 @@
                 });
                 
                 await saveUserData();
-                await loadShopItems();
+                // Мгновенно обновляем UI
+                updateUI();
+                updateShopUI();
                 showNotification(`Куплено: ${item.name}`);
                 
             } catch (error) {
@@ -1466,12 +1447,48 @@
                 });
                 
                 await saveUserData();
-                await loadNFTItems();
+                // Мгновенно обновляем UI
+                updateUI();
+                updateNFTUI();
+                updateInventoryUI();
                 showNotification(`Куплено NFT: ${nft.name}`);
                 
             } catch (error) {
                 console.error('Ошибка покупки NFT:', error);
                 showNotification('Ошибка покупки NFT', true);
+            }
+        }
+
+        // Продажа NFT
+        async function sellNFT(nftId) {
+            const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
+            if (nftIndex === -1) {
+                return showNotification('NFT не найдено в вашем инвентаре', true);
+            }
+            
+            const nft = userData.nfts[nftIndex];
+            const sellPrice = Math.floor(nft.price * 0.7); // 70% от стоимости
+            
+            try {
+                // Увеличиваем глобальный запас
+                await db.collection('nftItems').doc(nftId).update({
+                    currentStock: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                // Обновляем данные пользователя
+                userData.samd += sellPrice;
+                userData.nfts.splice(nftIndex, 1);
+                
+                await saveUserData();
+                // Мгновенно обновляем UI
+                updateUI();
+                updateNFTUI();
+                updateInventoryUI();
+                showNotification(`NFT "${nft.name}" продано за ${sellPrice} SAMD`);
+                
+            } catch (error) {
+                console.error('Ошибка продажи NFT:', error);
+                showNotification('Ошибка продажи NFT', true);
             }
         }
 
@@ -1528,6 +1545,7 @@
                 await saveUserData();
                 
                 // Обновляем UI
+                updateUI();
                 updateInventoryUI();
                 closeSendModal();
                 
@@ -1618,11 +1636,12 @@
             gameTime = 30;
             gameScore = 0;
             
-            // Показываем игровое поле
+            // Показываем игровое поле на весь экран
             document.getElementById('coinGame').classList.add('active');
             document.getElementById('collectGameBtn').style.display = 'none';
             
             updateGameUI();
+            createTapTarget();
             
             gameTimer = setInterval(() => {
                 gameTime--;
@@ -1632,25 +1651,66 @@
                     endCoinGame();
                 }
             }, 1000);
+            
+            // Создаем новые таргеты каждые 0.5 секунды
+            tapInterval = setInterval(createTapTarget, 500);
         }
 
-        function coinClick() {
+        function createTapTarget() {
             if (!gameActive) return;
             
-            gameScore++;
-            updateGameUI();
+            const gameArea = document.getElementById('gameArea');
+            const tapTarget = document.createElement('div');
+            tapTarget.className = 'tap-target';
+            tapTarget.innerHTML = '💰';
             
-            // Анимация клика
-            const coin = document.getElementById('coin');
-            coin.style.transform = 'scale(0.95)';
+            // Случайная позиция
+            const x = Math.random() * 80 + 10; // 10-90%
+            const y = Math.random() * 80 + 10; // 10-90%
+            
+            tapTarget.style.left = x + '%';
+            tapTarget.style.top = y + '%';
+            
+            // Обработчик клика
+            tapTarget.addEventListener('click', function(e) {
+                if (!gameActive) return;
+                
+                gameScore++;
+                updateGameUI();
+                
+                // Анимация клика
+                this.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 100);
+                
+                // Удаляем через короткое время
+                setTimeout(() => {
+                    if (this.parentNode) {
+                        this.parentNode.removeChild(this);
+                    }
+                }, 150);
+                
+                e.stopPropagation();
+            });
+            
+            gameArea.appendChild(tapTarget);
+            
+            // Автоматическое удаление через 1.5 секунды
             setTimeout(() => {
-                coin.style.transform = 'scale(1.05)';
-            }, 50);
+                if (tapTarget.parentNode) {
+                    tapTarget.parentNode.removeChild(tapTarget);
+                }
+            }, 1500);
         }
 
         function endCoinGame() {
             gameActive = false;
             clearInterval(gameTimer);
+            clearInterval(tapInterval);
+            
+            // Очищаем игровое поле
+            document.getElementById('gameArea').innerHTML = '';
             
             document.getElementById('collectGameBtn').style.display = 'block';
             showNotification(`Игра окончена! Результат: ${gameScore} кликов`);
@@ -1675,6 +1735,24 @@
 
         // ==================== NFT ФУНКЦИИ ====================
 
+        // Открытие модального окна подтверждения покупки NFT
+        function openBuyConfirmModal(nftId) {
+            const nft = nftItems.find(n => n.id === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            document.getElementById('buyNftName').textContent = nft.name;
+            document.getElementById('buyNftPrice').textContent = nft.price;
+            document.getElementById('userCurrentBalance').textContent = Math.floor(userData.samd);
+            document.getElementById('buyConfirmModal').classList.add('active');
+        }
+
+        // Закрытие модального окна подтверждения покупки
+        function closeBuyConfirmModal() {
+            document.getElementById('buyConfirmModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
         // Открытие модального окна отправки NFT
         function openSendModal(nftId) {
             const nft = userData.nfts.find(n => n.nftId === nftId);
@@ -1692,43 +1770,58 @@
             selectedNFT = null;
         }
 
+        // Открытие модального окна продажи NFT
+        function openSellModal(nftId) {
+            const nft = userData.nfts.find(n => n.nftId === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            const sellPrice = Math.floor(nft.price * 0.7);
+            document.getElementById('sellNftName').textContent = nft.name;
+            document.getElementById('sellNftPrice').textContent = sellPrice;
+            document.getElementById('sellModal').classList.add('active');
+        }
+
+        // Закрытие модального окна продажи NFT
+        function closeSellModal() {
+            document.getElementById('sellModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
         // ==================== UI ФУНКЦИИ ====================
 
         function updateUI() {
             // Баланс
-            balanceSAMD.textContent = Math.floor(userData.samd);
-            balanceTickets.textContent = userData.tickets;
+            document.getElementById('balanceSAMD').textContent = Math.floor(userData.samd);
+            document.getElementById('balanceTickets').textContent = userData.tickets;
             
             // База
-            baseTitle.textContent = `База |${USERNAME}|`;
-            currentSAMD.textContent = userData.currentMining.toFixed(1);
-            maxSAMD.textContent = userData.maxMining;
-            incomePerSec.textContent = userData.incomePerSecond.toFixed(1);
-            ticketsCount.textContent = userData.tickets;
+            document.getElementById('baseTitle').textContent = `База |${USERNAME}|`;
+            document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
+            document.getElementById('maxSAMD').textContent = userData.maxMining;
+            document.getElementById('incomePerSec').textContent = userData.incomePerSecond.toFixed(1);
+            document.getElementById('ticketsCount').textContent = userData.tickets;
             
             // Профиль
-            profileName.textContent = user.first_name || USERNAME;
-            profileUsername.textContent = user.username ? `@${user.username}` : '';
-            profileSAMD.textContent = Math.floor(userData.samd);
-            profileTickets.textContent = userData.tickets;
-            profileIncome.textContent = userData.incomePerSecond.toFixed(1);
-            profileMax.textContent = userData.maxMining;
-            userId.textContent = USER_ID;
+            document.getElementById('profileName').textContent = user.first_name || USERNAME;
+            document.getElementById('profileUsername').textContent = user.username ? `@${user.username}` : '';
+            document.getElementById('profileSAMD').textContent = Math.floor(userData.samd);
+            document.getElementById('profileTickets').textContent = userData.tickets;
+            document.getElementById('profileIncome').textContent = userData.incomePerSecond.toFixed(1);
+            document.getElementById('profileMax').textContent = userData.maxMining;
+            document.getElementById('userId').textContent = USER_ID;
             
             if (user.photo_url) {
-                profileAvatar.src = user.photo_url;
-                userAvatar.src = user.photo_url;
+                document.getElementById('profileAvatar').src = user.photo_url;
+                document.getElementById('userAvatar').src = user.photo_url;
             }
             
             // Обновляем статус майнинга
             updateMiningStatus();
-            
-            // Обновляем инвентарь
-            updateInventoryUI();
         }
 
         function updateMiningUI() {
-            currentSAMD.textContent = userData.currentMining.toFixed(1);
+            document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
             updateMiningStatus();
         }
 
@@ -1737,7 +1830,7 @@
             shopContainer.innerHTML = '';
             
             if (shopItems.length === 0) {
-                shopContainer.innerHTML = '<div class="empty-state">Магазин пуст</div>';
+                shopContainer.innerHTML = '<div class="empty-state">В магазине пока что ничего нет</div>';
                 return;
             }
             
@@ -1769,7 +1862,7 @@
             nftContainer.innerHTML = '';
             
             if (nftItems.length === 0) {
-                nftContainer.innerHTML = '<div class="empty-state">NFT пока нет в продаже</div>';
+                nftContainer.innerHTML = '<div class="empty-state">В NFT магазине пока что ничего нет</div>';
                 return;
             }
             
@@ -1778,7 +1871,7 @@
                 card.className = 'nft-card';
                 card.innerHTML = `
                     <div class="nft-image">
-                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop'">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
                     </div>
                     <div class="nft-info">
                         <div class="nft-name">${nft.name}</div>
@@ -1786,7 +1879,7 @@
                             <div class="nft-current-price">${nft.price} SAMD</div>
                             <div class="nft-stock">Осталось: ${nft.currentStock}</div>
                         </div>
-                        <button class="buy-btn" onclick="buyNFTItem('${nft.id}')" 
+                        <button class="buy-btn" onclick="openBuyConfirmModal('${nft.id}')" 
                                 ${userData.samd < nft.price || nft.currentStock <= 0 ? 'disabled' : ''}>
                             ${userData.samd < nft.price ? 'Недостаточно SAMD' : 
                               nft.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
@@ -1807,17 +1900,22 @@
             }
             
             userData.nfts.forEach(nft => {
+                const sellPrice = Math.floor(nft.price * 0.7);
                 const card = document.createElement('div');
                 card.className = 'inventory-card';
                 card.innerHTML = `
                     <div class="inventory-image">
-                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop'">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
                     </div>
                     <div class="inventory-info">
                         <div class="inventory-name">${nft.name}</div>
+                        <div class="inventory-price">Куплено за: ${nft.price} SAMD</div>
                         <div class="inventory-actions">
                             <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
                                 Отправить
+                            </button>
+                            <button class="sell-nft-btn" onclick="openSellModal('${nft.nftId}')">
+                                Продать (${sellPrice})
                             </button>
                         </div>
                     </div>
@@ -1901,12 +1999,29 @@
 
         document.getElementById('mineBtn').addEventListener('click', handleMiningClick);
         document.getElementById('confirmGameBtn').addEventListener('click', startGame);
-        document.getElementById('coin').addEventListener('click', coinClick);
         document.getElementById('collectGameBtn').addEventListener('click', collectGameReward);
+
+        // Подтверждение покупки NFT
+        document.getElementById('confirmBuyBtn').addEventListener('click', () => {
+            if (selectedNFT) {
+                buyNFTItem(selectedNFT.id);
+                closeBuyConfirmModal();
+            }
+        });
+
+        // Подтверждение отправки NFT
         document.getElementById('confirmSendBtn').addEventListener('click', () => {
             const recipientUsername = document.getElementById('sendUsername').value.trim();
-            if (selectedNFT) {
+            if (selectedNFT && recipientUsername) {
                 sendNFT(selectedNFT.nftId, recipientUsername);
+            }
+        });
+
+        // Подтверждение продажи NFT
+        document.getElementById('confirmSellBtn').addEventListener('click', () => {
+            if (selectedNFT) {
+                sellNFT(selectedNFT.nftId);
+                closeSellModal();
             }
         });
 
