@@ -629,6 +629,141 @@
             text-align: center;
         }
 
+        /* Инвентарь */
+        .inventory-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .inventory-card {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .inventory-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .inventory-image {
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .inventory-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .inventory-info {
+            padding: 12px;
+        }
+
+        .inventory-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .inventory-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .send-nft-btn {
+            flex: 1;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        /* Модальное окно отправки NFT */
+        .send-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .send-modal.active {
+            display: flex;
+        }
+
+        .send-content {
+            background: var(--secondary-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .send-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--text-secondary);
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
+        .send-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .send-confirm-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .send-cancel-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
         .mobile-menu {
             display: flex;
             position: fixed;
@@ -775,6 +910,19 @@
         </div>
     </div>
 
+    <!-- Модальное окно отправки NFT -->
+    <div class="send-modal" id="sendModal">
+        <div class="send-content">
+            <h3>Отправить NFT</h3>
+            <p id="sendNftName">Название NFT</p>
+            <input type="text" class="send-input" id="sendUsername" placeholder="Введите никнейм получателя">
+            <div class="send-buttons">
+                <button class="send-confirm-btn" id="confirmSendBtn">Отправить</button>
+                <button class="send-cancel-btn" onclick="closeSendModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <header>
         <div class="container">
             <div class="header-content">
@@ -806,6 +954,7 @@
             <div class="nav-tab" data-tab="shop">Магазин</div>
             <div class="nav-tab" data-tab="nft">NFT Магазин</div>
             <div class="nav-tab" data-tab="games">Мини-игры</div>
+            <div class="nav-tab" data-tab="inventory">Инвентарь</div>
             <div class="nav-tab" data-tab="profile">Профиль</div>
         </div>
 
@@ -897,6 +1046,16 @@
             </div>
         </div>
 
+        <!-- Вкладка Инвентарь -->
+        <div class="tab-content" id="inventory-content">
+            <div class="inventory-section">
+                <h2>Ваши NFT</h2>
+                <div class="inventory-grid" id="inventoryItems">
+                    <div class="loading">Загрузка инвентаря...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Вкладка Профиль -->
         <div class="tab-content" id="profile-content">
             <div class="profile-section">
@@ -958,6 +1117,10 @@
                 <i class="fas fa-gamepad"></i>
                 <span>Игры</span>
             </div>
+            <div class="mobile-nav-item" data-tab="inventory">
+                <i class="fas fa-box"></i>
+                <span>Инвентарь</span>
+            </div>
             <div class="mobile-nav-item" data-tab="profile">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
@@ -974,13 +1137,13 @@
         // ==================== КОНФИГУРАЦИЯ FIREBASE ====================
         const firebaseConfig = {
             apiKey: "AIzaSyCcxotG6DNpkUxTXplC4DURNe-S02otuc4",
-    authDomain: "samdcoin-e65a5.firebaseapp.com",
-    databaseURL: "https://samdcoin-e65a5-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "samdcoin-e65a5",
-    storageBucket: "samdcoin-e65a5.firebasestorage.app",
-    messagingSenderId: "30873122562",
-    appId: "1:30873122562:web:5243417cc6ebc5abe4341b",
-    measurementId: "G-BBPFLK9DMS"
+            authDomain: "samdcoin-e65a5.firebaseapp.com",
+            databaseURL: "https://samdcoin-e65a5-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "samdcoin-e65a5",
+            storageBucket: "samdcoin-e65a5.firebasestorage.app",
+            messagingSenderId: "30873122562",
+            appId: "1:30873122562:web:5243417cc6ebc5abe4341b",
+            measurementId: "G-BBPFLK9DMS"
         };
 
         // Инициализация Firebase
@@ -1018,6 +1181,9 @@
         let gameTime = 30;
         let gameScore = 0;
         let gameTimer;
+
+        // Отправка NFT
+        let selectedNFT = null;
 
         // ==================== FIREBASE ФУНКЦИИ ====================
 
@@ -1113,6 +1279,7 @@
                     });
                 });
                 
+                // Создаем товары по умолчанию только если их нет
                 if (shopItems.length === 0) {
                     await createDefaultShopItems();
                 }
@@ -1136,6 +1303,7 @@
                     });
                 });
                 
+                // Создаем NFT по умолчанию только если их нет
                 if (nftItems.length === 0) {
                     await createDefaultNFTItems();
                 }
@@ -1307,6 +1475,70 @@
             }
         }
 
+        // Отправка NFT другому пользователю
+        async function sendNFT(nftId, recipientUsername) {
+            if (!recipientUsername) {
+                return showNotification('Введите никнейм получателя', true);
+            }
+            
+            // Находим NFT в инвентаре пользователя
+            const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
+            if (nftIndex === -1) {
+                return showNotification('NFT не найдено в вашем инвентаре', true);
+            }
+            
+            try {
+                // Ищем пользователя по username
+                const usersSnapshot = await db.collection('users')
+                    .where('username', '==', recipientUsername)
+                    .get();
+                
+                if (usersSnapshot.empty) {
+                    return showNotification('Пользователь с таким никнеймом не найден', true);
+                }
+                
+                const recipientDoc = usersSnapshot.docs[0];
+                const recipientId = recipientDoc.id;
+                
+                // Нельзя отправить себе
+                if (recipientId === USER_ID) {
+                    return showNotification('Нельзя отправить NFT самому себе', true);
+                }
+                
+                const recipientData = recipientDoc.data();
+                
+                // Удаляем NFT у отправителя
+                const nftToSend = userData.nfts[nftIndex];
+                userData.nfts.splice(nftIndex, 1);
+                
+                // Добавляем NFT получателю
+                const recipientNfts = recipientData.nfts || [];
+                recipientNfts.push({
+                    ...nftToSend,
+                    receivedFrom: USERNAME,
+                    receivedAt: new Date().toISOString()
+                });
+                
+                // Обновляем данные получателя
+                await db.collection('users').doc(recipientId).update({
+                    nfts: recipientNfts
+                });
+                
+                // Обновляем данные отправителя
+                await saveUserData();
+                
+                // Обновляем UI
+                updateInventoryUI();
+                closeSendModal();
+                
+                showNotification(`NFT "${nftToSend.name}" отправлено пользователю @${recipientUsername}`);
+                
+            } catch (error) {
+                console.error('Ошибка отправки NFT:', error);
+                showNotification('Ошибка отправки NFT', true);
+            }
+        }
+
         // ==================== МАЙНИНГ ФУНКЦИИ ====================
 
         // Начало майнинга
@@ -1441,6 +1673,25 @@
             document.getElementById('gameScore').textContent = `Кликов: ${gameScore}`;
         }
 
+        // ==================== NFT ФУНКЦИИ ====================
+
+        // Открытие модального окна отправки NFT
+        function openSendModal(nftId) {
+            const nft = userData.nfts.find(n => n.nftId === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            document.getElementById('sendNftName').textContent = nft.name;
+            document.getElementById('sendUsername').value = '';
+            document.getElementById('sendModal').classList.add('active');
+        }
+
+        // Закрытие модального окна отправки NFT
+        function closeSendModal() {
+            document.getElementById('sendModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
         // ==================== UI ФУНКЦИИ ====================
 
         function updateUI() {
@@ -1471,6 +1722,9 @@
             
             // Обновляем статус майнинга
             updateMiningStatus();
+            
+            // Обновляем инвентарь
+            updateInventoryUI();
         }
 
         function updateMiningUI() {
@@ -1481,6 +1735,11 @@
         function updateShopUI() {
             const shopContainer = document.getElementById('shopItems');
             shopContainer.innerHTML = '';
+            
+            if (shopItems.length === 0) {
+                shopContainer.innerHTML = '<div class="empty-state">Магазин пуст</div>';
+                return;
+            }
             
             shopItems.forEach(item => {
                 const card = document.createElement('div');
@@ -1509,6 +1768,11 @@
             const nftContainer = document.getElementById('nftMarketplace');
             nftContainer.innerHTML = '';
             
+            if (nftItems.length === 0) {
+                nftContainer.innerHTML = '<div class="empty-state">NFT пока нет в продаже</div>';
+                return;
+            }
+            
             nftItems.forEach(nft => {
                 const card = document.createElement('div');
                 card.className = 'nft-card';
@@ -1530,6 +1794,35 @@
                     </div>
                 `;
                 nftContainer.appendChild(card);
+            });
+        }
+
+        function updateInventoryUI() {
+            const inventoryContainer = document.getElementById('inventoryItems');
+            inventoryContainer.innerHTML = '';
+            
+            if (userData.nfts.length === 0) {
+                inventoryContainer.innerHTML = '<div class="empty-state">У вас пока нет NFT</div>';
+                return;
+            }
+            
+            userData.nfts.forEach(nft => {
+                const card = document.createElement('div');
+                card.className = 'inventory-card';
+                card.innerHTML = `
+                    <div class="inventory-image">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop'">
+                    </div>
+                    <div class="inventory-info">
+                        <div class="inventory-name">${nft.name}</div>
+                        <div class="inventory-actions">
+                            <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
+                                Отправить
+                            </button>
+                        </div>
+                    </div>
+                `;
+                inventoryContainer.appendChild(card);
             });
         }
 
@@ -1610,6 +1903,12 @@
         document.getElementById('confirmGameBtn').addEventListener('click', startGame);
         document.getElementById('coin').addEventListener('click', coinClick);
         document.getElementById('collectGameBtn').addEventListener('click', collectGameReward);
+        document.getElementById('confirmSendBtn').addEventListener('click', () => {
+            const recipientUsername = document.getElementById('sendUsername').value.trim();
+            if (selectedNFT) {
+                sendNFT(selectedNFT.nftId, recipientUsername);
+            }
+        });
 
         // Назначение обработчиков вкладок
         document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(element => {
