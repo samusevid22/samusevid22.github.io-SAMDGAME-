@@ -1606,8 +1606,8 @@
                 saveUserData();
             }
             
-            const botUsername = 'jfbxoiebaospxjxb_bot';
-            return `https://t.me/${botUsername}?start=ref_${userData.referralCode}`;
+            const botUsername = 'SamdGame_bot';
+            return `https://t.me/${botUsername}?startapp=ref_${userData.referralCode}`;
         }
 
         // Проверка реферальной ссылки при старте
@@ -1615,8 +1615,14 @@
             try {
                 const startParam = tg.initDataUnsafe.start_param;
                 if (!startParam || !startParam.startsWith('ref_')) {
-                    return;
-                }
+    // Также проверим параметр из initData
+    const webAppStartParam = tg.initDataUnsafe.start_param;
+    if (webAppStartParam && webAppStartParam.startsWith('ref_')) {
+        referrerCode = webAppStartParam.substring(4);
+    } else {
+        return;
+    }
+}
                 
                 const referrerCode = startParam.substring(4);
                 if (!referrerCode) {
