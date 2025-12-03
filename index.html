@@ -44,111 +44,6 @@
             padding: 0 16px;
         }
 
-        /* Стили для реферальной системы */
-        .referral-section {
-            background-color: var(--secondary-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-
-        .referral-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .referral-link-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .referral-link {
-            flex: 1;
-            padding: 12px 16px;
-            background-color: var(--primary-color);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--text-secondary);
-            color: var(--text-color);
-            font-family: monospace;
-            font-size: 14px;
-            word-break: break-all;
-        }
-
-        .copy-btn {
-            background-color: var(--accent-color);
-            color: var(--primary-color);
-            border: none;
-            padding: 12px 20px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: bold;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .copy-btn:hover {
-            background-color: var(--success-color);
-        }
-
-        .referral-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .referral-stat {
-            background-color: var(--primary-color);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            text-align: center;
-        }
-
-        .referral-stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin-bottom: 5px;
-        }
-
-        .referral-stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .referral-rewards {
-            background-color: var(--primary-color);
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-top: 20px;
-        }
-
-        .referral-reward-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .referral-reward-item:last-child {
-            border-bottom: none;
-        }
-
-        .referral-reward-text {
-            color: var(--text-secondary);
-        }
-
-        .referral-reward-value {
-            font-weight: bold;
-            color: var(--success-color);
-        }
-
         /* Модальные окна */
         .warning-modal, .confirmation-modal, .promocode-modal {
             position: fixed;
@@ -276,6 +171,84 @@
             margin-top: 10px;
             font-size: 12px;
             color: var(--text-secondary);
+        }
+
+        /* Остальные стили остаются без изменений */
+        .warning-modal {
+            z-index: 10003;
+        }
+
+        .warning-content {
+            max-width: 500px;
+        }
+
+        .buy-confirm-modal, .case-confirm-modal, .send-modal, .sell-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .buy-confirm-modal.active, .case-confirm-modal.active, .send-modal.active, .sell-modal.active {
+            display: flex;
+        }
+
+        .buy-confirm-content, .case-confirm-content, .send-content, .sell-content {
+            background: var(--secondary-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .send-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--text-secondary);
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .confirm-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cancel-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
         header {
@@ -662,7 +635,6 @@
         .case-icon {
             font-size: 48px;
             margin-bottom: 15px;
-            color: var(--accent-color);
         }
 
         .case-title {
@@ -679,34 +651,83 @@
             font-weight: bold;
             margin-bottom: 15px;
             display: inline-block;
-            color: var(--warning-color);
         }
 
         .case-rewards {
             font-size: 12px;
             color: var(--text-secondary);
             margin-bottom: 15px;
-            min-height: 40px;
         }
 
-        .case-open-btn {
-            background: linear-gradient(135deg, var(--accent-color), #0099cc);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
+        /* Анимация открытия кейса */
+        .case-opening {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
 
-        .case-open-btn:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
+        .case-opening.active {
+            display: flex;
         }
 
-        /* Профиль с рефералами */
+        .case-reward {
+            background: var(--secondary-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+            animation: pulse 2s infinite;
+        }
+
+        .reward-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .reward-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .reward-image img[src*=".gif"] {
+            image-rendering: pixelated;
+        }
+
+        .reward-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .reward-rarity {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Профиль с промокодами */
         .profile-section {
             background-color: var(--secondary-color);
             border-radius: var(--border-radius);
@@ -746,88 +767,11 @@
             text-align: center;
         }
 
-        .profile-referral-section {
+        .profile-promocode-section {
             background-color: var(--primary-color);
             border-radius: var(--border-radius);
             padding: 20px;
             margin-top: 20px;
-        }
-
-        .referral-share-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .share-btn {
-            flex: 1;
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            border: none;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-width: 120px;
-        }
-
-        .share-telegram {
-            background-color: #0088cc;
-        }
-
-        .share-whatsapp {
-            background-color: #25D366;
-        }
-
-        .share-copy {
-            background-color: var(--accent-color);
-        }
-
-        .referral-history {
-            margin-top: 20px;
-        }
-
-        .referral-history h4 {
-            margin-bottom: 10px;
-            color: var(--accent-color);
-        }
-
-        .referral-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .referral-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 10px;
-            background-color: var(--secondary-color);
-            border-radius: var(--border-radius);
-            margin-bottom: 5px;
-        }
-
-        .referral-user {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .referral-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .referral-date {
-            font-size: 11px;
-            color: var(--text-secondary);
         }
 
         .promocode-input-container {
@@ -1133,19 +1077,11 @@
                 align-items: flex-start;
             }
             
-            .referral-link-container {
+            .promocode-input-container {
                 flex-direction: column;
             }
             
-            .copy-btn {
-                width: 100%;
-            }
-            
-            .referral-share-buttons {
-                flex-direction: column;
-            }
-            
-            .share-btn {
+            .promocode-activate-btn {
                 width: 100%;
             }
         }
@@ -1233,6 +1169,72 @@
         </div>
     </div>
 
+    <!-- Подтверждение покупки NFT -->
+    <div class="buy-confirm-modal" id="buyConfirmModal">
+        <div class="buy-confirm-content">
+            <h3>Купить NFT?</h3>
+            <p id="buyNftName">Название NFT</p>
+            <p>Стоимость: <span id="buyNftPrice">0</span> SAMD</p>
+            <p>У вас есть: <span id="userCurrentBalance">0</span> SAMD</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmBuyBtn">Купить</button>
+                <button class="cancel-btn" onclick="closeBuyConfirmModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подтверждение открытия кейса -->
+    <div class="case-confirm-modal" id="caseConfirmModal">
+        <div class="case-confirm-content">
+            <h3>Открыть кейс?</h3>
+            <p id="caseConfirmName">Название кейса</p>
+            <p>Стоимость: <span id="caseConfirmCost">0</span> 🎟️</p>
+            <p>У вас останется: <span id="remainingTicketsCase">0</span> 🎟️</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmCaseBtn">Открыть</button>
+                <button class="cancel-btn" onclick="closeCaseConfirmModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Открытие кейса -->
+    <div class="case-opening" id="caseOpening">
+        <div class="case-reward">
+            <div class="reward-image">
+                <img id="rewardImage" src="" alt="Reward">
+            </div>
+            <div class="reward-name" id="rewardName">Название награды</div>
+            <div class="reward-rarity" id="rewardRarity">Редкость</div>
+            <button class="confirm-btn" onclick="closeCaseOpening()">Забрать</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно отправки NFT -->
+    <div class="send-modal" id="sendModal">
+        <div class="send-content">
+            <h3>Отправить NFT</h3>
+            <p id="sendNftName">Название NFT</p>
+            <input type="text" class="send-input" id="sendUsername" placeholder="Введите никнейм получателя">
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmSendBtn">Отправить</button>
+                <button class="cancel-btn" onclick="closeSendModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно продажи NFT -->
+    <div class="sell-modal" id="sellModal">
+        <div class="sell-content">
+            <h3>Продать NFT?</h3>
+            <p id="sellNftName">Название NFT</p>
+            <p>Вы получите: <span id="sellNftPrice">0</span> SAMD (70% от стоимости)</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmSellBtn">Продать</button>
+                <button class="cancel-btn" onclick="closeSellModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
     <header>
         <div class="container">
             <div class="header-content">
@@ -1265,7 +1267,6 @@
             <div class="nav-tab" data-tab="nft">NFT Магазин</div>
             <div class="nav-tab" data-tab="cases">Кейсы</div>
             <div class="nav-tab" data-tab="inventory">Инвентарь</div>
-            <div class="nav-tab" data-tab="referral">Рефералы</div>
             <div class="nav-tab" data-tab="profile">Профиль</div>
         </div>
 
@@ -1307,14 +1308,14 @@
         <!-- Вкладка Магазин -->
         <div class="tab-content" id="shop-content">
             <div class="shop-grid" id="shopItems">
-                <div class="loading">Загрузка магазина...</div>
+                <div class="empty-state">В магазине пока что ничего нет</div>
             </div>
         </div>
 
         <!-- Вкладка NFT Магазин -->
         <div class="tab-content" id="nft-content">
             <div class="nft-grid" id="nftMarketplace">
-                <div class="loading">Загрузка NFT магазина...</div>
+                <div class="empty-state">В NFT магазине пока что ничего нет</div>
             </div>
         </div>
 
@@ -1349,66 +1350,7 @@
             </div>
         </div>
 
-        <!-- Вкладка Рефералы -->
-        <div class="tab-content" id="referral-content">
-            <div class="referral-section">
-                <h2 class="referral-title">
-                    <i class="fas fa-users"></i>
-                    Реферальная система
-                </h2>
-                <p style="color: var(--text-secondary); margin-bottom: 15px;">
-                    Приглашайте друзей и получайте 50 🎟️ за каждого приглашенного!
-                </p>
-
-                <div class="referral-link-container">
-                    <input type="text" readonly class="referral-link" id="referralLink">
-                    <button class="copy-btn" onclick="copyReferralLink()">
-                        <i class="fas fa-copy"></i> Копировать
-                    </button>
-                </div>
-
-                <div class="referral-stats">
-                    <div class="referral-stat">
-                        <div class="referral-stat-value" id="referralCount">0</div>
-                        <div class="referral-stat-label">Приглашено друзей</div>
-                    </div>
-                    <div class="referral-stat">
-                        <div class="referral-stat-value" id="referralEarned">0</div>
-                        <div class="referral-stat-label">Заработано 🎟️</div>
-                    </div>
-                    <div class="referral-stat">
-                        <div class="referral-stat-value" id="referralReward">50</div>
-                        <div class="referral-stat-label">За каждого друга</div>
-                    </div>
-                </div>
-
-                <div class="referral-rewards">
-                    <h3 style="margin-bottom: 15px; color: var(--accent-color);">Как это работает:</h3>
-                    <div class="referral-reward-item">
-                        <span class="referral-reward-text">1. Делитесь своей реферальной ссылкой</span>
-                        <span class="referral-reward-value">🎁</span>
-                    </div>
-                    <div class="referral-reward-item">
-                        <span class="referral-reward-text">2. Друг переходит по ссылке и запускает бота</span>
-                        <span class="referral-reward-value">🚀</span>
-                    </div>
-                    <div class="referral-reward-item">
-                        <span class="referral-reward-text">3. Вы получаете награду</span>
-                        <span class="referral-reward-value">+50 🎟️</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- История рефералов -->
-            <div class="referral-history" id="referralHistorySection" style="display: none;">
-                <h4>Приглашенные друзья:</h4>
-                <div class="referral-list" id="referralList">
-                    <!-- Список рефералов будет загружен динамически -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Вкладка Профиль -->
+        <!-- Вкладка Профиль с промокодами -->
         <div class="tab-content" id="profile-content">
             <div class="profile-section">
                 <div class="profile-header">
@@ -1438,36 +1380,6 @@
                     </div>
                 </div>
 
-                <!-- Секция рефералов в профиле -->
-                <div class="profile-referral-section">
-                    <h3>Реферальная система</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 10px;">
-                        Приглашено друзей: <strong id="profileReferralCount">0</strong>
-                    </p>
-                    <p style="color: var(--text-secondary); margin-bottom: 15px;">
-                        Заработано билетов: <strong id="profileReferralEarned">0</strong> 🎟️
-                    </p>
-                    
-                    <div class="referral-link-container" style="margin-bottom: 15px;">
-                        <input type="text" readonly class="referral-link" id="profileReferralLink">
-                        <button class="copy-btn" onclick="copyProfileReferralLink()">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-
-                    <div class="referral-share-buttons">
-                        <button class="share-btn share-telegram" onclick="shareToTelegram()">
-                            <i class="fab fa-telegram"></i> Telegram
-                        </button>
-                        <button class="share-btn share-whatsapp" onclick="shareToWhatsApp()">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
-                        </button>
-                        <button class="share-btn share-copy" onclick="copyReferralLink()">
-                            <i class="fas fa-link"></i> Ссылка
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Секция промокодов -->
                 <div class="profile-promocode-section">
                     <h3>Промокоды</h3>
@@ -1483,6 +1395,7 @@
                         </button>
                     </div>
                     
+                    <!-- Список активированных промокодов -->
                     <div class="activated-promocodes" id="activatedPromocodes" style="display: none;">
                         <h4>Активированные промокоды:</h4>
                         <div class="promocode-list" id="promocodeList">
@@ -1525,10 +1438,6 @@
             <div class="mobile-nav-item" data-tab="inventory">
                 <i class="fas fa-box"></i>
                 <span>Инвентарь</span>
-            </div>
-            <div class="mobile-nav-item" data-tab="referral">
-                <i class="fas fa-users"></i>
-                <span>Рефералы</span>
             </div>
             <div class="mobile-nav-item" data-tab="profile">
                 <i class="fas fa-user"></i>
@@ -1578,265 +1487,33 @@
             isMining: false,
             upgrades: [],
             nfts: [],
-            activatedPromocodes: [],
-            referralCode: null,
-            referrals: [],
-            referralCount: 0,
-            referralEarned: 0,
-            referredBy: null
+            activatedPromocodes: [] // Новое поле для активированных промокодов
         };
 
         let shopItems = [];
         let nftItems = [];
         let cases = [];
-        let promocodes = [];
+        let promocodes = []; // Коллекция промокодов
         let lastSave = Date.now();
         let currentInventoryFilter = 'all';
+
+        // Модальные окна
+        let selectedNFT = null;
+        let selectedCase = null;
         
         // Realtime listeners
         let userListener = null;
         let shopListener = null;
         let nftListener = null;
         let casesListener = null;
-        let promocodesListener = null;
+        let promocodesListener = null; // Слушатель для промокодов
 
         // Подтверждение действий
         let pendingAction = null;
         let pendingActionData = null;
 
-        // ==================== РЕФЕРАЛЬНАЯ СИСТЕМА ====================
-
-        // Генерация реферального кода
-        function generateReferralCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
-
-        // Получение реферальной ссылки - ИСПРАВЛЕННЫЙ КОД
-        function getReferralLink() {
-            if (!userData.referralCode) {
-                userData.referralCode = generateReferralCode();
-                saveUserData();
-            }
-            
-            // Правильный формат для запуска приложения
-            const botUsername = 'SamdGame_bot'; // Убедитесь, что это правильное имя вашего бота
-            return `https://t.me/${botUsername}?startapp=ref_${userData.referralCode}`;
-        }
-
-        // Проверка реферальной ссылки при старте - ИСПРАВЛЕННЫЙ КОД
-        async function checkReferralOnStart() {
-            try {
-                const startParam = tg.initDataUnsafe.start_param;
-                let referrerCode = null;
-                
-                // Проверяем startapp параметр
-                if (startParam && startParam.startsWith('ref_')) {
-                    referrerCode = startParam.substring(4);
-                }
-                
-                if (!referrerCode) {
-                    return;
-                }
-                
-                // Проверяем, не является ли это сам пользователь
-                if (referrerCode === userData.referralCode) {
-                    return;
-                }
-                
-                // Проверяем, не был ли уже приглашен этот пользователь
-                const userDoc = await db.collection('users').doc(USER_ID).get();
-                if (userDoc.exists) {
-                    const existingUser = userDoc.data();
-                    if (existingUser.referredBy) {
-                        return;
-                    }
-                }
-                
-                // Ищем реферера по коду
-                const referrersSnapshot = await db.collection('users')
-                    .where('referralCode', '==', referrerCode)
-                    .get();
-                
-                if (referrersSnapshot.empty) {
-                    return;
-                }
-                
-                const referrerDoc = referrersSnapshot.docs[0];
-                const referrerId = referrerDoc.id;
-                
-                // Проверяем, не приглашает ли пользователь сам себя
-                if (referrerId === USER_ID) {
-                    return;
-                }
-                
-                // Обновляем данные приглашенного пользователя
-                await db.collection('users').doc(USER_ID).update({
-                    referredBy: referrerId,
-                    referralJoinedAt: new Date().toISOString()
-                });
-                
-                // Обновляем данные реферера
-                await db.runTransaction(async (transaction) => {
-                    const referrerRef = db.collection('users').doc(referrerId);
-                    const referrerSnapshot = await transaction.get(referrerRef);
-                    
-                    if (!referrerSnapshot.exists) {
-                        return;
-                    }
-                    
-                    const referrerData = referrerSnapshot.data();
-                    const referrals = referrerData.referrals || [];
-                    
-                    // Проверяем, не был ли уже приглашен этот пользователь
-                    if (referrals.includes(USER_ID)) {
-                        return;
-                    }
-                    
-                    // Добавляем пользователя в список рефералов
-                    referrals.push(USER_ID);
-                    
-                    // Начисляем награду рефереру
-                    const referralReward = 50;
-                    
-                    transaction.update(referrerRef, {
-                        referrals: referrals,
-                        referralCount: referrals.length,
-                        referralEarned: (referrerData.referralEarned || 0) + referralReward,
-                        tickets: firebase.firestore.FieldValue.increment(referralReward)
-                    });
-                });
-                
-                // Обновляем локальные данные пользователя
-                userData.referredBy = referrerId;
-                userData.tickets += 50;
-                
-                console.log(`Пользователь ${USER_ID} присоединился по реферальной ссылке от ${referrerId}`);
-                showNotification('🎉 Вы присоединились по реферальной ссылке! Получено 50 🎟️!');
-                
-            } catch (error) {
-                console.error('Ошибка обработки реферальной ссылки:', error);
-            }
-        }
-
-        // Загрузка данных рефералов
-        async function loadReferralsData() {
-            try {
-                const referrals = userData.referrals || [];
-                
-                if (referrals.length > 0) {
-                    const referralsData = [];
-                    
-                    for (const referralId of referrals.slice(-10)) {
-                        try {
-                            const referralDoc = await db.collection('users').doc(referralId).get();
-                            if (referralDoc.exists) {
-                                const data = referralDoc.data();
-                                referralsData.push({
-                                    id: referralId,
-                                    username: data.username || `user_${referralId.substring(0, 6)}`,
-                                    photo_url: data.telegramData?.photo_url,
-                                    joinedAt: data.referralJoinedAt || data.lastActive
-                                });
-                            }
-                        } catch (error) {
-                            console.error('Ошибка загрузки реферала:', error);
-                        }
-                    }
-                    
-                    updateReferralHistoryUI(referralsData);
-                }
-                
-                updateReferralUI();
-                
-            } catch (error) {
-                console.error('Ошибка загрузки данных рефералов:', error);
-            }
-        }
-
-        // Обновление UI реферальной системы
-        function updateReferralUI() {
-            document.getElementById('referralCount').textContent = userData.referralCount || 0;
-            document.getElementById('referralEarned').textContent = userData.referralEarned || 0;
-            document.getElementById('referralLink').value = getReferralLink();
-            
-            document.getElementById('profileReferralCount').textContent = userData.referralCount || 0;
-            document.getElementById('profileReferralEarned').textContent = userData.referralEarned || 0;
-            document.getElementById('profileReferralLink').value = getReferralLink();
-            
-            // Показываем/скрываем историю рефералов
-            const historySection = document.getElementById('referralHistorySection');
-            if (userData.referrals && userData.referrals.length > 0) {
-                historySection.style.display = 'block';
-            } else {
-                historySection.style.display = 'none';
-            }
-        }
-
-        // Обновление истории рефералов
-        function updateReferralHistoryUI(referralsData) {
-            const referralList = document.getElementById('referralList');
-            referralList.innerHTML = '';
-            
-            referralsData.forEach(ref => {
-                const referralItem = document.createElement('div');
-                referralItem.className = 'referral-item';
-                
-                const date = ref.joinedAt ? new Date(ref.joinedAt).toLocaleDateString('ru-RU') : 'Неизвестно';
-                
-                referralItem.innerHTML = `
-                    <div class="referral-user">
-                        ${ref.photo_url ? `<img src="${ref.photo_url}" alt="Avatar" class="referral-avatar">` : ''}
-                        <span>${ref.username}</span>
-                    </div>
-                    <div class="referral-date">${date}</div>
-                `;
-                
-                referralList.appendChild(referralItem);
-            });
-        }
-
-        // Копирование реферальной ссылки
-        function copyReferralLink() {
-            const link = getReferralLink();
-            navigator.clipboard.writeText(link).then(() => {
-                showNotification('Реферальная ссылка скопирована!');
-            }).catch(err => {
-                const textArea = document.createElement('textarea');
-                textArea.value = link;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showNotification('Реферальная ссылка скопирована!');
-            });
-        }
-
-        function copyProfileReferralLink() {
-            copyReferralLink();
-        }
-
-        // Поделиться в Telegram
-        function shareToTelegram() {
-            const link = getReferralLink();
-            const text = `🎮 Присоединяйся к SAMDCOIN - увлекательной майнинг игре в Telegram!\n\n🔥 Майни SAMD, собирай NFT, открывай кейсы\n🎁 Получи бонус при регистрации по моей ссылке\n\n${link}`;
-            
-            const url = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        }
-
-        // Поделиться в WhatsApp
-        function shareToWhatsApp() {
-            const link = getReferralLink();
-            const text = `🎮 Присоединяйся к SAMDCOIN - увлекательной майнинг игре в Telegram!\n\n${link}`;
-            
-            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        }
+        // Промокоды
+        let currentPromocodeCheck = null;
 
         // ==================== FIREBASE REALTIME FUNCTIONS ====================
 
@@ -1858,18 +1535,14 @@
                         if (data.nfts) userData.nfts = data.nfts;
                         if (data.upgrades) userData.upgrades = data.upgrades;
                         if (data.activatedPromocodes) userData.activatedPromocodes = data.activatedPromocodes;
-                        if (data.referralCode) userData.referralCode = data.referralCode;
-                        if (data.referrals) userData.referrals = data.referrals;
-                        if (data.referralCount !== undefined) userData.referralCount = data.referralCount;
-                        if (data.referralEarned !== undefined) userData.referralEarned = data.referralEarned;
-                        if (data.referredBy !== undefined) userData.referredBy = data.referredBy;
                         
                         updateUI();
-                        updateReferralUI();
-                        
-                        if (data.referrals && data.referrals.length > 0) {
-                            loadReferralsData();
+                        // Обновляем инвентарь если он открыт
+                        if (document.getElementById('inventory-content').classList.contains('active')) {
+                            updateInventoryUI();
                         }
+                        // Обновляем список активированных промокодов
+                        updateActivatedPromocodesUI();
                     }
                 }, (error) => {
                     console.error('Ошибка слушателя пользователя:', error);
@@ -1935,6 +1608,7 @@
                             ...doc.data()
                         });
                     });
+                    console.log('Промокоды обновлены:', promocodes.length);
                 }, (error) => {
                     console.error('Ошибка слушателя промокодов:', error);
                 });
@@ -1958,33 +1632,15 @@
                 if (doc.exists) {
                     const data = doc.data();
                     userData = { ...userData, ...data };
-                    
-                    // Генерируем реферальный код если его нет
-                    if (!userData.referralCode) {
-                        userData.referralCode = generateReferralCode();
-                    }
-                    
                     calculateOfflineMining();
                     updateMiningStatus();
-                    
-                    // Проверяем реферальную ссылку
-                    await checkReferralOnStart();
-                    
-                    await saveUserData();
-                    
                 } else {
                     console.log('Создание нового пользователя');
-                    userData.referralCode = generateReferralCode();
                     await saveUserData();
-                    
-                    await checkReferralOnStart();
                 }
                 
                 updateUI();
-                updateReferralUI();
-                updateActivatedPromocodesUI();
                 setupRealtimeListeners();
-                
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
             }
@@ -2020,6 +1676,7 @@
             const cleanCode = code.trim().toUpperCase();
             
             try {
+                // Ищем промокод в базе
                 const promocodesSnapshot = await db.collection('promocodes')
                     .where('code', '==', cleanCode)
                     .where('isActive', '==', true)
@@ -2035,6 +1692,7 @@
                     ...promocodeDoc.data()
                 };
                 
+                // Проверяем дату истечения
                 if (promocode.expiresAt) {
                     const expiresDate = new Date(promocode.expiresAt);
                     const now = new Date();
@@ -2043,10 +1701,12 @@
                     }
                 }
                 
+                // Проверяем количество активаций
                 if (promocode.maxActivations > 0 && promocode.currentActivations >= promocode.maxActivations) {
                     return { success: false, message: 'Лимит активаций промокода исчерпан' };
                 }
                 
+                // Проверяем, активировал ли пользователь уже этот промокод
                 const userDoc = await db.collection('users').doc(USER_ID).get();
                 if (userDoc.exists) {
                     const userData = userDoc.data();
@@ -2054,6 +1714,11 @@
                     if (activatedPromocodes.includes(promocode.id)) {
                         return { success: false, message: 'Вы уже активировали этот промокод' };
                     }
+                }
+                
+                // Проверяем минимальный уровень если указан
+                if (promocode.minLevel && userData.level < promocode.minLevel) {
+                    return { success: false, message: `Для активации нужен уровень ${promocode.minLevel}+` };
                 }
                 
                 return { 
@@ -2079,10 +1744,12 @@
             const promocode = checkResult.promocode;
             
             try {
+                // Используем транзакцию для атомарной активации
                 const promocodeRef = db.collection('promocodes').doc(promocode.id);
                 const userRef = db.collection('users').doc(USER_ID);
                 
                 const result = await db.runTransaction(async (transaction) => {
+                    // Получаем актуальные данные
                     const promocodeSnapshot = await transaction.get(promocodeRef);
                     const userSnapshot = await transaction.get(userRef);
                     
@@ -2093,6 +1760,7 @@
                     const promocodeData = promocodeSnapshot.data();
                     const userDataInTrans = userSnapshot.data();
                     
+                    // Повторяем проверки в транзакции
                     if (!promocodeData.isActive) {
                         throw new Error("Промокод неактивен");
                     }
@@ -2107,16 +1775,19 @@
                         throw new Error("Промокод уже активирован");
                     }
                     
+                    // Обновляем промокод
                     transaction.update(promocodeRef, {
                         currentActivations: firebase.firestore.FieldValue.increment(1),
                         lastActivatedAt: new Date().toISOString(),
                         activatedBy: firebase.firestore.FieldValue.arrayUnion(USER_ID)
                     });
                     
+                    // Награждаем пользователя
                     let updates = {
                         activatedPromocodes: [...activatedPromocodes, promocode.id]
                     };
                     
+                    // Применяем награды
                     if (promocodeData.rewards) {
                         const rewards = promocodeData.rewards;
                         
@@ -2141,6 +1812,7 @@
                         }
                     }
                     
+                    // Обновляем пользователя
                     transaction.update(userRef, updates);
                     
                     return {
@@ -2150,7 +1822,7 @@
                     };
                 });
                 
-                // Обновляем локальные данные
+                // Локальное обновление
                 if (result.rewards.samd) {
                     userData.samd += result.rewards.samd;
                 }
@@ -2174,7 +1846,6 @@
                 
                 updateUI();
                 updateActivatedPromocodesUI();
-                updateInventoryUI();
                 
                 return {
                     success: true,
@@ -2191,6 +1862,63 @@
             }
         }
 
+        // Показать информацию о промокоде
+        async function showPromocodeInfo(code) {
+            const checkResult = await checkPromocode(code);
+            
+            if (!checkResult.success) {
+                return checkResult;
+            }
+            
+            const promocode = checkResult.promocode;
+            
+            // Показываем информацию в модальном окне
+            document.getElementById('promocodeModalTitle').textContent = promocode.name || promocode.code;
+            document.getElementById('promocodeModalText').textContent = promocode.description || 'Введите промокод для получения награды';
+            
+            // Показываем награды
+            const rewardsList = document.getElementById('promocodeRewardsList');
+            const rewardsContainer = document.getElementById('promocodeRewards');
+            const remainingEl = document.getElementById('promocodeRemaining');
+            const expiresEl = document.getElementById('promocodeExpires');
+            
+            if (promocode.rewards) {
+                let rewardsText = '';
+                if (promocode.rewards.samd) {
+                    rewardsText += `${promocode.rewards.samd} SAMD `;
+                }
+                if (promocode.rewards.tickets) {
+                    rewardsText += `${promocode.rewards.tickets} 🎟️ `;
+                }
+                if (promocode.rewards.nft) {
+                    rewardsText += `NFT "${promocode.rewards.nft.name}" `;
+                }
+                
+                rewardsList.textContent = rewardsText || 'Секретная награда';
+                rewardsContainer.style.display = 'block';
+            } else {
+                rewardsContainer.style.display = 'none';
+            }
+            
+            // Показываем статистику
+            if (promocode.maxActivations > 0) {
+                const remaining = promocode.maxActivations - promocode.currentActivations;
+                remainingEl.textContent = remaining;
+            } else {
+                remainingEl.textContent = '∞';
+            }
+            
+            if (promocode.expiresAt) {
+                const expiresDate = new Date(promocode.expiresAt);
+                expiresEl.textContent = expiresDate.toLocaleDateString('ru-RU');
+            } else {
+                expiresEl.textContent = '∞';
+            }
+            
+            currentPromocodeCheck = promocode;
+            return { success: true, promocode: promocode };
+        }
+
         // Обновление UI активированных промокодов
         function updateActivatedPromocodesUI() {
             const container = document.getElementById('activatedPromocodes');
@@ -2204,6 +1932,7 @@
             container.style.display = 'block';
             list.innerHTML = '';
             
+            // Показываем только последние 10 промокодов
             const recentPromocodes = userData.activatedPromocodes.slice(-10);
             
             recentPromocodes.forEach(promoId => {
@@ -2216,6 +1945,22 @@
                 badge.title = `Промокод ID: ${promoId}`;
                 list.appendChild(badge);
             });
+        }
+
+        // Открытие модального окна промокода
+        function openPromocodeModal() {
+            document.getElementById('promocodeModal').style.display = 'flex';
+            document.getElementById('promocodeInput').value = '';
+            document.getElementById('promocodeInput').focus();
+            document.getElementById('promocodeRewards').style.display = 'none';
+            document.getElementById('promocodeModalTitle').textContent = 'Активация промокода';
+            document.getElementById('promocodeModalText').textContent = 'Введите промокод для получения награды';
+        }
+
+        // Закрытие модального окна промокода
+        function closePromocodeModal() {
+            document.getElementById('promocodeModal').style.display = 'none';
+            currentPromocodeCheck = null;
         }
 
         // ==================== СИСТЕМА ПОДТВЕРЖДЕНИЙ ====================
@@ -2247,7 +1992,299 @@
             pendingActionData = null;
         }
 
-        // ==================== МАЙНИНГ ФУНКЦИИ ====================
+        // ==================== ОБНОВЛЕННЫЕ ФУНКЦИИ ПОКУПКИ ====================
+
+        async function buyShopItem(itemId) {
+            const item = shopItems.find(i => i.id === itemId);
+            if (!item) {
+                showNotification('Товар не найден', true);
+                return;
+            }
+            
+            try {
+                const itemDoc = await db.collection('shopItems').doc(itemId).get();
+                if (!itemDoc.exists) {
+                    showNotification('Товар больше не существует', true);
+                    return;
+                }
+                
+                const actualItem = itemDoc.data();
+                const userDoc = await db.collection('users').doc(USER_ID).get();
+                const actualUserData = userDoc.exists ? userDoc.data() : null;
+                
+                if (actualUserData && actualUserData.samd < item.price) {
+                    showNotification('Недостаточно SAMD', true);
+                    return;
+                }
+                
+                if (actualItem.currentStock <= 0) {
+                    showNotification('Товар закончился', true);
+                    updateShopUI();
+                    return;
+                }
+                
+                await db.collection('shopItems').doc(itemId).update({
+                    currentStock: firebase.firestore.FieldValue.increment(-1)
+                });
+                
+                await db.collection('users').doc(USER_ID).update({
+                    samd: firebase.firestore.FieldValue.increment(-item.price)
+                });
+                
+                if (item.type === 'income') {
+                    await db.collection('users').doc(USER_ID).update({
+                        incomePerSecond: firebase.firestore.FieldValue.increment(item.value)
+                    });
+                    userData.incomePerSecond += item.value;
+                } else if (item.type === 'max') {
+                    await db.collection('users').doc(USER_ID).update({
+                        maxMining: firebase.firestore.FieldValue.increment(item.value)
+                    });
+                    userData.maxMining += item.value;
+                } else if (item.type === 'tickets') {
+                    await db.collection('users').doc(USER_ID).update({
+                        tickets: firebase.firestore.FieldValue.increment(item.value)
+                    });
+                    userData.tickets += item.value;
+                }
+                
+                if (actualUserData) {
+                    userData.samd = actualUserData.samd - item.price;
+                }
+                
+                showNotification(`Куплено: ${item.name}`);
+                
+            } catch (error) {
+                console.error('Ошибка покупки:', error);
+                showNotification('Ошибка покупки. Попробуйте еще раз.', true);
+            }
+        }
+
+        async function buyNFTItem(nftId) {
+            const nft = nftItems.find(i => i.id === nftId);
+            if (!nft) {
+                showNotification('NFT не найдено', true);
+                return;
+            }
+            
+            try {
+                const nftDoc = await db.collection('nftItems').doc(nftId).get();
+                if (!nftDoc.exists) {
+                    showNotification('NFT больше не существует', true);
+                    return;
+                }
+                
+                const actualNFT = nftDoc.data();
+                const userDoc = await db.collection('users').doc(USER_ID).get();
+                const actualUserData = userDoc.exists ? userDoc.data() : null;
+                
+                if (actualUserData && actualUserData.samd < nft.price) {
+                    showNotification('Недостаточно SAMD', true);
+                    return;
+                }
+                
+                if (actualNFT.currentStock <= 0) {
+                    showNotification('NFT закончилось', true);
+                    updateNFTUI();
+                    return;
+                }
+                
+                const nftRef = db.collection('nftItems').doc(nftId);
+                const userRef = db.collection('users').doc(USER_ID);
+                
+                await db.runTransaction(async (transaction) => {
+                    const nftSnapshot = await transaction.get(nftRef);
+                    const userSnapshot = await transaction.get(userRef);
+                    
+                    if (!nftSnapshot.exists || !userSnapshot.exists) {
+                        throw new Error("Документ не найден");
+                    }
+                    
+                    const nftData = nftSnapshot.data();
+                    const userDataInTrans = userSnapshot.data();
+                    
+                    if (nftData.currentStock <= 0) {
+                        throw new Error("NFT закончилось");
+                    }
+                    
+                    if (userDataInTrans.samd < nft.price) {
+                        throw new Error("Недостаточно средств");
+                    }
+                    
+                    transaction.update(nftRef, {
+                        currentStock: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    
+                    const nftCopy = { ...nft };
+                    delete nftCopy.currentStock;
+                    delete nftCopy.globalStock;
+                    
+                    const newNFTs = [...(userDataInTrans.nfts || []), {
+                        nftId: nftId,
+                        ...nftCopy,
+                        purchasedAt: new Date().toISOString()
+                    }];
+                    
+                    transaction.update(userRef, {
+                        samd: firebase.firestore.FieldValue.increment(-nft.price),
+                        nfts: newNFTs
+                    });
+                    
+                    return true;
+                });
+                
+                showNotification(`Куплено NFT: ${nft.name}`);
+                
+            } catch (error) {
+                console.error('Ошибка покупки NFT:', error);
+                if (error.message === "NFT закончилось") {
+                    showNotification('NFT закончилось!', true);
+                    updateNFTUI();
+                } else if (error.message === "Недостаточно средств") {
+                    showNotification('Недостаточно SAMD', true);
+                } else {
+                    showNotification('Ошибка покупки NFT', true);
+                }
+            }
+        }
+
+        async function openCase(caseId) {
+            const caseItem = cases.find(c => c.id === caseId);
+            if (!caseItem) {
+                showNotification('Кейс не найден', true);
+                return;
+            }
+            
+            try {
+                const userDoc = await db.collection('users').doc(USER_ID).get();
+                if (!userDoc.exists) {
+                    showNotification('Ошибка: пользователь не найден', true);
+                    return;
+                }
+                
+                const actualUserData = userDoc.data();
+                if (actualUserData.tickets < caseItem.cost) {
+                    showNotification('Недостаточно билетов!', true);
+                    userData.tickets = actualUserData.tickets;
+                    updateUI();
+                    return;
+                }
+                
+                const rewards = caseItem.rewards || [];
+                if (rewards.length === 0) {
+                    showNotification('В кейсе нет наград', true);
+                    return;
+                }
+                
+                const totalWeight = rewards.reduce((sum, reward) => sum + (reward.weight || 1), 0);
+                let random = Math.random() * totalWeight;
+                let selectedReward = null;
+                
+                for (const reward of rewards) {
+                    random -= (reward.weight || 1);
+                    if (random <= 0) {
+                        selectedReward = reward;
+                        break;
+                    }
+                }
+                
+                if (!selectedReward) {
+                    selectedReward = rewards[0];
+                }
+                
+                const userRef = db.collection('users').doc(USER_ID);
+                
+                await db.runTransaction(async (transaction) => {
+                    const userSnapshot = await transaction.get(userRef);
+                    if (!userSnapshot.exists) {
+                        throw new Error("Пользователь не найден");
+                    }
+                    
+                    const userDataInTrans = userSnapshot.data();
+                    
+                    if (userDataInTrans.tickets < caseItem.cost) {
+                        throw new Error("Недостаточно билетов");
+                    }
+                    
+                    transaction.update(userRef, {
+                        tickets: firebase.firestore.FieldValue.increment(-caseItem.cost)
+                    });
+                    
+                    const newNFTs = [...(userDataInTrans.nfts || []), {
+                        nftId: selectedReward.id || 'case_reward_' + Date.now(),
+                        name: selectedReward.name,
+                        imageUrl: selectedReward.imageUrl,
+                        rarity: selectedReward.rarity,
+                        price: selectedReward.price || 0,
+                        fromCase: caseItem.name,
+                        receivedAt: new Date().toISOString()
+                    }];
+                    
+                    transaction.update(userRef, {
+                        nfts: newNFTs
+                    });
+                    
+                    return selectedReward;
+                });
+                
+                showCaseReward(selectedReward);
+                
+            } catch (error) {
+                console.error('Ошибка открытия кейса:', error);
+                if (error.message === "Недостаточно билетов") {
+                    showNotification('Недостаточно билетов!', true);
+                } else {
+                    showNotification('Ошибка открытия кейса', true);
+                }
+            }
+        }
+
+        async function sellNFT(nftId) {
+            const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
+            if (nftIndex === -1) {
+                showNotification('NFT не найдено в вашем инвентаре', true);
+                return;
+            }
+            
+            const nft = userData.nfts[nftIndex];
+            const sellPrice = Math.floor(nft.price * 0.7);
+            
+            try {
+                const userRef = db.collection('users').doc(USER_ID);
+                
+                await db.runTransaction(async (transaction) => {
+                    const userSnapshot = await transaction.get(userRef);
+                    if (!userSnapshot.exists) {
+                        throw new Error("Пользователь не найден");
+                    }
+                    
+                    const userDataInTrans = userSnapshot.data();
+                    const currentNFTs = userDataInTrans.nfts || [];
+                    
+                    const nftToSellIndex = currentNFTs.findIndex(item => item.nftId === nftId);
+                    if (nftToSellIndex === -1) {
+                        throw new Error("NFT не найдено");
+                    }
+                    
+                    currentNFTs.splice(nftToSellIndex, 1);
+                    
+                    transaction.update(userRef, {
+                        samd: firebase.firestore.FieldValue.increment(sellPrice),
+                        nfts: currentNFTs
+                    });
+                    
+                    return true;
+                });
+                
+                showNotification(`NFT "${nft.name}" продано за ${sellPrice} SAMD`);
+                
+            } catch (error) {
+                console.error('Ошибка продажи NFT:', error);
+                showNotification('Ошибка продажи NFT', true);
+            }
+        }
+
+        // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
 
         function calculateOfflineMining() {
             const lastUpdate = new Date(userData.lastMiningUpdate);
@@ -2317,18 +2354,188 @@
                 'Начать майнинг SAMD?');
         }
 
+        function openCaseConfirmModal(caseId) {
+            const caseItem = cases.find(c => c.id === caseId);
+            if (!caseItem) return;
+            
+            if (userData.tickets < caseItem.cost) {
+                showNotification('Недостаточно билетов!', true);
+                return;
+            }
+            
+            selectedCase = caseItem;
+            document.getElementById('caseConfirmName').textContent = caseItem.name;
+            document.getElementById('caseConfirmCost').textContent = caseItem.cost;
+            document.getElementById('remainingTicketsCase').textContent = userData.tickets - caseItem.cost;
+            document.getElementById('caseConfirmModal').classList.add('active');
+        }
+
+        function closeCaseConfirmModal() {
+            document.getElementById('caseConfirmModal').classList.remove('active');
+            selectedCase = null;
+        }
+
+        function showCaseReward(reward) {
+            document.getElementById('rewardImage').src = reward.imageUrl;
+            document.getElementById('rewardName').textContent = reward.name;
+            document.getElementById('rewardRarity').textContent = `Редкость: ${reward.rarity}`;
+            document.getElementById('caseOpening').classList.add('active');
+        }
+
+        function closeCaseOpening() {
+            document.getElementById('caseOpening').classList.remove('active');
+            closeCaseConfirmModal();
+        }
+
+        function openBuyConfirmModal(nftId) {
+            const nft = nftItems.find(n => n.id === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            document.getElementById('buyNftName').textContent = nft.name;
+            document.getElementById('buyNftPrice').textContent = nft.price;
+            document.getElementById('userCurrentBalance').textContent = Math.floor(userData.samd);
+            document.getElementById('buyConfirmModal').classList.add('active');
+        }
+
+        function closeBuyConfirmModal() {
+            document.getElementById('buyConfirmModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
+        function openSendModal(nftId) {
+            const nft = userData.nfts.find(n => n.nftId === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            document.getElementById('sendNftName').textContent = nft.name;
+            document.getElementById('sendUsername').value = '';
+            document.getElementById('sendModal').classList.add('active');
+        }
+
+        function closeSendModal() {
+            document.getElementById('sendModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
+        function openSellModal(nftId) {
+            const nft = userData.nfts.find(n => n.nftId === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            const sellPrice = Math.floor(nft.price * 0.7);
+            document.getElementById('sellNftName').textContent = nft.name;
+            document.getElementById('sellNftPrice').textContent = sellPrice;
+            document.getElementById('sellModal').classList.add('active');
+        }
+
+        function closeSellModal() {
+            document.getElementById('sellModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
+        async function sendNFT(nftId, recipientUsername) {
+            if (!recipientUsername) {
+                showNotification('Введите никнейм получателя', true);
+                return;
+            }
+            
+            const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
+            if (nftIndex === -1) {
+                showNotification('NFT не найдено в вашем инвентаре', true);
+                return;
+            }
+            
+            try {
+                const usersSnapshot = await db.collection('users')
+                    .where('username', '==', recipientUsername)
+                    .get();
+                
+                if (usersSnapshot.empty) {
+                    showNotification('Пользователь с таким никнеймом не найден', true);
+                    return;
+                }
+                
+                const recipientDoc = usersSnapshot.docs[0];
+                const recipientId = recipientDoc.id;
+                
+                if (recipientId === USER_ID) {
+                    showNotification('Нельзя отправить NFT самому себе', true);
+                    return;
+                }
+                
+                const senderRef = db.collection('users').doc(USER_ID);
+                const recipientRef = db.collection('users').doc(recipientId);
+                
+                await db.runTransaction(async (transaction) => {
+                    const senderSnapshot = await transaction.get(senderRef);
+                    const recipientSnapshot = await transaction.get(recipientRef);
+                    
+                    if (!senderSnapshot.exists || !recipientSnapshot.exists) {
+                        throw new Error("Пользователь не найден");
+                    }
+                    
+                    const senderData = senderSnapshot.data();
+                    const recipientData = recipientSnapshot.data();
+                    
+                    const senderNFTs = senderData.nfts || [];
+                    const nftIndex = senderNFTs.findIndex(n => n.nftId === nftId);
+                    
+                    if (nftIndex === -1) {
+                        throw new Error("NFT не найдено у отправителя");
+                    }
+                    
+                    const nftToSend = senderNFTs[nftIndex];
+                    senderNFTs.splice(nftIndex, 1);
+                    
+                    const recipientNFTs = recipientData.nfts || [];
+                    recipientNFTs.push({
+                        ...nftToSend,
+                        receivedFrom: USERNAME,
+                        receivedAt: new Date().toISOString()
+                    });
+                    
+                    transaction.update(senderRef, { nfts: senderNFTs });
+                    transaction.update(recipientRef, { nfts: recipientNFTs });
+                    
+                    return true;
+                });
+                
+                closeSendModal();
+                showNotification(`NFT отправлено пользователю @${recipientUsername}`);
+                
+            } catch (error) {
+                console.error('Ошибка отправки NFT:', error);
+                showNotification('Ошибка отправки NFT', true);
+            }
+        }
+
+        function filterInventory(filter) {
+            currentInventoryFilter = filter;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            updateInventoryUI();
+        }
+
         // ==================== UI ФУНКЦИИ ====================
 
         function updateUI() {
+            // Баланс
             document.getElementById('balanceSAMD').textContent = Math.floor(userData.samd);
             document.getElementById('balanceTickets').textContent = userData.tickets;
             
+            // База
             document.getElementById('baseTitle').textContent = `База |${USERNAME}|`;
             document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
             document.getElementById('maxSAMD').textContent = userData.maxMining;
             document.getElementById('incomePerSec').textContent = userData.incomePerSecond.toFixed(1);
             document.getElementById('ticketsCount').textContent = userData.tickets;
             
+            // Профиль
             document.getElementById('profileName').textContent = user.first_name || USERNAME;
             document.getElementById('profileUsername').textContent = user.username ? `@${user.username}` : '';
             document.getElementById('profileSAMD').textContent = Math.floor(userData.samd);
@@ -2338,89 +2545,175 @@
             document.getElementById('userId').textContent = USER_ID;
             
             if (user.photo_url) {
-                const profileAvatar = document.getElementById('profileAvatar');
-                const userAvatar = document.getElementById('userAvatar');
-                if (profileAvatar) profileAvatar.src = user.photo_url;
-                if (userAvatar) userAvatar.src = user.photo_url;
+                document.getElementById('profileAvatar').src = user.photo_url;
+                document.getElementById('userAvatar').src = user.photo_url;
             }
             
             updateMiningStatus();
         }
 
-        function displayUserProfile() {
-            if (user) {
-                const userNameEl = document.getElementById('userName');
-                const userAvatarEl = document.getElementById('userAvatar');
-                const userProfileEl = document.getElementById('userProfile');
-                
-                let displayName = user.first_name || user.username || 'User';
-                if (userNameEl) userNameEl.textContent = displayName;
-                
-                if (user.photo_url && userAvatarEl) {
-                    userAvatarEl.src = user.photo_url;
-                }
-                
-                if (userProfileEl) userProfileEl.style.display = 'flex';
+        function updateMiningUI() {
+            document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
+            updateMiningStatus();
+        }
+
+        function updateShopUI() {
+            const shopContainer = document.getElementById('shopItems');
+            shopContainer.innerHTML = '';
+            
+            if (shopItems.length === 0) {
+                shopContainer.innerHTML = '<div class="empty-state">В магазине пока что ничего нет</div>';
+                return;
+            }
+            
+            shopItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-price">${item.price} SAMD</div>
+                    </div>
+                    <div class="card-description">${item.description}</div>
+                    <div class="card-stats">
+                        <span>Осталось: ${item.currentStock}</span>
+                        <span>+${item.value} ${getItemUnit(item.type)}</span>
+                    </div>
+                    <button class="buy-btn" onclick="askConfirmation(() => buyShopItem('${item.id}'), 'Купить ${item.name} за ${item.price} SAMD?')" 
+                            ${userData.samd < item.price || item.currentStock <= 0 ? 'disabled' : ''}>
+                        ${userData.samd < item.price ? 'Недостаточно SAMD' : 
+                          item.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
+                    </button>
+                `;
+                shopContainer.appendChild(card);
+            });
+        }
+
+        function updateNFTUI() {
+            const nftContainer = document.getElementById('nftMarketplace');
+            nftContainer.innerHTML = '';
+            
+            if (nftItems.length === 0) {
+                nftContainer.innerHTML = '<div class="empty-state">В NFT магазине пока что ничего нет</div>';
+                return;
+            }
+            
+            nftItems.forEach(nft => {
+                const card = document.createElement('div');
+                card.className = 'nft-card';
+                card.innerHTML = `
+                    <div class="nft-image">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
+                    </div>
+                    <div class="nft-info">
+                        <div class="nft-name">${nft.name}</div>
+                        <div class="nft-price">
+                            <div class="nft-current-price">${nft.price} SAMD</div>
+                            <div class="nft-stock">Осталось: ${nft.currentStock}</div>
+                        </div>
+                        <button class="buy-btn" onclick="openBuyConfirmModal('${nft.id}')" 
+                                ${userData.samd < nft.price || nft.currentStock <= 0 ? 'disabled' : ''}>
+                            ${userData.samd < nft.price ? 'Недостаточно SAMD' : 
+                              nft.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
+                        </button>
+                    </div>
+                `;
+                nftContainer.appendChild(card);
+            });
+        }
+
+        function updateCasesUI() {
+            const casesContainer = document.getElementById('casesGrid');
+            casesContainer.innerHTML = '';
+            
+            if (cases.length === 0) {
+                casesContainer.innerHTML = '<div class="empty-state">Кейсы пока не добавлены</div>';
+                return;
+            }
+            
+            cases.forEach(caseItem => {
+                const card = document.createElement('div');
+                card.className = 'case-card';
+                card.onclick = () => openCaseConfirmModal(caseItem.id);
+                card.innerHTML = `
+                    <div class="case-icon">🎁</div>
+                    <div class="case-title">${caseItem.name}</div>
+                    <div class="case-cost">${caseItem.cost} 🎟️</div>
+                    <div class="case-rewards">${caseItem.rewards ? caseItem.rewards.length : 0} возможных наград</div>
+                `;
+                casesContainer.appendChild(card);
+            });
+        }
+
+        function updateInventoryUI() {
+            const inventoryContainer = document.getElementById('inventoryItems');
+            inventoryContainer.innerHTML = '';
+            
+            if (!userData.nfts || userData.nfts.length === 0) {
+                inventoryContainer.innerHTML = '<div class="empty-state">У вас пока нет NFT</div>';
+                return;
+            }
+            
+            let filteredNFTs = userData.nfts;
+            if (currentInventoryFilter !== 'all') {
+                filteredNFTs = userData.nfts.filter(nft => nft.rarity === currentInventoryFilter);
+            }
+            
+            if (filteredNFTs.length === 0) {
+                inventoryContainer.innerHTML = '<div class="empty-state">Нет NFT с выбранной редкостью</div>';
+                return;
+            }
+            
+            filteredNFTs.forEach(nft => {
+                const sellPrice = Math.floor(nft.price * 0.7);
+                const card = document.createElement('div');
+                card.className = `inventory-card ${nft.rarity || 'common'}`;
+                card.innerHTML = `
+                    <div class="inventory-image">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
+                    </div>
+                    <div class="inventory-info">
+                        <div class="inventory-name">${nft.name}</div>
+                        <div class="inventory-details">
+                            ${nft.fromCase ? 'Из кейса' : nft.fromPromocode ? 'Из промокода' : `Куплено за: ${nft.price} SAMD`}
+                            <br>Редкость: ${getRarityName(nft.rarity)}
+                        </div>
+                        <div class="inventory-actions">
+                            <button class="send-nft-btn" onclick="askConfirmation(() => openSendModal('${nft.nftId}'), 'Отправить NFT ${nft.name} другому пользователю?')">
+                                Отправить
+                            </button>
+                            ${!nft.fromCase && !nft.fromPromocode ? `<button class="sell-nft-btn" onclick="askConfirmation(() => openSellModal('${nft.nftId}'), 'Продать NFT ${nft.name} за ${sellPrice} SAMD? (70% от стоимости)')">
+                                Продать (${sellPrice})
+                            </button>` : ''}
+                        </div>
+                    </div>
+                `;
+                inventoryContainer.appendChild(card);
+            });
+        }
+
+        function getRarityName(rarity) {
+            switch(rarity) {
+                case 'common': return 'Обычная';
+                case 'rare': return 'Редкая';
+                case 'epic': return 'Эпическая';
+                case 'legendary': return 'Легендарная';
+                default: return rarity;
             }
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            const tabElement = document.querySelector(`[data-tab="${tabName}"]`);
-            const contentElement = document.querySelector(`#${tabName}-content`);
-            
-            if (tabElement) tabElement.classList.add('active');
-            if (contentElement) contentElement.classList.add('active');
-            
-            if (tabName === 'inventory') {
-                updateInventoryUI();
-            } else if (tabName === 'referral') {
-                updateReferralUI();
-                loadReferralsData();
-            } else if (tabName === 'shop') {
-                updateShopUI();
-            } else if (tabName === 'nft') {
-                updateNFTUI();
-            } else if (tabName === 'cases') {
-                updateCasesUI();
+        function getItemUnit(type) {
+            switch(type) {
+                case 'income': return 'SAMD/сек';
+                case 'max': return 'SAMD макс';
+                case 'tickets': return '🎟️';
+                default: return '';
             }
-        }
-
-        function resetProgress() {
-            askConfirmation(async () => {
-                userData = {
-                    samd: 0,
-                    tickets: 0,
-                    currentMining: 0,
-                    maxMining: 500,
-                    incomePerSecond: 0.1,
-                    lastMiningUpdate: new Date().toISOString(),
-                    isMining: false,
-                    upgrades: [],
-                    nfts: [],
-                    activatedPromocodes: [],
-                    referralCode: generateReferralCode(),
-                    referrals: [],
-                    referralCount: 0,
-                    referralEarned: 0,
-                    referredBy: null
-                };
-                await saveUserData(true);
-                updateUI();
-                updateReferralUI();
-                updateInventoryUI();
-                showNotification('Прогресс сброшен');
-            }, 'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!', 'Сброс прогресса');
         }
 
         function showNotification(message, isError = false, isWarning = false) {
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notificationText');
-            
-            if (!notification || !notificationText) return;
             
             notificationText.textContent = message;
             notification.className = 'notification';
@@ -2438,376 +2731,54 @@
             }, 3000);
         }
 
-        // ==================== ФУНКЦИИ МАГАЗИНА ====================
-
-        function updateShopUI() {
-            const shopContainer = document.getElementById('shopItems');
-            if (!shopContainer) return;
-            
-            if (shopItems.length === 0) {
-                shopContainer.innerHTML = '<div class="empty-state">В магазине пока что ничего нет</div>';
-                return;
-            }
-            
-            shopContainer.innerHTML = '';
-            
-            shopItems.forEach(item => {
-                const isPurchased = userData.upgrades && userData.upgrades.includes(item.id);
-                const canAfford = userData.samd >= item.price;
+        function displayUserProfile() {
+            if (user) {
+                const userNameEl = document.getElementById('userName');
+                const userAvatarEl = document.getElementById('userAvatar');
+                const userProfileEl = document.getElementById('userProfile');
                 
-                const shopCard = document.createElement('div');
-                shopCard.className = 'shop-card';
+                let displayName = user.first_name || user.username || 'User';
+                userNameEl.textContent = displayName;
                 
-                shopCard.innerHTML = `
-                    <div class="card-header">
-                        <div class="card-title">${item.name}</div>
-                        <div class="card-price">${item.price} SAMD</div>
-                    </div>
-                    <div class="card-description">${item.description || ''}</div>
-                    <div class="card-stats">
-                        <span>Доход: +${item.incomePerSecond || 0}/сек</span>
-                        <span>Емкость: +${item.maxMining || 0}</span>
-                    </div>
-                    <button class="buy-btn" ${isPurchased || !canAfford ? 'disabled' : ''}>
-                        ${isPurchased ? 'Куплено' : canAfford ? 'Купить' : 'Недостаточно SAMD'}
-                    </button>
-                `;
-                
-                const buyBtn = shopCard.querySelector('.buy-btn');
-                if (!isPurchased && canAfford) {
-                    buyBtn.addEventListener('click', () => {
-                        askConfirmation(() => {
-                            purchaseItem(item);
-                        }, `Купить "${item.name}" за ${item.price} SAMD?`, 'Покупка улучшения');
-                    });
+                if (user.photo_url) {
+                    userAvatarEl.src = user.photo_url;
                 }
                 
-                shopContainer.appendChild(shopCard);
-            });
+                userProfileEl.style.display = 'flex';
+            }
         }
 
-        async function purchaseItem(item) {
-            if (userData.samd < item.price) {
-                showNotification('Недостаточно SAMD!', true);
-                return;
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.querySelector(`#${tabName}-content`).classList.add('active');
+            
+            if (tabName === 'inventory') {
+                updateInventoryUI();
             }
-            
-            if (userData.upgrades && userData.upgrades.includes(item.id)) {
-                showNotification('Вы уже купили это улучшение!', true);
-                return;
-            }
-            
-            userData.samd -= item.price;
-            
-            if (!userData.upgrades) userData.upgrades = [];
-            userData.upgrades.push(item.id);
-            
-            if (item.incomePerSecond) {
-                userData.incomePerSecond += item.incomePerSecond;
-            }
-            
-            if (item.maxMining) {
-                userData.maxMining += item.maxMining;
-            }
-            
-            await saveUserData();
-            updateUI();
-            updateShopUI();
-            
-            showNotification(`Улучшение "${item.name}" куплено!`);
         }
 
-        // ==================== ФУНКЦИИ NFT МАГАЗИНА ====================
-
-        function updateNFTUI() {
-            const nftContainer = document.getElementById('nftMarketplace');
-            if (!nftContainer) return;
-            
-            if (nftItems.length === 0) {
-                nftContainer.innerHTML = '<div class="empty-state">В NFT магазине пока что ничего нет</div>';
-                return;
+        function resetProgress() {
+            if (confirm('Вы уверены что хотите сбросить весь прогресс? Это действие нельзя отменить!')) {
+                userData = {
+                    samd: 0,
+                    tickets: 0,
+                    currentMining: 0,
+                    maxMining: 500,
+                    incomePerSecond: 0.1,
+                    lastMiningUpdate: new Date().toISOString(),
+                    isMining: false,
+                    upgrades: [],
+                    nfts: [],
+                    activatedPromocodes: []
+                };
+                saveUserData(true);
+                updateUI();
+                showNotification('Прогресс сброшен');
             }
-            
-            nftContainer.innerHTML = '';
-            
-            nftItems.forEach(nft => {
-                if (nft.stock <= 0) return;
-                
-                const nftCard = document.createElement('div');
-                nftCard.className = 'nft-card';
-                
-                nftCard.innerHTML = `
-                    <div class="nft-image">
-                        <img src="${nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f'}" alt="${nft.name}">
-                    </div>
-                    <div class="nft-info">
-                        <div class="nft-name">${nft.name}</div>
-                        <div class="nft-price">
-                            <div class="nft-current-price">${nft.price} 🎟️</div>
-                            <div class="nft-stock">Осталось: ${nft.stock}</div>
-                        </div>
-                        <button class="buy-btn ${userData.tickets >= nft.price ? '' : 'disabled'}">
-                            ${userData.tickets >= nft.price ? 'Купить' : 'Недостаточно билетов'}
-                        </button>
-                    </div>
-                `;
-                
-                const buyBtn = nftCard.querySelector('.buy-btn');
-                if (userData.tickets >= nft.price && nft.stock > 0) {
-                    buyBtn.addEventListener('click', () => {
-                        askConfirmation(() => {
-                            purchaseNFT(nft);
-                        }, `Купить NFT "${nft.name}" за ${nft.price} 🎟️?`, 'Покупка NFT');
-                    });
-                }
-                
-                nftContainer.appendChild(nftCard);
-            });
-        }
-
-        async function purchaseNFT(nft) {
-            if (userData.tickets < nft.price) {
-                showNotification('Недостаточно билетов!', true);
-                return;
-            }
-            
-            if (nft.stock <= 0) {
-                showNotification('NFT распродан!', true);
-                return;
-            }
-            
-            userData.tickets -= nft.price;
-            
-            if (!userData.nfts) userData.nfts = [];
-            userData.nfts.push({
-                nftId: `${nft.id}_${Date.now()}`,
-                name: nft.name,
-                imageUrl: nft.imageUrl,
-                rarity: nft.rarity || 'common',
-                price: nft.price,
-                purchasedAt: new Date().toISOString()
-            });
-            
-            // Обновляем stock в базе данных
-            await db.collection('nftItems').doc(nft.id).update({
-                stock: firebase.firestore.FieldValue.increment(-1)
-            });
-            
-            await saveUserData();
-            updateUI();
-            updateNFTUI();
-            updateInventoryUI();
-            
-            showNotification(`NFT "${nft.name}" куплено!`);
-        }
-
-        // ==================== ФУНКЦИИ КЕЙСОВ ====================
-
-        function updateCasesUI() {
-            const casesContainer = document.getElementById('casesGrid');
-            if (!casesContainer) return;
-            
-            if (cases.length === 0) {
-                casesContainer.innerHTML = '<div class="empty-state">Кейсы временно недоступны</div>';
-                return;
-            }
-            
-            casesContainer.innerHTML = '';
-            
-            cases.forEach(caseItem => {
-                const canOpen = userData.tickets >= caseItem.price;
-                
-                const caseCard = document.createElement('div');
-                caseCard.className = 'case-card';
-                
-                caseCard.innerHTML = `
-                    <div class="case-icon">🎁</div>
-                    <div class="case-title">${caseItem.name}</div>
-                    <div class="case-cost">${caseItem.price} 🎟️</div>
-                    <div class="case-rewards">
-                        ${getCaseRewardsText(caseItem.rewards)}
-                    </div>
-                    <button class="case-open-btn" ${canOpen ? '' : 'disabled'}>
-                        ${canOpen ? 'Открыть кейс' : 'Недостаточно билетов'}
-                    </button>
-                `;
-                
-                const openBtn = caseCard.querySelector('.case-open-btn');
-                if (canOpen) {
-                    openBtn.addEventListener('click', () => {
-                        askConfirmation(() => {
-                            openCase(caseItem);
-                        }, `Открыть "${caseItem.name}" за ${caseItem.price} 🎟️?`, 'Открытие кейса');
-                    });
-                }
-                
-                casesContainer.appendChild(caseCard);
-            });
-        }
-
-        function getCaseRewardsText(rewards) {
-            if (!rewards) return 'Награды: разные';
-            
-            let text = 'Награды: ';
-            const rewardsList = [];
-            
-            if (rewards.samd) rewardsList.push(`${rewards.samd} SAMD`);
-            if (rewards.tickets) rewardsList.push(`${rewards.tickets} 🎟️`);
-            if (rewards.nfts && rewards.nfts.length > 0) {
-                rewardsList.push(`${rewards.nfts.length} NFT`);
-            }
-            
-            return text + rewardsList.join(', ');
-        }
-
-        async function openCase(caseItem) {
-            if (userData.tickets < caseItem.price) {
-                showNotification('Недостаточно билетов!', true);
-                return;
-            }
-            
-            userData.tickets -= caseItem.price;
-            
-            // Генерируем награду
-            const rewards = caseItem.rewards || {};
-            let rewardText = '';
-            
-            if (rewards.samd) {
-                const samdReward = Math.floor(Math.random() * (rewards.samd.max - rewards.samd.min + 1)) + rewards.samd.min;
-                userData.samd += samdReward;
-                rewardText += `${samdReward} SAMD, `;
-            }
-            
-            if (rewards.tickets) {
-                const ticketsReward = Math.floor(Math.random() * (rewards.tickets.max - rewards.tickets.min + 1)) + rewards.tickets.min;
-                userData.tickets += ticketsReward;
-                rewardText += `${ticketsReward} 🎟️, `;
-            }
-            
-            if (rewards.nfts && rewards.nfts.length > 0) {
-                // Выбираем случайный NFT из доступных
-                const nftIndex = Math.floor(Math.random() * rewards.nfts.length);
-                const nftReward = rewards.nfts[nftIndex];
-                
-                if (!userData.nfts) userData.nfts = [];
-                userData.nfts.push({
-                    nftId: `case_${caseItem.id}_${Date.now()}`,
-                    name: nftReward.name,
-                    imageUrl: nftReward.imageUrl,
-                    rarity: nftReward.rarity || 'common',
-                    price: nftReward.price || 100,
-                    fromCase: caseItem.name,
-                    receivedAt: new Date().toISOString()
-                });
-                
-                rewardText += `NFT "${nftReward.name}", `;
-            }
-            
-            await saveUserData();
-            updateUI();
-            updateInventoryUI();
-            updateCasesUI();
-            
-            showNotification(`Вы открыли кейс "${caseItem.name}"! Получено: ${rewardText.slice(0, -2)}`, false, true);
-        }
-
-        // ==================== ФУНКЦИИ ИНВЕНТАРЯ ====================
-
-        function filterInventory(filter) {
-            currentInventoryFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.filter === filter) {
-                    btn.classList.add('active');
-                }
-            });
-            updateInventoryUI();
-        }
-
-        function updateInventoryUI() {
-            const inventoryContainer = document.getElementById('inventoryItems');
-            if (!inventoryContainer) return;
-            
-            if (!userData.nfts || userData.nfts.length === 0) {
-                inventoryContainer.innerHTML = '<div class="empty-state">Ваш инвентарь пуст</div>';
-                return;
-            }
-            
-            // Фильтруем NFT по редкости
-            let filteredNFTs = userData.nfts;
-            if (currentInventoryFilter !== 'all') {
-                filteredNFTs = userData.nfts.filter(nft => 
-                    nft.rarity === currentInventoryFilter
-                );
-            }
-            
-            if (filteredNFTs.length === 0) {
-                inventoryContainer.innerHTML = `<div class="empty-state">NFT с редкостью "${currentInventoryFilter}" не найдены</div>`;
-                return;
-            }
-            
-            inventoryContainer.innerHTML = '';
-            
-            filteredNFTs.forEach(nft => {
-                const inventoryCard = document.createElement('div');
-                inventoryCard.className = `inventory-card ${nft.rarity || 'common'}`;
-                
-                inventoryCard.innerHTML = `
-                    <div class="inventory-image">
-                        <img src="${nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f'}" alt="${nft.name}">
-                    </div>
-                    <div class="inventory-info">
-                        <div class="inventory-name">${nft.name}</div>
-                        <div class="inventory-details">
-                            Редкость: ${getRarityText(nft.rarity)}<br>
-                            ${nft.fromCase ? `Из кейса: ${nft.fromCase}` : nft.fromPromocode ? `Промокод: ${nft.fromPromocode}` : `Куплено: ${nft.price} 🎟️`}
-                        </div>
-                        <div class="inventory-actions">
-                            <button class="send-nft-btn">Отправить</button>
-                            <button class="sell-nft-btn">Продать</button>
-                        </div>
-                    </div>
-                `;
-                
-                // Обработчики для кнопок
-                const sendBtn = inventoryCard.querySelector('.send-nft-btn');
-                const sellBtn = inventoryCard.querySelector('.sell-nft-btn');
-                
-                sendBtn.addEventListener('click', () => {
-                    showNotification('Функция отправки NFT скоро будет доступна!', false, true);
-                });
-                
-                sellBtn.addEventListener('click', () => {
-                    const sellPrice = Math.floor(nft.price * 0.7); // Продажа за 70% от цены
-                    askConfirmation(() => {
-                        sellNFT(nft, sellPrice);
-                    }, `Продать NFT "${nft.name}" за ${sellPrice} 🎟️?`, 'Продажа NFT');
-                });
-                
-                inventoryContainer.appendChild(inventoryCard);
-            });
-        }
-
-        function getRarityText(rarity) {
-            const rarityMap = {
-                'common': 'Обычная',
-                'rare': 'Редкая',
-                'epic': 'Эпическая',
-                'legendary': 'Легендарная'
-            };
-            return rarityMap[rarity] || rarity;
-        }
-
-        async function sellNFT(nft, price) {
-            // Удаляем NFT из инвентаря
-            userData.nfts = userData.nfts.filter(item => item.nftId !== nft.nftId);
-            userData.tickets += price;
-            
-            await saveUserData();
-            updateUI();
-            updateInventoryUI();
-            
-            showNotification(`NFT "${nft.name}" продано за ${price} 🎟️!`);
         }
 
         // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
@@ -2837,6 +2808,7 @@
                 if (activateResult.success) {
                     showNotification(activateResult.message);
                     
+                    // Показываем детали наград
                     let rewardDetails = 'Получено: ';
                     if (activateResult.rewards.samd) {
                         rewardDetails += `${activateResult.rewards.samd} SAMD `;
@@ -2852,11 +2824,116 @@
                         showNotification(rewardDetails, false, true);
                     }
                     
+                    // Очищаем поле ввода
                     document.getElementById('profilePromocodeInput').value = '';
                 } else {
                     showNotification(activateResult.message, true);
                 }
             }, `Активировать промокод "${code}"?`);
+        });
+
+        // Автопроверка промокода при вводе
+        document.getElementById('profilePromocodeInput').addEventListener('input', async (e) => {
+            const code = e.target.value.trim().toUpperCase();
+            if (code.length >= 3) {
+                const checkResult = await checkPromocode(code);
+                if (checkResult.success) {
+                    e.target.style.borderColor = 'var(--success-color)';
+                } else {
+                    e.target.style.borderColor = 'var(--danger-color)';
+                }
+            } else {
+                e.target.style.borderColor = 'var(--accent-color)';
+            }
+        });
+
+        // Подтверждение покупки NFT
+        document.getElementById('confirmBuyBtn').addEventListener('click', () => {
+            askConfirmation(() => {
+                if (selectedNFT) {
+                    buyNFTItem(selectedNFT.id);
+                    closeBuyConfirmModal();
+                }
+            }, `Купить NFT "${selectedNFT?.name}" за ${selectedNFT?.price} SAMD?`);
+        });
+
+        // Подтверждение открытия кейса
+        document.getElementById('confirmCaseBtn').addEventListener('click', () => {
+            askConfirmation(() => {
+                if (selectedCase) {
+                    openCase(selectedCase.id);
+                }
+            }, `Открыть кейс "${selectedCase?.name}" за ${selectedCase?.cost} 🎟️?`);
+        });
+
+        // Подтверждение отправки NFT
+        document.getElementById('confirmSendBtn').addEventListener('click', () => {
+            const recipientUsername = document.getElementById('sendUsername').value.trim();
+            if (selectedNFT && recipientUsername) {
+                askConfirmation(() => {
+                    sendNFT(selectedNFT.nftId, recipientUsername);
+                }, `Отправить NFT "${selectedNFT.name}" пользователю @${recipientUsername}?`);
+            }
+        });
+
+        // Подтверждение продажи NFT
+        document.getElementById('confirmSellBtn').addEventListener('click', () => {
+            if (selectedNFT) {
+                const sellPrice = Math.floor(selectedNFT.price * 0.7);
+                askConfirmation(() => {
+                    sellNFT(selectedNFT.nftId);
+                    closeSellModal();
+                }, `Продать NFT "${selectedNFT.name}" за ${sellPrice} SAMD? (70% от стоимости)`);
+            }
+        });
+
+        // Промокод модальное окно
+        document.getElementById('promocodeSubmitBtn').addEventListener('click', async () => {
+            const code = document.getElementById('promocodeInput').value.trim().toUpperCase();
+            if (!code) {
+                showNotification('Введите промокод', true);
+                return;
+            }
+            
+            const activateResult = await activatePromocode(code);
+            if (activateResult.success) {
+                showNotification(activateResult.message);
+                closePromocodeModal();
+                
+                if (activateResult.rewards) {
+                    let rewardDetails = 'Получено: ';
+                    if (activateResult.rewards.samd) {
+                        rewardDetails += `${activateResult.rewards.samd} SAMD `;
+                    }
+                    if (activateResult.rewards.tickets) {
+                        rewardDetails += `${activateResult.rewards.tickets} 🎟️ `;
+                    }
+                    if (activateResult.rewards.nft) {
+                        rewardDetails += `NFT "${activateResult.rewards.nft.name}" `;
+                    }
+                    
+                    if (rewardDetails !== 'Получено: ') {
+                        showNotification(rewardDetails, false, true);
+                    }
+                }
+            } else {
+                showNotification(activateResult.message, true);
+            }
+        });
+
+        document.getElementById('promocodeCancelBtn').addEventListener('click', closePromocodeModal);
+
+        // Автопроверка промокода в модальном окне
+        document.getElementById('promocodeInput').addEventListener('input', async (e) => {
+            const code = e.target.value.trim().toUpperCase();
+            if (code.length >= 3) {
+                const infoResult = await showPromocodeInfo(code);
+                if (!infoResult.success) {
+                    document.getElementById('promocodeRewards').style.display = 'none';
+                }
+            } else {
+                document.getElementById('promocodeRewards').style.display = 'none';
+            }
         });
 
         // Обработчики подтверждения действий
@@ -2883,7 +2960,7 @@
         setInterval(() => {
             if (userData.isMining && userData.currentMining < userData.maxMining) {
                 userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
-                updateUI();
+                updateMiningUI();
             }
             
             if (Date.now() - lastSave > 30000) {
@@ -2903,6 +2980,7 @@
             await loadUserData();
             console.log('Приложение инициализировано');
         });
+
     </script>
 </body>
 </html>
