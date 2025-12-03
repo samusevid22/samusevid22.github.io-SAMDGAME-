@@ -3,364 +3,2984 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Технические работы</title>
+    <title>SAMDCOIN - Майнинг Игра</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
+        :root {
+            --primary-color: #0f1422;
+            --secondary-color: #1a2035;
+            --accent-color: #00d4ff;
+            --success-color: #00d68f;
+            --danger-color: #ff3d71;
+            --warning-color: #ffaa00;
+            --text-color: #ffffff;
+            --text-secondary: #8f9bb3;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            font-family: 'Arial', sans-serif;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding-bottom: 80px;
         }
 
         .container {
-            text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 1s ease-in-out;
-            max-width: 500px;
-            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
         }
 
-        .sad-emoji {
-            font-size: 8rem;
-            margin-bottom: 30px;
-            animation: float 3s ease-in-out infinite;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-        }
-
-        .message {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #e0e0e0;
-            line-height: 1.6;
-            font-weight: 300;
-        }
-
-        .sub-message {
-            font-size: 1rem;
-            color: #b0b0b0;
-            margin-top: 10px;
-            font-weight: 300;
-        }
-
-        .timer-container {
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .timer-title {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #667eea;
-            font-weight: 500;
-        }
-
-        .timer {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .time-unit {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .time-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 10px;
-            min-width: 80px;
-            text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .time-label {
-            font-size: 0.8rem;
-            color: #b0b0b0;
-            margin-top: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .target-date {
-            font-size: 1.1rem;
-            color: #764ba2;
-            margin-top: 20px;
-            font-weight: 500;
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-
-        @keyframes timerPulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            }
-        }
-
-        .stars {
+        /* Модальные окна */
+        .warning-modal, .confirmation-modal, .promocode-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: -1;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10001;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
-        .star {
-            position: absolute;
-            background: white;
+        .promocode-modal {
+            z-index: 10002;
+        }
+
+        .warning-content, .confirmation-content, .promocode-content {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            border: 2px solid var(--warning-color);
+        }
+
+        .promocode-content {
+            border-color: var(--accent-color);
+            max-width: 450px;
+        }
+
+        .warning-icon, .confirmation-icon, .promocode-icon {
+            font-size: 48px;
+            color: var(--warning-color);
+            margin-bottom: 20px;
+        }
+
+        .promocode-icon {
+            color: var(--accent-color);
+        }
+
+        .warning-title, .confirmation-title, .promocode-title {
+            font-size: 24px;
+            color: var(--warning-color);
+            margin-bottom: 15px;
+        }
+
+        .promocode-title {
+            color: var(--accent-color);
+        }
+
+        .warning-text, .confirmation-text, .promocode-text {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .confirmation-buttons, .promocode-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .confirm-yes-btn, .confirm-no-btn, .promocode-submit-btn, .promocode-cancel-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            flex: 1;
+        }
+
+        .confirm-no-btn, .promocode-cancel-btn {
+            background-color: var(--danger-color);
+        }
+
+        .promocode-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--accent-color);
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 16px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .promocode-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .promocode-rewards {
+            background-color: var(--primary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .promocode-reward-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .promocode-reward-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .promocode-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Остальные стили остаются без изменений */
+        .warning-modal {
+            z-index: 10003;
+        }
+
+        .warning-content {
+            max-width: 500px;
+        }
+
+        .buy-confirm-modal, .case-confirm-modal, .send-modal, .sell-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .buy-confirm-modal.active, .case-confirm-modal.active, .send-modal.active, .sell-modal.active {
+            display: flex;
+        }
+
+        .buy-confirm-content, .case-confirm-content, .send-content, .sell-content {
+            background: var(--secondary-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .send-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--text-secondary);
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .confirm-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cancel-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        header {
+            background-color: var(--secondary-color);
+            padding: 12px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            animation: twinkle linear infinite;
+            object-fit: cover;
+            flex-shrink: 0;
         }
 
-        @keyframes twinkle {
-            from {
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
+        .balance {
+            background-color: var(--primary-color);
+            padding: 6px 10px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            min-width: 0;
+        }
+
+        .balance span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 6px;
+            margin: 16px 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 13px;
+            min-width: 60px;
+        }
+
+        .nav-tab.active {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* База - Mining */
+        .mining-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .base-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .base-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .mining-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: var(--primary-color);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .mine-btn {
+            background: linear-gradient(135deg, var(--success-color), #00b87d);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .mine-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 214, 143, 0.3);
+        }
+
+        .mine-btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .mine-btn.mining {
+            background: linear-gradient(135deg, var(--accent-color), #0099cc);
+        }
+
+        .mine-btn.collect {
+            background: linear-gradient(135deg, var(--warning-color), #cc8800);
+        }
+
+        /* Магазин */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .shop-grid {
+                grid-template-columns: 1fr;
             }
         }
 
+        .shop-card {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            transition: var(--transition);
+        }
+
+        .shop-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .card-price {
+            background-color: var(--primary-color);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .buy-btn {
+            width: 100%;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .buy-btn:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* NFT Магазин */
+        .nft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .nft-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }
+
+        .nft-card {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .nft-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .nft-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+        }
+
+        .nft-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .nft-image img[src*=".gif"] {
+            image-rendering: pixelated;
+        }
+
+        .nft-info {
+            padding: 12px;
+        }
+
+        .nft-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nft-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .nft-current-price {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .nft-stock {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Кейсы */
+        .cases-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .case-card {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .case-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .case-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .case-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .case-cost {
+            background-color: var(--secondary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .case-rewards {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        /* Анимация открытия кейса */
+        .case-opening {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .case-opening.active {
+            display: flex;
+        }
+
+        .case-reward {
+            background: var(--secondary-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+            animation: pulse 2s infinite;
+        }
+
+        .reward-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .reward-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .reward-image img[src*=".gif"] {
+            image-rendering: pixelated;
+        }
+
+        .reward-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .reward-rarity {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Профиль с промокодами */
+        .profile-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stat {
+            background-color: var(--primary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .profile-promocode-section {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .promocode-input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .promocode-input-field {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--accent-color);
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .promocode-activate-btn {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .promocode-activate-btn:hover:not(:disabled) {
+            background-color: var(--success-color);
+            transform: translateY(-2px);
+        }
+
+        .promocode-activate-btn:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .activated-promocodes {
+            margin-top: 20px;
+        }
+
+        .activated-promocodes h4 {
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .promocode-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .promocode-badge {
+            background-color: var(--secondary-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Инвентарь */
+        .inventory-section {
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .inventory-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .inventory-card {
+            background-color: var(--primary-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .inventory-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .inventory-card.rare {
+            border-color: #00d4ff;
+        }
+
+        .inventory-card.epic {
+            border-color: #ff00ff;
+        }
+
+        .inventory-card.legendary {
+            border-color: #ffaa00;
+        }
+
+        .inventory-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+        }
+
+        .inventory-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .inventory-image img[src*=".gif"] {
+            image-rendering: pixelated;
+        }
+
+        .inventory-info {
+            padding: 12px;
+        }
+
+        .inventory-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .inventory-details {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .inventory-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .send-nft-btn {
+            flex: 1;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .sell-nft-btn {
+            flex: 1;
+            background-color: var(--warning-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .mobile-menu {
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--secondary-color);
+            padding: 10px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
+            z-index: 99;
+        }
+
+        .mobile-nav {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 6px;
+            border-radius: 8px;
+            min-width: 50px;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent-color);
+            background-color: rgba(0, 212, 255, 0.1);
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 18px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transform: translateX(150%);
+            transition: var(--transition);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Адаптивность */
         @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            .sad-emoji {
-                font-size: 6rem;
-            }
-            
-            .message {
-                font-size: 1.2rem;
-            }
-            
-            .timer {
+            .header-content {
+                flex-direction: column;
                 gap: 10px;
             }
             
-            .time-value {
-                font-size: 1.8rem;
-                min-width: 60px;
-                padding: 8px 12px;
+            .user-info {
+                justify-content: center;
+                width: 100%;
             }
             
-            .time-label {
-                font-size: 0.7rem;
+            .mining-stats {
+                grid-template-columns: 1fr;
             }
             
-            .target-date {
-                font-size: 0.9rem;
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .inventory-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .promocode-input-container {
+                flex-direction: column;
+            }
+            
+            .promocode-activate-btn {
+                width: 100%;
             }
         }
 
         @media (max-width: 480px) {
-            .timer {
-                flex-wrap: wrap;
-                gap: 8px;
+            .container {
+                padding: 0 12px;
             }
             
-            .time-value {
-                font-size: 1.5rem;
-                min-width: 50px;
-                padding: 6px 10px;
+            .nav-tab {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+            
+            .balance {
+                font-size: 12px;
+                padding: 5px 8px;
+            }
+            
+            .mine-btn {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             }
         }
     </style>
 </head>
 <body>
-    <div class="stars" id="stars"></div>
-    
-    <div class="container">
-        <div class="sad-emoji">😔</div>
-        <h1 class="message">К сожалению, бот не доступен :(</h1>
-        <p class="sub-message">Сейчас проводятся технические работы</p>
-        
-        <div class="timer-container">
-            <div class="timer-title">До завершения работ осталось:</div>
-            <div class="timer">
-                <div class="time-unit">
-                    <div class="time-value" id="days">00</div>
-                    <div class="time-label">Дней</div>
+    <!-- Предупреждение -->
+    <div class="warning-modal" id="warningModal">
+        <div class="warning-content">
+            <div class="warning-icon">⚠️</div>
+            <h2 class="warning-title">ВНИМАНИЕ</h2>
+            <p class="warning-text">
+                Данный app создан ИСКЛЮЧИТЕЛЬНО в развлекательных целях. 
+                "SAMD" является вымышленной монетой и ничего не стоит в реальном мире.
+            </p>
+            <button class="mine-btn" id="acceptWarning">Понятно</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения действия -->
+    <div class="confirmation-modal" id="confirmationModal" style="display: none;">
+        <div class="confirmation-content">
+            <div class="confirmation-icon">❓</div>
+            <h2 class="confirmation-title" id="confirmationTitle">Вы уверены?</h2>
+            <p class="confirmation-text" id="confirmationText"></p>
+            <div class="confirmation-buttons">
+                <button class="confirm-yes-btn" id="confirmYesBtn">Да</button>
+                <button class="confirm-no-btn" id="confirmNoBtn">Нет</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно ввода промокода -->
+    <div class="promocode-modal" id="promocodeModal" style="display: none;">
+        <div class="promocode-content">
+            <div class="promocode-icon">🎁</div>
+            <h2 class="promocode-title" id="promocodeModalTitle">Активация промокода</h2>
+            <div class="promocode-text" id="promocodeModalText">
+                Введите промокод для получения награды
+            </div>
+            
+            <input type="text" class="promocode-input" id="promocodeInput" 
+                   placeholder="ВВЕДИТЕ ПРОМОКОД" maxlength="20">
+            
+            <div class="promocode-rewards" id="promocodeRewards" style="display: none;">
+                <div class="promocode-reward-item">
+                    <span>Награды:</span>
+                    <span id="promocodeRewardsList"></span>
                 </div>
-                <div class="time-unit">
-                    <div class="time-value" id="hours">00</div>
-                    <div class="time-label">Часов</div>
-                </div>
-                <div class="time-unit">
-                    <div class="time-value" id="minutes">00</div>
-                    <div class="time-label">Минут</div>
-                </div>
-                <div class="time-unit">
-                    <div class="time-value" id="seconds">00</div>
-                    <div class="time-label">Секунд</div>
+                <div class="promocode-stats">
+                    <span>Активаций осталось: <span id="promocodeRemaining">0</span></span>
+                    <span>Действует до: <span id="promocodeExpires">-</span></span>
                 </div>
             </div>
-            <div class="target-date" id="targetDate"></div>
+            
+            <div class="promocode-buttons">
+                <button class="promocode-submit-btn" id="promocodeSubmitBtn">Активировать</button>
+                <button class="promocode-cancel-btn" id="promocodeCancelBtn">Отмена</button>
+            </div>
         </div>
-        
-        <p class="sub-message pulse">Скоро мы откроем доступ к боту</p>
+    </div>
+
+    <!-- Подтверждение покупки NFT -->
+    <div class="buy-confirm-modal" id="buyConfirmModal">
+        <div class="buy-confirm-content">
+            <h3>Купить NFT?</h3>
+            <p id="buyNftName">Название NFT</p>
+            <p>Стоимость: <span id="buyNftPrice">0</span> SAMD</p>
+            <p>У вас есть: <span id="userCurrentBalance">0</span> SAMD</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmBuyBtn">Купить</button>
+                <button class="cancel-btn" onclick="closeBuyConfirmModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подтверждение открытия кейса -->
+    <div class="case-confirm-modal" id="caseConfirmModal">
+        <div class="case-confirm-content">
+            <h3>Открыть кейс?</h3>
+            <p id="caseConfirmName">Название кейса</p>
+            <p>Стоимость: <span id="caseConfirmCost">0</span> 🎟️</p>
+            <p>У вас останется: <span id="remainingTicketsCase">0</span> 🎟️</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmCaseBtn">Открыть</button>
+                <button class="cancel-btn" onclick="closeCaseConfirmModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Открытие кейса -->
+    <div class="case-opening" id="caseOpening">
+        <div class="case-reward">
+            <div class="reward-image">
+                <img id="rewardImage" src="" alt="Reward">
+            </div>
+            <div class="reward-name" id="rewardName">Название награды</div>
+            <div class="reward-rarity" id="rewardRarity">Редкость</div>
+            <button class="confirm-btn" onclick="closeCaseOpening()">Забрать</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно отправки NFT -->
+    <div class="send-modal" id="sendModal">
+        <div class="send-content">
+            <h3>Отправить NFT</h3>
+            <p id="sendNftName">Название NFT</p>
+            <input type="text" class="send-input" id="sendUsername" placeholder="Введите никнейм получателя">
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmSendBtn">Отправить</button>
+                <button class="cancel-btn" onclick="closeSendModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно продажи NFT -->
+    <div class="sell-modal" id="sellModal">
+        <div class="sell-content">
+            <h3>Продать NFT?</h3>
+            <p id="sellNftName">Название NFT</p>
+            <p>Вы получите: <span id="sellNftPrice">0</span> SAMD (70% от стоимости)</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" id="confirmSellBtn">Продать</button>
+                <button class="cancel-btn" onclick="closeSellModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-coins"></i>
+                    <span>SAMDCOIN</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-profile" id="userProfile" style="display: none;">
+                        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+                        <span id="userName" class="user-name"></span>
+                    </div>
+                    <div class="balance">
+                        <span>SAMD: </span>
+                        <span id="balanceSAMD">0</span>
+                    </div>
+                    <div class="balance">
+                        <span>🎟️ </span>
+                        <span id="balanceTickets">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="base">База</div>
+            <div class="nav-tab" data-tab="shop">Магазин</div>
+            <div class="nav-tab" data-tab="nft">NFT Магазин</div>
+            <div class="nav-tab" data-tab="cases">Кейсы</div>
+            <div class="nav-tab" data-tab="inventory">Инвентарь</div>
+            <div class="nav-tab" data-tab="profile">Профиль</div>
+        </div>
+
+        <!-- Вкладка База -->
+        <div class="tab-content active" id="base-content">
+            <div class="mining-section">
+                <h2 class="base-title" id="baseTitle">База |Загрузка...|</h2>
+                <p class="base-subtitle">Майните SAMDCOIN и улучшайте свою ферму</p>
+                
+                <div class="mining-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentSAMD">0</div>
+                        <div class="stat-label">Текущий SAMD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="maxSAMD">500</div>
+                        <div class="stat-label">Максимум SAMD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="incomePerSec">0.1</div>
+                        <div class="stat-label">Доход в секунду</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="ticketsCount">0</div>
+                        <div class="stat-label">Билеты 🎟️</div>
+                    </div>
+                </div>
+
+                <button class="mine-btn" id="mineBtn">
+                    <i class="fas fa-digging"></i>
+                    Майнить SAMD
+                </button>
+                <div style="margin-top: 10px; font-size: 12px; color: var(--text-secondary);">
+                    Майнинг работает даже когда приложение закрыто!
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Магазин -->
+        <div class="tab-content" id="shop-content">
+            <div class="shop-grid" id="shopItems">
+                <div class="empty-state">В магазине пока что ничего нет</div>
+            </div>
+        </div>
+
+        <!-- Вкладка NFT Магазин -->
+        <div class="tab-content" id="nft-content">
+            <div class="nft-grid" id="nftMarketplace">
+                <div class="empty-state">В NFT магазине пока что ничего нет</div>
+            </div>
+        </div>
+
+        <!-- Вкладка Кейсы -->
+        <div class="tab-content" id="cases-content">
+            <div class="cases-section">
+                <h2>Кейсы</h2>
+                <p>Открывайте кейсы за билеты 🎟️ и получайте редкие NFT!</p>
+                
+                <div class="cases-grid" id="casesGrid">
+                    <div class="loading">Загрузка кейсов...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Инвентарь -->
+        <div class="tab-content" id="inventory-content">
+            <div class="inventory-section">
+                <div class="inventory-header">
+                    <h2>Ваши NFT</h2>
+                    <div class="inventory-filters">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="common">Обычные</button>
+                        <button class="filter-btn" data-filter="rare">Редкие</button>
+                        <button class="filter-btn" data-filter="epic">Эпические</button>
+                        <button class="filter-btn" data-filter="legendary">Легендарные</button>
+                    </div>
+                </div>
+                <div class="inventory-grid" id="inventoryItems">
+                    <div class="loading">Загрузка инвентаря...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Профиль с промокодами -->
+        <div class="tab-content" id="profile-content">
+            <div class="profile-section">
+                <div class="profile-header">
+                    <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar">
+                    <div class="profile-info">
+                        <h2 id="profileName">Загрузка...</h2>
+                        <p id="profileUsername"></p>
+                    </div>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileSAMD">0</div>
+                        <div class="stat-label">Всего SAMD</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileTickets">0</div>
+                        <div class="stat-label">Билеты 🎟️</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileIncome">0.1</div>
+                        <div class="stat-label">Доход/сек</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="stat-value" id="profileMax">500</div>
+                        <div class="stat-label">Макс. SAMD</div>
+                    </div>
+                </div>
+
+                <!-- Секция промокодов -->
+                <div class="profile-promocode-section">
+                    <h3>Промокоды</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                        Введите промокод для получения наград. Каждый промокод можно активировать только один раз.
+                    </p>
+                    
+                    <div class="promocode-input-container">
+                        <input type="text" class="promocode-input-field" id="profilePromocodeInput" 
+                               placeholder="ВВЕДИТЕ ПРОМОКОД" maxlength="20">
+                        <button class="promocode-activate-btn" id="profilePromocodeBtn">
+                            Активировать
+                        </button>
+                    </div>
+                    
+                    <!-- Список активированных промокодов -->
+                    <div class="activated-promocodes" id="activatedPromocodes" style="display: none;">
+                        <h4>Активированные промокоды:</h4>
+                        <div class="promocode-list" id="promocodeList">
+                            <!-- Промокоды будут загружены динамически -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card" style="margin-top: 20px;">
+                    <h3>Настройки</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                        ID пользователя: <span id="userId"></span>
+                    </p>
+                    <button class="buy-btn" onclick="askConfirmation(resetProgress, 'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!')" style="background-color: var(--danger-color);">
+                        Сбросить прогресс
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-menu">
+        <div class="mobile-nav">
+            <div class="mobile-nav-item active" data-tab="base">
+                <i class="fas fa-home"></i>
+                <span>База</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="shop">
+                <i class="fas fa-store"></i>
+                <span>Магазин</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="nft">
+                <i class="fas fa-palette"></i>
+                <span>NFT</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="cases">
+                <i class="fas fa-gift"></i>
+                <span>Кейсы</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="inventory">
+                <i class="fas fa-box"></i>
+                <span>Инвентарь</span>
+            </div>
+            <div class="mobile-nav-item" data-tab="profile">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
     </div>
 
     <script>
-        // Создание звездного фона
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            const starsCount = 150;
-            
-            for (let i = 0; i < starsCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
+        // ==================== КОНФИГУРАЦИЯ FIREBASE ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCcxotG6DNpkUxTXplC4DURNe-S02otuc4",
+            authDomain: "samdcoin-e65a5.firebaseapp.com",
+            databaseURL: "https://samdcoin-e65a5-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "samdcoin-e65a5",
+            storageBucket: "samdcoin-e65a5.firebasestorage.app",
+            messagingSenderId: "30873122562",
+            appId: "1:30873122562:web:5243417cc6ebc5abe4341b",
+            measurementId: "G-BBPFLK9DMS"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ==================== TELEGRAM WEB APP ====================
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const user = tg.initDataUnsafe.user;
+        const USER_ID = user ? user.id.toString() : 'demo-user';
+        const USERNAME = user?.username || 'user';
+
+        // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
+        let userData = {
+            samd: 0,
+            tickets: 0,
+            currentMining: 0,
+            maxMining: 500,
+            incomePerSecond: 0.1,
+            lastMiningUpdate: new Date().toISOString(),
+            isMining: false,
+            upgrades: [],
+            nfts: [],
+            activatedPromocodes: [] // Новое поле для активированных промокодов
+        };
+
+        let shopItems = [];
+        let nftItems = [];
+        let cases = [];
+        let promocodes = []; // Коллекция промокодов
+        let lastSave = Date.now();
+        let currentInventoryFilter = 'all';
+
+        // Модальные окна
+        let selectedNFT = null;
+        let selectedCase = null;
+        
+        // Realtime listeners
+        let userListener = null;
+        let shopListener = null;
+        let nftListener = null;
+        let casesListener = null;
+        let promocodesListener = null; // Слушатель для промокодов
+
+        // Подтверждение действий
+        let pendingAction = null;
+        let pendingActionData = null;
+
+        // Промокоды
+        let currentPromocodeCheck = null;
+
+        // ==================== FIREBASE REALTIME FUNCTIONS ====================
+
+        // Установка realtime слушателей
+        function setupRealtimeListeners() {
+            // Слушатель данных пользователя
+            if (userListener) userListener();
+            userListener = db.collection('users').doc(USER_ID)
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        // Обновляем все данные пользователя
+                        if (data.samd !== undefined) userData.samd = data.samd;
+                        if (data.tickets !== undefined) userData.tickets = data.tickets;
+                        if (data.currentMining !== undefined) userData.currentMining = data.currentMining;
+                        if (data.isMining !== undefined) userData.isMining = data.isMining;
+                        if (data.maxMining !== undefined) userData.maxMining = data.maxMining;
+                        if (data.incomePerSecond !== undefined) userData.incomePerSecond = data.incomePerSecond;
+                        if (data.nfts) userData.nfts = data.nfts;
+                        if (data.upgrades) userData.upgrades = data.upgrades;
+                        if (data.activatedPromocodes) userData.activatedPromocodes = data.activatedPromocodes;
+                        
+                        updateUI();
+                        // Обновляем инвентарь если он открыт
+                        if (document.getElementById('inventory-content').classList.contains('active')) {
+                            updateInventoryUI();
+                        }
+                        // Обновляем список активированных промокодов
+                        updateActivatedPromocodesUI();
+                    }
+                }, (error) => {
+                    console.error('Ошибка слушателя пользователя:', error);
+                });
+
+            // Слушатель магазина
+            if (shopListener) shopListener();
+            shopListener = db.collection('shopItems')
+                .onSnapshot((snapshot) => {
+                    shopItems = [];
+                    snapshot.forEach(doc => {
+                        shopItems.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    updateShopUI();
+                }, (error) => {
+                    console.error('Ошибка слушателя магазина:', error);
+                });
+
+            // Слушатель NFT магазина
+            if (nftListener) nftListener();
+            nftListener = db.collection('nftItems')
+                .onSnapshot((snapshot) => {
+                    nftItems = [];
+                    snapshot.forEach(doc => {
+                        nftItems.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    updateNFTUI();
+                }, (error) => {
+                    console.error('Ошибка слушателя NFT:', error);
+                });
+
+            // Слушатель кейсов
+            if (casesListener) casesListener();
+            casesListener = db.collection('cases')
+                .onSnapshot((snapshot) => {
+                    cases = [];
+                    snapshot.forEach(doc => {
+                        cases.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    updateCasesUI();
+                }, (error) => {
+                    console.error('Ошибка слушателя кейсов:', error);
+                });
+
+            // Слушатель промокодов (только активные)
+            if (promocodesListener) promocodesListener();
+            promocodesListener = db.collection('promocodes')
+                .where('isActive', '==', true)
+                .onSnapshot((snapshot) => {
+                    promocodes = [];
+                    snapshot.forEach(doc => {
+                        promocodes.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    console.log('Промокоды обновлены:', promocodes.length);
+                }, (error) => {
+                    console.error('Ошибка слушателя промокодов:', error);
+                });
+        }
+
+        // Удаление слушателей
+        function cleanupListeners() {
+            if (userListener) userListener();
+            if (shopListener) shopListener();
+            if (nftListener) nftListener();
+            if (casesListener) casesListener();
+            if (promocodesListener) promocodesListener();
+        }
+
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            try {
+                console.log('Загрузка данных пользователя...');
+                const doc = await db.collection('users').doc(USER_ID).get();
                 
-                const size = Math.random() * 3;
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                const duration = 2 + Math.random() * 3;
-                const delay = Math.random() * 5;
+                if (doc.exists) {
+                    const data = doc.data();
+                    userData = { ...userData, ...data };
+                    calculateOfflineMining();
+                    updateMiningStatus();
+                } else {
+                    console.log('Создание нового пользователя');
+                    await saveUserData();
+                }
                 
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${x}vw`;
-                star.style.top = `${y}vh`;
-                star.style.animationDuration = `${duration}s`;
-                star.style.animationDelay = `${delay}s`;
-                
-                starsContainer.appendChild(star);
+                updateUI();
+                setupRealtimeListeners();
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
             }
         }
 
-        // Установка целевой даты: 3 декабря 2025 года, 17:00 по Москве
-        const targetDate = new Date('December 3, 2025 17:00:00 GMT+0300');
+        // Сохранение данных пользователя
+        async function saveUserData(force = false) {
+            try {
+                userData.lastMiningUpdate = new Date().toISOString();
+                
+                await db.collection('users').doc(USER_ID).set({
+                    ...userData,
+                    telegramData: user,
+                    username: USERNAME,
+                    lastActive: new Date().toISOString()
+                }, { merge: true });
+                
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                return false;
+            }
+        }
 
-        // Обновление отображения таймера
-        function updateTimer() {
-            const now = new Date();
+        // ==================== СИСТЕМА ПРОМОКОДОВ ====================
+
+        // Проверка промокода
+        async function checkPromocode(code) {
+            if (!code || code.trim() === '') {
+                return { success: false, message: 'Введите промокод' };
+            }
             
-            // Разница во времени (в миллисекундах)
-            const diff = targetDate - now;
+            const cleanCode = code.trim().toUpperCase();
             
-            // Если время вышло
-            if (diff <= 0) {
-                document.getElementById('days').textContent = '00';
-                document.getElementById('hours').textContent = '00';
-                document.getElementById('minutes').textContent = '00';
-                document.getElementById('seconds').textContent = '00';
+            try {
+                // Ищем промокод в базе
+                const promocodesSnapshot = await db.collection('promocodes')
+                    .where('code', '==', cleanCode)
+                    .where('isActive', '==', true)
+                    .get();
                 
-                document.querySelector('.message').textContent = 'Технические работы завершены!';
-                document.querySelector('.sub-message').textContent = 'Бот скоро будет доступен';
-                document.querySelector('.sad-emoji').textContent = '🎉';
+                if (promocodesSnapshot.empty) {
+                    return { success: false, message: 'Промокод не найден или неактивен' };
+                }
                 
-                clearInterval(timerInterval);
+                const promocodeDoc = promocodesSnapshot.docs[0];
+                const promocode = {
+                    id: promocodeDoc.id,
+                    ...promocodeDoc.data()
+                };
+                
+                // Проверяем дату истечения
+                if (promocode.expiresAt) {
+                    const expiresDate = new Date(promocode.expiresAt);
+                    const now = new Date();
+                    if (expiresDate < now) {
+                        return { success: false, message: 'Промокод истек' };
+                    }
+                }
+                
+                // Проверяем количество активаций
+                if (promocode.maxActivations > 0 && promocode.currentActivations >= promocode.maxActivations) {
+                    return { success: false, message: 'Лимит активаций промокода исчерпан' };
+                }
+                
+                // Проверяем, активировал ли пользователь уже этот промокод
+                const userDoc = await db.collection('users').doc(USER_ID).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    const activatedPromocodes = userData.activatedPromocodes || [];
+                    if (activatedPromocodes.includes(promocode.id)) {
+                        return { success: false, message: 'Вы уже активировали этот промокод' };
+                    }
+                }
+                
+                // Проверяем минимальный уровень если указан
+                if (promocode.minLevel && userData.level < promocode.minLevel) {
+                    return { success: false, message: `Для активации нужен уровень ${promocode.minLevel}+` };
+                }
+                
+                return { 
+                    success: true, 
+                    promocode: promocode,
+                    message: 'Промокод действителен'
+                };
+                
+            } catch (error) {
+                console.error('Ошибка проверки промокода:', error);
+                return { success: false, message: 'Ошибка проверки промокода' };
+            }
+        }
+
+        // Активация промокода
+        async function activatePromocode(code) {
+            const checkResult = await checkPromocode(code);
+            
+            if (!checkResult.success) {
+                return checkResult;
+            }
+            
+            const promocode = checkResult.promocode;
+            
+            try {
+                // Используем транзакцию для атомарной активации
+                const promocodeRef = db.collection('promocodes').doc(promocode.id);
+                const userRef = db.collection('users').doc(USER_ID);
+                
+                const result = await db.runTransaction(async (transaction) => {
+                    // Получаем актуальные данные
+                    const promocodeSnapshot = await transaction.get(promocodeRef);
+                    const userSnapshot = await transaction.get(userRef);
+                    
+                    if (!promocodeSnapshot.exists || !userSnapshot.exists) {
+                        throw new Error("Документ не найден");
+                    }
+                    
+                    const promocodeData = promocodeSnapshot.data();
+                    const userDataInTrans = userSnapshot.data();
+                    
+                    // Повторяем проверки в транзакции
+                    if (!promocodeData.isActive) {
+                        throw new Error("Промокод неактивен");
+                    }
+                    
+                    if (promocodeData.maxActivations > 0 && 
+                        promocodeData.currentActivations >= promocodeData.maxActivations) {
+                        throw new Error("Лимит активаций исчерпан");
+                    }
+                    
+                    const activatedPromocodes = userDataInTrans.activatedPromocodes || [];
+                    if (activatedPromocodes.includes(promocode.id)) {
+                        throw new Error("Промокод уже активирован");
+                    }
+                    
+                    // Обновляем промокод
+                    transaction.update(promocodeRef, {
+                        currentActivations: firebase.firestore.FieldValue.increment(1),
+                        lastActivatedAt: new Date().toISOString(),
+                        activatedBy: firebase.firestore.FieldValue.arrayUnion(USER_ID)
+                    });
+                    
+                    // Награждаем пользователя
+                    let updates = {
+                        activatedPromocodes: [...activatedPromocodes, promocode.id]
+                    };
+                    
+                    // Применяем награды
+                    if (promocodeData.rewards) {
+                        const rewards = promocodeData.rewards;
+                        
+                        if (rewards.samd) {
+                            updates.samd = firebase.firestore.FieldValue.increment(rewards.samd);
+                        }
+                        if (rewards.tickets) {
+                            updates.tickets = firebase.firestore.FieldValue.increment(rewards.tickets);
+                        }
+                        if (rewards.nft) {
+                            const nfts = userDataInTrans.nfts || [];
+                            nfts.push({
+                                nftId: `promocode_${promocode.id}_${Date.now()}`,
+                                name: rewards.nft.name || 'Промо NFT',
+                                imageUrl: rewards.nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f',
+                                rarity: rewards.nft.rarity || 'common',
+                                price: rewards.nft.price || 100,
+                                fromPromocode: promocodeData.code,
+                                receivedAt: new Date().toISOString()
+                            });
+                            updates.nfts = nfts;
+                        }
+                    }
+                    
+                    // Обновляем пользователя
+                    transaction.update(userRef, updates);
+                    
+                    return {
+                        success: true,
+                        rewards: promocodeData.rewards || {},
+                        promocodeName: promocodeData.name || promocodeData.code
+                    };
+                });
+                
+                // Локальное обновление
+                if (result.rewards.samd) {
+                    userData.samd += result.rewards.samd;
+                }
+                if (result.rewards.tickets) {
+                    userData.tickets += result.rewards.tickets;
+                }
+                if (result.rewards.nft) {
+                    if (!userData.nfts) userData.nfts = [];
+                    userData.nfts.push({
+                        nftId: `promocode_${promocode.id}_${Date.now()}`,
+                        name: result.rewards.nft.name || 'Промо NFT',
+                        imageUrl: result.rewards.nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f',
+                        rarity: result.rewards.nft.rarity || 'common',
+                        price: result.rewards.nft.price || 100,
+                        fromPromocode: promocode.code,
+                        receivedAt: new Date().toISOString()
+                    });
+                }
+                
+                userData.activatedPromocodes = [...(userData.activatedPromocodes || []), promocode.id];
+                
+                updateUI();
+                updateActivatedPromocodesUI();
+                
+                return {
+                    success: true,
+                    message: `Промокод "${result.promocodeName}" активирован успешно!`,
+                    rewards: result.rewards
+                };
+                
+            } catch (error) {
+                console.error('Ошибка активации промокода:', error);
+                return { 
+                    success: false, 
+                    message: error.message || 'Ошибка активации промокода' 
+                };
+            }
+        }
+
+        // Показать информацию о промокоде
+        async function showPromocodeInfo(code) {
+            const checkResult = await checkPromocode(code);
+            
+            if (!checkResult.success) {
+                return checkResult;
+            }
+            
+            const promocode = checkResult.promocode;
+            
+            // Показываем информацию в модальном окне
+            document.getElementById('promocodeModalTitle').textContent = promocode.name || promocode.code;
+            document.getElementById('promocodeModalText').textContent = promocode.description || 'Введите промокод для получения награды';
+            
+            // Показываем награды
+            const rewardsList = document.getElementById('promocodeRewardsList');
+            const rewardsContainer = document.getElementById('promocodeRewards');
+            const remainingEl = document.getElementById('promocodeRemaining');
+            const expiresEl = document.getElementById('promocodeExpires');
+            
+            if (promocode.rewards) {
+                let rewardsText = '';
+                if (promocode.rewards.samd) {
+                    rewardsText += `${promocode.rewards.samd} SAMD `;
+                }
+                if (promocode.rewards.tickets) {
+                    rewardsText += `${promocode.rewards.tickets} 🎟️ `;
+                }
+                if (promocode.rewards.nft) {
+                    rewardsText += `NFT "${promocode.rewards.nft.name}" `;
+                }
+                
+                rewardsList.textContent = rewardsText || 'Секретная награда';
+                rewardsContainer.style.display = 'block';
+            } else {
+                rewardsContainer.style.display = 'none';
+            }
+            
+            // Показываем статистику
+            if (promocode.maxActivations > 0) {
+                const remaining = promocode.maxActivations - promocode.currentActivations;
+                remainingEl.textContent = remaining;
+            } else {
+                remainingEl.textContent = '∞';
+            }
+            
+            if (promocode.expiresAt) {
+                const expiresDate = new Date(promocode.expiresAt);
+                expiresEl.textContent = expiresDate.toLocaleDateString('ru-RU');
+            } else {
+                expiresEl.textContent = '∞';
+            }
+            
+            currentPromocodeCheck = promocode;
+            return { success: true, promocode: promocode };
+        }
+
+        // Обновление UI активированных промокодов
+        function updateActivatedPromocodesUI() {
+            const container = document.getElementById('activatedPromocodes');
+            const list = document.getElementById('promocodeList');
+            
+            if (!userData.activatedPromocodes || userData.activatedPromocodes.length === 0) {
+                container.style.display = 'none';
                 return;
             }
             
-            // Расчет временных единиц
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            container.style.display = 'block';
+            list.innerHTML = '';
             
-            // Обновление элементов на странице
-            document.getElementById('days').textContent = days.toString().padStart(2, '0');
-            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            // Показываем только последние 10 промокодов
+            const recentPromocodes = userData.activatedPromocodes.slice(-10);
             
-            // Анимация для секунд
-            const secondsElement = document.getElementById('seconds');
-            secondsElement.style.animation = 'timerPulse 1s ease-in-out';
+            recentPromocodes.forEach(promoId => {
+                const badge = document.createElement('div');
+                badge.className = 'promocode-badge';
+                badge.innerHTML = `
+                    <i class="fas fa-gift"></i>
+                    <span>${promoId.substring(0, 8)}...</span>
+                `;
+                badge.title = `Промокод ID: ${promoId}`;
+                list.appendChild(badge);
+            });
+        }
+
+        // Открытие модального окна промокода
+        function openPromocodeModal() {
+            document.getElementById('promocodeModal').style.display = 'flex';
+            document.getElementById('promocodeInput').value = '';
+            document.getElementById('promocodeInput').focus();
+            document.getElementById('promocodeRewards').style.display = 'none';
+            document.getElementById('promocodeModalTitle').textContent = 'Активация промокода';
+            document.getElementById('promocodeModalText').textContent = 'Введите промокод для получения награды';
+        }
+
+        // Закрытие модального окна промокода
+        function closePromocodeModal() {
+            document.getElementById('promocodeModal').style.display = 'none';
+            currentPromocodeCheck = null;
+        }
+
+        // ==================== СИСТЕМА ПОДТВЕРЖДЕНИЙ ====================
+
+        function askConfirmation(action, message, title = "Вы уверены?", data = null) {
+            pendingAction = action;
+            pendingActionData = data;
+            
+            document.getElementById('confirmationTitle').textContent = title;
+            document.getElementById('confirmationText').textContent = message;
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        function executePendingAction() {
+            if (pendingAction) {
+                if (pendingActionData) {
+                    pendingAction(pendingActionData);
+                } else {
+                    pendingAction();
+                }
+                pendingAction = null;
+                pendingActionData = null;
+            }
+        }
+
+        function closeConfirmationModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+            pendingAction = null;
+            pendingActionData = null;
+        }
+
+        // ==================== ОБНОВЛЕННЫЕ ФУНКЦИИ ПОКУПКИ ====================
+
+        async function buyShopItem(itemId) {
+            const item = shopItems.find(i => i.id === itemId);
+            if (!item) {
+                showNotification('Товар не найден', true);
+                return;
+            }
+            
+            try {
+                const itemDoc = await db.collection('shopItems').doc(itemId).get();
+                if (!itemDoc.exists) {
+                    showNotification('Товар больше не существует', true);
+                    return;
+                }
+                
+                const actualItem = itemDoc.data();
+                const userDoc = await db.collection('users').doc(USER_ID).get();
+                const actualUserData = userDoc.exists ? userDoc.data() : null;
+                
+                if (actualUserData && actualUserData.samd < item.price) {
+                    showNotification('Недостаточно SAMD', true);
+                    return;
+                }
+                
+                if (actualItem.currentStock <= 0) {
+                    showNotification('Товар закончился', true);
+                    updateShopUI();
+                    return;
+                }
+                
+                await db.collection('shopItems').doc(itemId).update({
+                    currentStock: firebase.firestore.FieldValue.increment(-1)
+                });
+                
+                await db.collection('users').doc(USER_ID).update({
+                    samd: firebase.firestore.FieldValue.increment(-item.price)
+                });
+                
+                if (item.type === 'income') {
+                    await db.collection('users').doc(USER_ID).update({
+                        incomePerSecond: firebase.firestore.FieldValue.increment(item.value)
+                    });
+                    userData.incomePerSecond += item.value;
+                } else if (item.type === 'max') {
+                    await db.collection('users').doc(USER_ID).update({
+                        maxMining: firebase.firestore.FieldValue.increment(item.value)
+                    });
+                    userData.maxMining += item.value;
+                } else if (item.type === 'tickets') {
+                    await db.collection('users').doc(USER_ID).update({
+                        tickets: firebase.firestore.FieldValue.increment(item.value)
+                    });
+                    userData.tickets += item.value;
+                }
+                
+                if (actualUserData) {
+                    userData.samd = actualUserData.samd - item.price;
+                }
+                
+                showNotification(`Куплено: ${item.name}`);
+                
+            } catch (error) {
+                console.error('Ошибка покупки:', error);
+                showNotification('Ошибка покупки. Попробуйте еще раз.', true);
+            }
+        }
+
+        async function buyNFTItem(nftId) {
+            const nft = nftItems.find(i => i.id === nftId);
+            if (!nft) {
+                showNotification('NFT не найдено', true);
+                return;
+            }
+            
+            try {
+                const nftDoc = await db.collection('nftItems').doc(nftId).get();
+                if (!nftDoc.exists) {
+                    showNotification('NFT больше не существует', true);
+                    return;
+                }
+                
+                const actualNFT = nftDoc.data();
+                const userDoc = await db.collection('users').doc(USER_ID).get();
+                const actualUserData = userDoc.exists ? userDoc.data() : null;
+                
+                if (actualUserData && actualUserData.samd < nft.price) {
+                    showNotification('Недостаточно SAMD', true);
+                    return;
+                }
+                
+                if (actualNFT.currentStock <= 0) {
+                    showNotification('NFT закончилось', true);
+                    updateNFTUI();
+                    return;
+                }
+                
+                const nftRef = db.collection('nftItems').doc(nftId);
+                const userRef = db.collection('users').doc(USER_ID);
+                
+                await db.runTransaction(async (transaction) => {
+                    const nftSnapshot = await transaction.get(nftRef);
+                    const userSnapshot = await transaction.get(userRef);
+                    
+                    if (!nftSnapshot.exists || !userSnapshot.exists) {
+                        throw new Error("Документ не найден");
+                    }
+                    
+                    const nftData = nftSnapshot.data();
+                    const userDataInTrans = userSnapshot.data();
+                    
+                    if (nftData.currentStock <= 0) {
+                        throw new Error("NFT закончилось");
+                    }
+                    
+                    if (userDataInTrans.samd < nft.price) {
+                        throw new Error("Недостаточно средств");
+                    }
+                    
+                    transaction.update(nftRef, {
+                        currentStock: firebase.firestore.FieldValue.increment(-1)
+                    });
+                    
+                    const nftCopy = { ...nft };
+                    delete nftCopy.currentStock;
+                    delete nftCopy.globalStock;
+                    
+                    const newNFTs = [...(userDataInTrans.nfts || []), {
+                        nftId: nftId,
+                        ...nftCopy,
+                        purchasedAt: new Date().toISOString()
+                    }];
+                    
+                    transaction.update(userRef, {
+                        samd: firebase.firestore.FieldValue.increment(-nft.price),
+                        nfts: newNFTs
+                    });
+                    
+                    return true;
+                });
+                
+                showNotification(`Куплено NFT: ${nft.name}`);
+                
+            } catch (error) {
+                console.error('Ошибка покупки NFT:', error);
+                if (error.message === "NFT закончилось") {
+                    showNotification('NFT закончилось!', true);
+                    updateNFTUI();
+                } else if (error.message === "Недостаточно средств") {
+                    showNotification('Недостаточно SAMD', true);
+                } else {
+                    showNotification('Ошибка покупки NFT', true);
+                }
+            }
+        }
+
+        async function openCase(caseId) {
+            const caseItem = cases.find(c => c.id === caseId);
+            if (!caseItem) {
+                showNotification('Кейс не найден', true);
+                return;
+            }
+            
+            try {
+                const userDoc = await db.collection('users').doc(USER_ID).get();
+                if (!userDoc.exists) {
+                    showNotification('Ошибка: пользователь не найден', true);
+                    return;
+                }
+                
+                const actualUserData = userDoc.data();
+                if (actualUserData.tickets < caseItem.cost) {
+                    showNotification('Недостаточно билетов!', true);
+                    userData.tickets = actualUserData.tickets;
+                    updateUI();
+                    return;
+                }
+                
+                const rewards = caseItem.rewards || [];
+                if (rewards.length === 0) {
+                    showNotification('В кейсе нет наград', true);
+                    return;
+                }
+                
+                const totalWeight = rewards.reduce((sum, reward) => sum + (reward.weight || 1), 0);
+                let random = Math.random() * totalWeight;
+                let selectedReward = null;
+                
+                for (const reward of rewards) {
+                    random -= (reward.weight || 1);
+                    if (random <= 0) {
+                        selectedReward = reward;
+                        break;
+                    }
+                }
+                
+                if (!selectedReward) {
+                    selectedReward = rewards[0];
+                }
+                
+                const userRef = db.collection('users').doc(USER_ID);
+                
+                await db.runTransaction(async (transaction) => {
+                    const userSnapshot = await transaction.get(userRef);
+                    if (!userSnapshot.exists) {
+                        throw new Error("Пользователь не найден");
+                    }
+                    
+                    const userDataInTrans = userSnapshot.data();
+                    
+                    if (userDataInTrans.tickets < caseItem.cost) {
+                        throw new Error("Недостаточно билетов");
+                    }
+                    
+                    transaction.update(userRef, {
+                        tickets: firebase.firestore.FieldValue.increment(-caseItem.cost)
+                    });
+                    
+                    const newNFTs = [...(userDataInTrans.nfts || []), {
+                        nftId: selectedReward.id || 'case_reward_' + Date.now(),
+                        name: selectedReward.name,
+                        imageUrl: selectedReward.imageUrl,
+                        rarity: selectedReward.rarity,
+                        price: selectedReward.price || 0,
+                        fromCase: caseItem.name,
+                        receivedAt: new Date().toISOString()
+                    }];
+                    
+                    transaction.update(userRef, {
+                        nfts: newNFTs
+                    });
+                    
+                    return selectedReward;
+                });
+                
+                showCaseReward(selectedReward);
+                
+            } catch (error) {
+                console.error('Ошибка открытия кейса:', error);
+                if (error.message === "Недостаточно билетов") {
+                    showNotification('Недостаточно билетов!', true);
+                } else {
+                    showNotification('Ошибка открытия кейса', true);
+                }
+            }
+        }
+
+        async function sellNFT(nftId) {
+            const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
+            if (nftIndex === -1) {
+                showNotification('NFT не найдено в вашем инвентаре', true);
+                return;
+            }
+            
+            const nft = userData.nfts[nftIndex];
+            const sellPrice = Math.floor(nft.price * 0.7);
+            
+            try {
+                const userRef = db.collection('users').doc(USER_ID);
+                
+                await db.runTransaction(async (transaction) => {
+                    const userSnapshot = await transaction.get(userRef);
+                    if (!userSnapshot.exists) {
+                        throw new Error("Пользователь не найден");
+                    }
+                    
+                    const userDataInTrans = userSnapshot.data();
+                    const currentNFTs = userDataInTrans.nfts || [];
+                    
+                    const nftToSellIndex = currentNFTs.findIndex(item => item.nftId === nftId);
+                    if (nftToSellIndex === -1) {
+                        throw new Error("NFT не найдено");
+                    }
+                    
+                    currentNFTs.splice(nftToSellIndex, 1);
+                    
+                    transaction.update(userRef, {
+                        samd: firebase.firestore.FieldValue.increment(sellPrice),
+                        nfts: currentNFTs
+                    });
+                    
+                    return true;
+                });
+                
+                showNotification(`NFT "${nft.name}" продано за ${sellPrice} SAMD`);
+                
+            } catch (error) {
+                console.error('Ошибка продажи NFT:', error);
+                showNotification('Ошибка продажи NFT', true);
+            }
+        }
+
+        // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
+
+        function calculateOfflineMining() {
+            const lastUpdate = new Date(userData.lastMiningUpdate);
+            const now = new Date();
+            const diffSeconds = (now - lastUpdate) / 1000;
+            
+            if (diffSeconds > 0 && userData.isMining) {
+                const mined = diffSeconds * userData.incomePerSecond;
+                userData.currentMining = Math.min(userData.currentMining + mined, userData.maxMining);
+                if (mined > 0) {
+                    showNotification(`За время отсутствия намайнено: ${mined.toFixed(1)} SAMD`);
+                }
+            }
+        }
+
+        function updateMiningStatus() {
+            const mineBtn = document.getElementById('mineBtn');
+            if (!mineBtn) return;
+
+            if (userData.isMining && userData.currentMining < userData.maxMining) {
+                mineBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Майнинг...';
+                mineBtn.className = 'mine-btn mining';
+                mineBtn.disabled = true;
+            } else if (userData.currentMining >= userData.maxMining) {
+                mineBtn.innerHTML = '<i class="fas fa-coins"></i> Забрать SAMD';
+                mineBtn.className = 'mine-btn collect';
+                mineBtn.disabled = false;
+            } else {
+                mineBtn.innerHTML = '<i class="fas fa-digging"></i> Майнить SAMD';
+                mineBtn.className = 'mine-btn';
+                mineBtn.disabled = false;
+            }
+        }
+
+        function startMining() {
+            if (userData.isMining) return;
+            
+            userData.isMining = true;
+            updateMiningStatus();
+            saveUserData();
+            
+            showNotification('Майнинг начат!');
+        }
+
+        function collectMining() {
+            if (userData.currentMining > 0) {
+                userData.samd += userData.currentMining;
+                const collected = userData.currentMining;
+                userData.currentMining = 0;
+                userData.isMining = false;
+                
+                updateUI();
+                showNotification(`Собрано: ${collected.toFixed(1)} SAMD`);
+                saveUserData();
+            }
+        }
+
+        function handleMiningClick() {
+            askConfirmation(() => {
+                if (userData.currentMining >= userData.maxMining) {
+                    collectMining();
+                } else if (!userData.isMining) {
+                    startMining();
+                }
+            }, userData.currentMining >= userData.maxMining ? 
+                `Забрать ${userData.currentMining.toFixed(1)} SAMD?` : 
+                'Начать майнинг SAMD?');
+        }
+
+        function openCaseConfirmModal(caseId) {
+            const caseItem = cases.find(c => c.id === caseId);
+            if (!caseItem) return;
+            
+            if (userData.tickets < caseItem.cost) {
+                showNotification('Недостаточно билетов!', true);
+                return;
+            }
+            
+            selectedCase = caseItem;
+            document.getElementById('caseConfirmName').textContent = caseItem.name;
+            document.getElementById('caseConfirmCost').textContent = caseItem.cost;
+            document.getElementById('remainingTicketsCase').textContent = userData.tickets - caseItem.cost;
+            document.getElementById('caseConfirmModal').classList.add('active');
+        }
+
+        function closeCaseConfirmModal() {
+            document.getElementById('caseConfirmModal').classList.remove('active');
+            selectedCase = null;
+        }
+
+        function showCaseReward(reward) {
+            document.getElementById('rewardImage').src = reward.imageUrl;
+            document.getElementById('rewardName').textContent = reward.name;
+            document.getElementById('rewardRarity').textContent = `Редкость: ${reward.rarity}`;
+            document.getElementById('caseOpening').classList.add('active');
+        }
+
+        function closeCaseOpening() {
+            document.getElementById('caseOpening').classList.remove('active');
+            closeCaseConfirmModal();
+        }
+
+        function openBuyConfirmModal(nftId) {
+            const nft = nftItems.find(n => n.id === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            document.getElementById('buyNftName').textContent = nft.name;
+            document.getElementById('buyNftPrice').textContent = nft.price;
+            document.getElementById('userCurrentBalance').textContent = Math.floor(userData.samd);
+            document.getElementById('buyConfirmModal').classList.add('active');
+        }
+
+        function closeBuyConfirmModal() {
+            document.getElementById('buyConfirmModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
+        function openSendModal(nftId) {
+            const nft = userData.nfts.find(n => n.nftId === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            document.getElementById('sendNftName').textContent = nft.name;
+            document.getElementById('sendUsername').value = '';
+            document.getElementById('sendModal').classList.add('active');
+        }
+
+        function closeSendModal() {
+            document.getElementById('sendModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
+        function openSellModal(nftId) {
+            const nft = userData.nfts.find(n => n.nftId === nftId);
+            if (!nft) return;
+            
+            selectedNFT = nft;
+            const sellPrice = Math.floor(nft.price * 0.7);
+            document.getElementById('sellNftName').textContent = nft.name;
+            document.getElementById('sellNftPrice').textContent = sellPrice;
+            document.getElementById('sellModal').classList.add('active');
+        }
+
+        function closeSellModal() {
+            document.getElementById('sellModal').classList.remove('active');
+            selectedNFT = null;
+        }
+
+        async function sendNFT(nftId, recipientUsername) {
+            if (!recipientUsername) {
+                showNotification('Введите никнейм получателя', true);
+                return;
+            }
+            
+            const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
+            if (nftIndex === -1) {
+                showNotification('NFT не найдено в вашем инвентаре', true);
+                return;
+            }
+            
+            try {
+                const usersSnapshot = await db.collection('users')
+                    .where('username', '==', recipientUsername)
+                    .get();
+                
+                if (usersSnapshot.empty) {
+                    showNotification('Пользователь с таким никнеймом не найден', true);
+                    return;
+                }
+                
+                const recipientDoc = usersSnapshot.docs[0];
+                const recipientId = recipientDoc.id;
+                
+                if (recipientId === USER_ID) {
+                    showNotification('Нельзя отправить NFT самому себе', true);
+                    return;
+                }
+                
+                const senderRef = db.collection('users').doc(USER_ID);
+                const recipientRef = db.collection('users').doc(recipientId);
+                
+                await db.runTransaction(async (transaction) => {
+                    const senderSnapshot = await transaction.get(senderRef);
+                    const recipientSnapshot = await transaction.get(recipientRef);
+                    
+                    if (!senderSnapshot.exists || !recipientSnapshot.exists) {
+                        throw new Error("Пользователь не найден");
+                    }
+                    
+                    const senderData = senderSnapshot.data();
+                    const recipientData = recipientSnapshot.data();
+                    
+                    const senderNFTs = senderData.nfts || [];
+                    const nftIndex = senderNFTs.findIndex(n => n.nftId === nftId);
+                    
+                    if (nftIndex === -1) {
+                        throw new Error("NFT не найдено у отправителя");
+                    }
+                    
+                    const nftToSend = senderNFTs[nftIndex];
+                    senderNFTs.splice(nftIndex, 1);
+                    
+                    const recipientNFTs = recipientData.nfts || [];
+                    recipientNFTs.push({
+                        ...nftToSend,
+                        receivedFrom: USERNAME,
+                        receivedAt: new Date().toISOString()
+                    });
+                    
+                    transaction.update(senderRef, { nfts: senderNFTs });
+                    transaction.update(recipientRef, { nfts: recipientNFTs });
+                    
+                    return true;
+                });
+                
+                closeSendModal();
+                showNotification(`NFT отправлено пользователю @${recipientUsername}`);
+                
+            } catch (error) {
+                console.error('Ошибка отправки NFT:', error);
+                showNotification('Ошибка отправки NFT', true);
+            }
+        }
+
+        function filterInventory(filter) {
+            currentInventoryFilter = filter;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            updateInventoryUI();
+        }
+
+        // ==================== UI ФУНКЦИИ ====================
+
+        function updateUI() {
+            // Баланс
+            document.getElementById('balanceSAMD').textContent = Math.floor(userData.samd);
+            document.getElementById('balanceTickets').textContent = userData.tickets;
+            
+            // База
+            document.getElementById('baseTitle').textContent = `База |${USERNAME}|`;
+            document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
+            document.getElementById('maxSAMD').textContent = userData.maxMining;
+            document.getElementById('incomePerSec').textContent = userData.incomePerSecond.toFixed(1);
+            document.getElementById('ticketsCount').textContent = userData.tickets;
+            
+            // Профиль
+            document.getElementById('profileName').textContent = user.first_name || USERNAME;
+            document.getElementById('profileUsername').textContent = user.username ? `@${user.username}` : '';
+            document.getElementById('profileSAMD').textContent = Math.floor(userData.samd);
+            document.getElementById('profileTickets').textContent = userData.tickets;
+            document.getElementById('profileIncome').textContent = userData.incomePerSecond.toFixed(1);
+            document.getElementById('profileMax').textContent = userData.maxMining;
+            document.getElementById('userId').textContent = USER_ID;
+            
+            if (user.photo_url) {
+                document.getElementById('profileAvatar').src = user.photo_url;
+                document.getElementById('userAvatar').src = user.photo_url;
+            }
+            
+            updateMiningStatus();
+        }
+
+        function updateMiningUI() {
+            document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
+            updateMiningStatus();
+        }
+
+        function updateShopUI() {
+            const shopContainer = document.getElementById('shopItems');
+            shopContainer.innerHTML = '';
+            
+            if (shopItems.length === 0) {
+                shopContainer.innerHTML = '<div class="empty-state">В магазине пока что ничего нет</div>';
+                return;
+            }
+            
+            shopItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-price">${item.price} SAMD</div>
+                    </div>
+                    <div class="card-description">${item.description}</div>
+                    <div class="card-stats">
+                        <span>Осталось: ${item.currentStock}</span>
+                        <span>+${item.value} ${getItemUnit(item.type)}</span>
+                    </div>
+                    <button class="buy-btn" onclick="askConfirmation(() => buyShopItem('${item.id}'), 'Купить ${item.name} за ${item.price} SAMD?')" 
+                            ${userData.samd < item.price || item.currentStock <= 0 ? 'disabled' : ''}>
+                        ${userData.samd < item.price ? 'Недостаточно SAMD' : 
+                          item.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
+                    </button>
+                `;
+                shopContainer.appendChild(card);
+            });
+        }
+
+        function updateNFTUI() {
+            const nftContainer = document.getElementById('nftMarketplace');
+            nftContainer.innerHTML = '';
+            
+            if (nftItems.length === 0) {
+                nftContainer.innerHTML = '<div class="empty-state">В NFT магазине пока что ничего нет</div>';
+                return;
+            }
+            
+            nftItems.forEach(nft => {
+                const card = document.createElement('div');
+                card.className = 'nft-card';
+                card.innerHTML = `
+                    <div class="nft-image">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
+                    </div>
+                    <div class="nft-info">
+                        <div class="nft-name">${nft.name}</div>
+                        <div class="nft-price">
+                            <div class="nft-current-price">${nft.price} SAMD</div>
+                            <div class="nft-stock">Осталось: ${nft.currentStock}</div>
+                        </div>
+                        <button class="buy-btn" onclick="openBuyConfirmModal('${nft.id}')" 
+                                ${userData.samd < nft.price || nft.currentStock <= 0 ? 'disabled' : ''}>
+                            ${userData.samd < nft.price ? 'Недостаточно SAMD' : 
+                              nft.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
+                        </button>
+                    </div>
+                `;
+                nftContainer.appendChild(card);
+            });
+        }
+
+        function updateCasesUI() {
+            const casesContainer = document.getElementById('casesGrid');
+            casesContainer.innerHTML = '';
+            
+            if (cases.length === 0) {
+                casesContainer.innerHTML = '<div class="empty-state">Кейсы пока не добавлены</div>';
+                return;
+            }
+            
+            cases.forEach(caseItem => {
+                const card = document.createElement('div');
+                card.className = 'case-card';
+                card.onclick = () => openCaseConfirmModal(caseItem.id);
+                card.innerHTML = `
+                    <div class="case-icon">🎁</div>
+                    <div class="case-title">${caseItem.name}</div>
+                    <div class="case-cost">${caseItem.cost} 🎟️</div>
+                    <div class="case-rewards">${caseItem.rewards ? caseItem.rewards.length : 0} возможных наград</div>
+                `;
+                casesContainer.appendChild(card);
+            });
+        }
+
+        function updateInventoryUI() {
+            const inventoryContainer = document.getElementById('inventoryItems');
+            inventoryContainer.innerHTML = '';
+            
+            if (!userData.nfts || userData.nfts.length === 0) {
+                inventoryContainer.innerHTML = '<div class="empty-state">У вас пока нет NFT</div>';
+                return;
+            }
+            
+            let filteredNFTs = userData.nfts;
+            if (currentInventoryFilter !== 'all') {
+                filteredNFTs = userData.nfts.filter(nft => nft.rarity === currentInventoryFilter);
+            }
+            
+            if (filteredNFTs.length === 0) {
+                inventoryContainer.innerHTML = '<div class="empty-state">Нет NFT с выбранной редкостью</div>';
+                return;
+            }
+            
+            filteredNFTs.forEach(nft => {
+                const sellPrice = Math.floor(nft.price * 0.7);
+                const card = document.createElement('div');
+                card.className = `inventory-card ${nft.rarity || 'common'}`;
+                card.innerHTML = `
+                    <div class="inventory-image">
+                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
+                    </div>
+                    <div class="inventory-info">
+                        <div class="inventory-name">${nft.name}</div>
+                        <div class="inventory-details">
+                            ${nft.fromCase ? 'Из кейса' : nft.fromPromocode ? 'Из промокода' : `Куплено за: ${nft.price} SAMD`}
+                            <br>Редкость: ${getRarityName(nft.rarity)}
+                        </div>
+                        <div class="inventory-actions">
+                            <button class="send-nft-btn" onclick="askConfirmation(() => openSendModal('${nft.nftId}'), 'Отправить NFT ${nft.name} другому пользователю?')">
+                                Отправить
+                            </button>
+                            ${!nft.fromCase && !nft.fromPromocode ? `<button class="sell-nft-btn" onclick="askConfirmation(() => openSellModal('${nft.nftId}'), 'Продать NFT ${nft.name} за ${sellPrice} SAMD? (70% от стоимости)')">
+                                Продать (${sellPrice})
+                            </button>` : ''}
+                        </div>
+                    </div>
+                `;
+                inventoryContainer.appendChild(card);
+            });
+        }
+
+        function getRarityName(rarity) {
+            switch(rarity) {
+                case 'common': return 'Обычная';
+                case 'rare': return 'Редкая';
+                case 'epic': return 'Эпическая';
+                case 'legendary': return 'Легендарная';
+                default: return rarity;
+            }
+        }
+
+        function getItemUnit(type) {
+            switch(type) {
+                case 'income': return 'SAMD/сек';
+                case 'max': return 'SAMD макс';
+                case 'tickets': return '🎟️';
+                default: return '';
+            }
+        }
+
+        function showNotification(message, isError = false, isWarning = false) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = 'notification';
+            
+            if (isError) {
+                notification.className += ' error';
+            } else if (isWarning) {
+                notification.className += ' warning';
+            }
+            
+            notification.classList.add('show');
+            
             setTimeout(() => {
-                secondsElement.style.animation = '';
-            }, 1000);
+                notification.classList.remove('show');
+            }, 3000);
         }
 
-        // Отображение целевой даты
-        function displayTargetDate() {
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'Europe/Moscow',
-                timeZoneName: 'short'
-            };
-            const dateString = targetDate.toLocaleDateString('ru-RU', options);
-            document.getElementById('targetDate').textContent = `Завершение: ${dateString}`;
+        function displayUserProfile() {
+            if (user) {
+                const userNameEl = document.getElementById('userName');
+                const userAvatarEl = document.getElementById('userAvatar');
+                const userProfileEl = document.getElementById('userProfile');
+                
+                let displayName = user.first_name || user.username || 'User';
+                userNameEl.textContent = displayName;
+                
+                if (user.photo_url) {
+                    userAvatarEl.src = user.photo_url;
+                }
+                
+                userProfileEl.style.display = 'flex';
+            }
         }
 
-        // Инициализация
-        createStars();
-        displayTargetDate();
-        updateTimer(); // Первоначальное обновление
-        
-        // Обновление таймера каждую секунду
-        const timerInterval = setInterval(updateTimer, 1000);
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.querySelector(`#${tabName}-content`).classList.add('active');
+            
+            if (tabName === 'inventory') {
+                updateInventoryUI();
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('Вы уверены что хотите сбросить весь прогресс? Это действие нельзя отменить!')) {
+                userData = {
+                    samd: 0,
+                    tickets: 0,
+                    currentMining: 0,
+                    maxMining: 500,
+                    incomePerSecond: 0.1,
+                    lastMiningUpdate: new Date().toISOString(),
+                    isMining: false,
+                    upgrades: [],
+                    nfts: [],
+                    activatedPromocodes: []
+                };
+                saveUserData(true);
+                updateUI();
+                showNotification('Прогресс сброшен');
+            }
+        }
+
+        // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
+
+        document.getElementById('acceptWarning').addEventListener('click', () => {
+            document.getElementById('warningModal').style.display = 'none';
+        });
+
+        document.getElementById('mineBtn').addEventListener('click', handleMiningClick);
+
+        // Промокоды
+        document.getElementById('profilePromocodeBtn').addEventListener('click', async () => {
+            const code = document.getElementById('profilePromocodeInput').value.trim().toUpperCase();
+            if (!code) {
+                showNotification('Введите промокод', true);
+                return;
+            }
+            
+            const checkResult = await checkPromocode(code);
+            if (!checkResult.success) {
+                showNotification(checkResult.message, true);
+                return;
+            }
+            
+            askConfirmation(async () => {
+                const activateResult = await activatePromocode(code);
+                if (activateResult.success) {
+                    showNotification(activateResult.message);
+                    
+                    // Показываем детали наград
+                    let rewardDetails = 'Получено: ';
+                    if (activateResult.rewards.samd) {
+                        rewardDetails += `${activateResult.rewards.samd} SAMD `;
+                    }
+                    if (activateResult.rewards.tickets) {
+                        rewardDetails += `${activateResult.rewards.tickets} 🎟️ `;
+                    }
+                    if (activateResult.rewards.nft) {
+                        rewardDetails += `NFT "${activateResult.rewards.nft.name}" `;
+                    }
+                    
+                    if (rewardDetails !== 'Получено: ') {
+                        showNotification(rewardDetails, false, true);
+                    }
+                    
+                    // Очищаем поле ввода
+                    document.getElementById('profilePromocodeInput').value = '';
+                } else {
+                    showNotification(activateResult.message, true);
+                }
+            }, `Активировать промокод "${code}"?`);
+        });
+
+        // Автопроверка промокода при вводе
+        document.getElementById('profilePromocodeInput').addEventListener('input', async (e) => {
+            const code = e.target.value.trim().toUpperCase();
+            if (code.length >= 3) {
+                const checkResult = await checkPromocode(code);
+                if (checkResult.success) {
+                    e.target.style.borderColor = 'var(--success-color)';
+                } else {
+                    e.target.style.borderColor = 'var(--danger-color)';
+                }
+            } else {
+                e.target.style.borderColor = 'var(--accent-color)';
+            }
+        });
+
+        // Подтверждение покупки NFT
+        document.getElementById('confirmBuyBtn').addEventListener('click', () => {
+            askConfirmation(() => {
+                if (selectedNFT) {
+                    buyNFTItem(selectedNFT.id);
+                    closeBuyConfirmModal();
+                }
+            }, `Купить NFT "${selectedNFT?.name}" за ${selectedNFT?.price} SAMD?`);
+        });
+
+        // Подтверждение открытия кейса
+        document.getElementById('confirmCaseBtn').addEventListener('click', () => {
+            askConfirmation(() => {
+                if (selectedCase) {
+                    openCase(selectedCase.id);
+                }
+            }, `Открыть кейс "${selectedCase?.name}" за ${selectedCase?.cost} 🎟️?`);
+        });
+
+        // Подтверждение отправки NFT
+        document.getElementById('confirmSendBtn').addEventListener('click', () => {
+            const recipientUsername = document.getElementById('sendUsername').value.trim();
+            if (selectedNFT && recipientUsername) {
+                askConfirmation(() => {
+                    sendNFT(selectedNFT.nftId, recipientUsername);
+                }, `Отправить NFT "${selectedNFT.name}" пользователю @${recipientUsername}?`);
+            }
+        });
+
+        // Подтверждение продажи NFT
+        document.getElementById('confirmSellBtn').addEventListener('click', () => {
+            if (selectedNFT) {
+                const sellPrice = Math.floor(selectedNFT.price * 0.7);
+                askConfirmation(() => {
+                    sellNFT(selectedNFT.nftId);
+                    closeSellModal();
+                }, `Продать NFT "${selectedNFT.name}" за ${sellPrice} SAMD? (70% от стоимости)`);
+            }
+        });
+
+        // Промокод модальное окно
+        document.getElementById('promocodeSubmitBtn').addEventListener('click', async () => {
+            const code = document.getElementById('promocodeInput').value.trim().toUpperCase();
+            if (!code) {
+                showNotification('Введите промокод', true);
+                return;
+            }
+            
+            const activateResult = await activatePromocode(code);
+            if (activateResult.success) {
+                showNotification(activateResult.message);
+                closePromocodeModal();
+                
+                if (activateResult.rewards) {
+                    let rewardDetails = 'Получено: ';
+                    if (activateResult.rewards.samd) {
+                        rewardDetails += `${activateResult.rewards.samd} SAMD `;
+                    }
+                    if (activateResult.rewards.tickets) {
+                        rewardDetails += `${activateResult.rewards.tickets} 🎟️ `;
+                    }
+                    if (activateResult.rewards.nft) {
+                        rewardDetails += `NFT "${activateResult.rewards.nft.name}" `;
+                    }
+                    
+                    if (rewardDetails !== 'Получено: ') {
+                        showNotification(rewardDetails, false, true);
+                    }
+                }
+            } else {
+                showNotification(activateResult.message, true);
+            }
+        });
+
+        document.getElementById('promocodeCancelBtn').addEventListener('click', closePromocodeModal);
+
+        // Автопроверка промокода в модальном окне
+        document.getElementById('promocodeInput').addEventListener('input', async (e) => {
+            const code = e.target.value.trim().toUpperCase();
+            if (code.length >= 3) {
+                const infoResult = await showPromocodeInfo(code);
+                if (!infoResult.success) {
+                    document.getElementById('promocodeRewards').style.display = 'none';
+                }
+            } else {
+                document.getElementById('promocodeRewards').style.display = 'none';
+            }
+        });
+
+        // Обработчики подтверждения действий
+        document.getElementById('confirmYesBtn').addEventListener('click', () => {
+            executePendingAction();
+            closeConfirmationModal();
+        });
+
+        document.getElementById('confirmNoBtn').addEventListener('click', () => {
+            closeConfirmationModal();
+        });
+
+        // Назначение обработчиков вкладок
+        document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(element => {
+            element.addEventListener('click', () => switchTab(element.dataset.tab));
+        });
+
+        // Обработчики фильтров инвентаря
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => filterInventory(btn.dataset.filter));
+        });
+
+        // Авто-сохранение и майнинг
+        setInterval(() => {
+            if (userData.isMining && userData.currentMining < userData.maxMining) {
+                userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
+                updateMiningUI();
+            }
+            
+            if (Date.now() - lastSave > 30000) {
+                saveUserData();
+                lastSave = Date.now();
+            }
+        }, 1000);
+
+        // Очистка слушателей
+        window.addEventListener('beforeunload', cleanupListeners);
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Инициализация приложения...');
+            displayUserProfile();
+            await loadUserData();
+            console.log('Приложение инициализировано');
+        });
+
     </script>
 </body>
 </html>
