@@ -470,17 +470,14 @@
         }
 
         .nav-tab.active {
-            color: var(--text-color);
+            color: var(--accent-blue);
+            background: rgba(58, 134, 255, 0.1);
         }
 
         .nav-tab.active i {
             opacity: 1;
             color: var(--accent-blue);
         }
-
-        .nav-indicator {
-    display: none;  /* Просто скрываем индикатор */
-}
 
         .tab-content {
             display: none;
@@ -1551,9 +1548,9 @@
                     <span>SAMDCOIN</span>
                 </div>
                 <div class="user-info">
-                    <div class="user-profile" id="userProfile" style="display: none;">
-                        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
-                        <span id="userName" class="user-name"></span>
+                    <div class="user-profile" id="userProfile">
+                        <img id="userAvatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar">
+                        <span id="userName" class="user-name">Гость</span>
                     </div>
                     <div class="balance">
                         <span>SAMD: </span>
@@ -1571,7 +1568,6 @@
     <div class="container">
         <div class="nav-container">
             <div class="nav-tabs" id="navTabs">
-                <div class="nav-indicator" id="navIndicator"></div>
                 <button class="nav-tab active" data-tab="base">
                     <i class="fas fa-home"></i>
                     <span class="tab-text">База</span>
@@ -1683,7 +1679,7 @@
         <div class="tab-content" id="profile-content">
             <div class="profile-section">
                 <div class="profile-header">
-                    <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar">
+                    <img id="profileAvatar" class="profile-avatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar">
                     <div class="profile-info">
                         <h2 id="profileName">Загрузка...</h2>
                         <p id="profileUsername" style="color: var(--text-secondary);"></p>
@@ -1804,6 +1800,7 @@
         const user = tg.initDataUnsafe.user;
         const USER_ID = user ? user.id.toString() : 'demo-user';
         const USERNAME = user?.username || 'user';
+        const FIRST_NAME = user?.first_name || 'Гость';
 
         // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
         let userData = {
@@ -1812,17 +1809,17 @@
             currentMining: 0,
             maxMining: 500,
             incomePerSecond: 0.1,
-            lastMiningUpdate: new Date().toISOString(),
+            lastMiningUpdate: Date.now(),
             isMining: false,
             upgrades: [],
             nfts: [],
-            activatedPromocodes: [] // Новое поле для активированных промокодов
+            activatedPromocodes: []
         };
 
         let shopItems = [];
         let nftItems = [];
         let cases = [];
-        let promocodes = []; // Коллекция промокодов
+        let promocodes = [];
         let lastSave = Date.now();
         let currentInventoryFilter = 'all';
 
@@ -1835,7 +1832,7 @@
         let shopListener = null;
         let nftListener = null;
         let casesListener = null;
-        let promocodesListener = null; // Слушатель для промокодов
+        let promocodesListener = null;
 
         // Подтверждение действий
         let pendingAction = null;
@@ -1844,9 +1841,198 @@
         // Промокоды
         let currentPromocodeCheck = null;
 
-        // ==================== FIREBASE REALTIME FUNCTIONS ====================
+        // ==================== ИСПРАВЛЕННЫЙ МАЙНИНГ ====================
 
-        // Установка realtime слушателей
+        // Загрузка данных пользователя с исправленным оффлайн майнингом
+        async function loadUserData() {
+            try {
+                console.log('Загрузка данных пользователя...');
+                const doc = await db.collection('users').doc(USER_ID).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    userData = { ...userData, ...data };
+                    
+                    // ВАЖНОЕ ИСПРАВЛЕНИЕ: Правильный расчет оффлайн майнинга
+                    await calculateOfflineMining();
+                    
+                    // Обновляем UI после загрузки
+                    updateUI();
+                    updateMiningStatus();
+                    
+                    // Показываем уведомление о намайненном в оффлайне
+                    showOfflineEarnings();
+                } else {
+                    console.log('Создание нового пользователя');
+                    await saveUserData();
+                }
+                
+                setupRealtimeListeners();
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                // Показываем дефолтные данные при ошибке
+                updateUI();
+            }
+        }
+
+        // ИСПРАВЛЕННЫЙ расчет оффлайн майнинга
+        async function calculateOfflineMining() {
+            try {
+                const lastUpdate = userData.lastMiningUpdate || Date.now();
+                const now = Date.now();
+                const diffSeconds = (now - lastUpdate) / 1000;
+                
+                console.log('Оффлайн майнинг:', {
+                    lastUpdate: new Date(lastUpdate).toLocaleString(),
+                    now: new Date(now).toLocaleString(),
+                    diffSeconds: diffSeconds,
+                    isMining: userData.isMining,
+                    currentMining: userData.currentMining,
+                    maxMining: userData.maxMining,
+                    incomePerSecond: userData.incomePerSecond
+                });
+                
+                if (diffSeconds > 0 && userData.isMining) {
+                    const mined = diffSeconds * userData.incomePerSecond;
+                    const newMining = userData.currentMining + mined;
+                    
+                    // Если превысили максимум, останавливаем майнинг
+                    if (newMining >= userData.maxMining) {
+                        userData.currentMining = userData.maxMining;
+                        userData.isMining = false;
+                        showNotification(`Майнинг завершен! Намайнено: ${userData.maxMining.toFixed(1)} SAMD`);
+                    } else {
+                        userData.currentMining = newMining;
+                    }
+                    
+                    // Обновляем время последнего обновления
+                    userData.lastMiningUpdate = now;
+                    
+                    console.log('Оффлайн майнинг начислен:', {
+                        mined: mined.toFixed(2),
+                        newCurrent: userData.currentMining.toFixed(2),
+                        isMiningNow: userData.isMining
+                    });
+                    
+                    // Сохраняем обновленные данные
+                    await saveUserData();
+                    
+                    return mined;
+                }
+                return 0;
+            } catch (error) {
+                console.error('Ошибка расчета оффлайн майнинга:', error);
+                return 0;
+            }
+        }
+
+        // Показ оффлайн заработка
+        function showOfflineEarnings() {
+            const lastUpdate = userData.lastMiningUpdate || Date.now();
+            const now = Date.now();
+            const diffSeconds = (now - lastUpdate) / 1000;
+            
+            if (diffSeconds > 60 && userData.isMining) { // Если прошло больше минуты
+                const mined = diffSeconds * userData.incomePerSecond;
+                if (mined > 0.1) { // Показываем только если намайнено больше 0.1
+                    const message = `Пока вас не было намайнено: ${mined.toFixed(1)} SAMD`;
+                    setTimeout(() => showNotification(message, false, true), 1000);
+                }
+            }
+        }
+
+        // Сохранение данных пользователя
+        async function saveUserData() {
+            try {
+                // Обновляем время последнего обновления ПЕРЕД сохранением
+                userData.lastMiningUpdate = Date.now();
+                
+                await db.collection('users').doc(USER_ID).set({
+                    ...userData,
+                    telegramId: USER_ID,
+                    telegramData: user,
+                    username: USERNAME,
+                    firstName: FIRST_NAME,
+                    lastActive: new Date().toISOString(),
+                    updatedAt: Date.now()
+                }, { merge: true });
+                
+                console.log('Данные сохранены:', {
+                    samd: userData.samd,
+                    currentMining: userData.currentMining,
+                    isMining: userData.isMining,
+                    lastMiningUpdate: new Date(userData.lastMiningUpdate).toLocaleString()
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                return false;
+            }
+        }
+
+        // ==================== ИСПРАВЛЕННЫЕ ФУНКЦИИ МАЙНИНГА ====================
+
+        function updateMiningStatus() {
+            const mineBtn = document.getElementById('mineBtn');
+            if (!mineBtn) return;
+
+            if (userData.isMining && userData.currentMining < userData.maxMining) {
+                mineBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Майнинг...';
+                mineBtn.className = 'mine-btn mining';
+                mineBtn.disabled = false;
+            } else if (userData.currentMining >= userData.maxMining) {
+                mineBtn.innerHTML = '<i class="fas fa-coins"></i> Забрать SAMD';
+                mineBtn.className = 'mine-btn collect';
+                mineBtn.disabled = false;
+            } else {
+                mineBtn.innerHTML = '<i class="fas fa-digging"></i> Майнить SAMD';
+                mineBtn.className = 'mine-btn';
+                mineBtn.disabled = false;
+            }
+        }
+
+        function startMining() {
+            if (userData.currentMining >= userData.maxMining) {
+                collectMining();
+                return;
+            }
+            
+            userData.isMining = true;
+            userData.lastMiningUpdate = Date.now();
+            updateMiningStatus();
+            saveUserData();
+            
+            showNotification('Майнинг начат! Начинаем добывать SAMD...');
+        }
+
+        function collectMining() {
+            if (userData.currentMining > 0) {
+                const collected = userData.currentMining;
+                userData.samd += collected;
+                userData.currentMining = 0;
+                userData.isMining = false;
+                
+                updateUI();
+                showNotification(`Собрано: ${collected.toFixed(1)} SAMD`);
+                saveUserData();
+            } else {
+                showNotification('Нечего собирать!', true);
+            }
+        }
+
+        function handleMiningClick() {
+            if (userData.currentMining >= userData.maxMining) {
+                collectMining();
+            } else if (!userData.isMining) {
+                startMining();
+            } else {
+                showNotification('Майнинг уже идет!', false, true);
+            }
+        }
+
+        // ==================== УСТАНОВКА REALTIME LISTENERS ====================
+
         function setupRealtimeListeners() {
             // Слушатель данных пользователя
             if (userListener) userListener();
@@ -1854,6 +2040,10 @@
                 .onSnapshot((doc) => {
                     if (doc.exists) {
                         const data = doc.data();
+                        // Сохраняем старые значения для сравнения
+                        const oldMining = userData.isMining;
+                        const oldCurrentMining = userData.currentMining;
+                        
                         // Обновляем все данные пользователя
                         if (data.samd !== undefined) userData.samd = data.samd;
                         if (data.tickets !== undefined) userData.tickets = data.tickets;
@@ -1864,12 +2054,25 @@
                         if (data.nfts) userData.nfts = data.nfts;
                         if (data.upgrades) userData.upgrades = data.upgrades;
                         if (data.activatedPromocodes) userData.activatedPromocodes = data.activatedPromocodes;
+                        if (data.lastMiningUpdate) userData.lastMiningUpdate = data.lastMiningUpdate;
                         
+                        // Обновляем UI
                         updateUI();
+                        
+                        // Проверяем изменения майнинга
+                        if (oldMining !== userData.isMining) {
+                            updateMiningStatus();
+                        }
+                        
+                        if (Math.abs(oldCurrentMining - userData.currentMining) > 0.01) {
+                            updateMiningUI();
+                        }
+                        
                         // Обновляем инвентарь если он открыт
                         if (document.getElementById('inventory-content').classList.contains('active')) {
                             updateInventoryUI();
                         }
+                        
                         // Обновляем список активированных промокодов
                         updateActivatedPromocodesUI();
                     }
@@ -1925,7 +2128,7 @@
                     console.error('Ошибка слушателя кейсов:', error);
                 });
 
-            // Слушатель промокодов (только активные)
+            // Слушатель промокодов
             if (promocodesListener) promocodesListener();
             promocodesListener = db.collection('promocodes')
                 .where('isActive', '==', true)
@@ -1937,7 +2140,6 @@
                             ...doc.data()
                         });
                     });
-                    console.log('Промокоды обновлены:', promocodes.length);
                 }, (error) => {
                     console.error('Ошибка слушателя промокодов:', error);
                 });
@@ -1950,48 +2152,6 @@
             if (nftListener) nftListener();
             if (casesListener) casesListener();
             if (promocodesListener) promocodesListener();
-        }
-
-        // Загрузка данных пользователя
-        async function loadUserData() {
-            try {
-                console.log('Загрузка данных пользователя...');
-                const doc = await db.collection('users').doc(USER_ID).get();
-                
-                if (doc.exists) {
-                    const data = doc.data();
-                    userData = { ...userData, ...data };
-                    calculateOfflineMining();
-                    updateMiningStatus();
-                } else {
-                    console.log('Создание нового пользователя');
-                    await saveUserData();
-                }
-                
-                updateUI();
-                setupRealtimeListeners();
-            } catch (error) {
-                console.error('Ошибка загрузки:', error);
-            }
-        }
-
-        // Сохранение данных пользователя
-        async function saveUserData(force = false) {
-            try {
-                userData.lastMiningUpdate = new Date().toISOString();
-                
-                await db.collection('users').doc(USER_ID).set({
-                    ...userData,
-                    telegramData: user,
-                    username: USERNAME,
-                    lastActive: new Date().toISOString()
-                }, { merge: true });
-                
-                return true;
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                return false;
-            }
         }
 
         // ==================== СИСТЕМА ПРОМОКОДОВ ====================
@@ -2045,11 +2205,6 @@
                     }
                 }
                 
-                // Проверяем минимальный уровень если указан
-                if (promocode.minLevel && userData.level < promocode.minLevel) {
-                    return { success: false, message: `Для активации нужен уровень ${promocode.minLevel}+` };
-                }
-                
                 return { 
                     success: true, 
                     promocode: promocode,
@@ -2073,12 +2228,10 @@
             const promocode = checkResult.promocode;
             
             try {
-                // Используем транзакцию для атомарной активации
                 const promocodeRef = db.collection('promocodes').doc(promocode.id);
                 const userRef = db.collection('users').doc(USER_ID);
                 
                 const result = await db.runTransaction(async (transaction) => {
-                    // Получаем актуальные данные
                     const promocodeSnapshot = await transaction.get(promocodeRef);
                     const userSnapshot = await transaction.get(userRef);
                     
@@ -2089,7 +2242,6 @@
                     const promocodeData = promocodeSnapshot.data();
                     const userDataInTrans = userSnapshot.data();
                     
-                    // Повторяем проверки в транзакции
                     if (!promocodeData.isActive) {
                         throw new Error("Промокод неактивен");
                     }
@@ -2122,9 +2274,11 @@
                         
                         if (rewards.samd) {
                             updates.samd = firebase.firestore.FieldValue.increment(rewards.samd);
+                            userData.samd += rewards.samd;
                         }
                         if (rewards.tickets) {
                             updates.tickets = firebase.firestore.FieldValue.increment(rewards.tickets);
+                            userData.tickets += rewards.tickets;
                         }
                         if (rewards.nft) {
                             const nfts = userDataInTrans.nfts || [];
@@ -2138,6 +2292,7 @@
                                 receivedAt: new Date().toISOString()
                             });
                             updates.nfts = nfts;
+                            userData.nfts = nfts;
                         }
                     }
                     
@@ -2150,26 +2305,6 @@
                         promocodeName: promocodeData.name || promocodeData.code
                     };
                 });
-                
-                // Локальное обновление
-                if (result.rewards.samd) {
-                    userData.samd += result.rewards.samd;
-                }
-                if (result.rewards.tickets) {
-                    userData.tickets += result.rewards.tickets;
-                }
-                if (result.rewards.nft) {
-                    if (!userData.nfts) userData.nfts = [];
-                    userData.nfts.push({
-                        nftId: `promocode_${promocode.id}_${Date.now()}`,
-                        name: result.rewards.nft.name || 'Промо NFT',
-                        imageUrl: result.rewards.nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f',
-                        rarity: result.rewards.nft.rarity || 'common',
-                        price: result.rewards.nft.price || 100,
-                        fromPromocode: promocode.code,
-                        receivedAt: new Date().toISOString()
-                    });
-                }
                 
                 userData.activatedPromocodes = [...(userData.activatedPromocodes || []), promocode.id];
                 
@@ -2191,63 +2326,6 @@
             }
         }
 
-        // Показать информацию о промокоде
-        async function showPromocodeInfo(code) {
-            const checkResult = await checkPromocode(code);
-            
-            if (!checkResult.success) {
-                return checkResult;
-            }
-            
-            const promocode = checkResult.promocode;
-            
-            // Показываем информацию в модальном окне
-            document.getElementById('promocodeModalTitle').textContent = promocode.name || promocode.code;
-            document.getElementById('promocodeModalText').textContent = promocode.description || 'Введите промокод для получения награды';
-            
-            // Показываем награды
-            const rewardsList = document.getElementById('promocodeRewardsList');
-            const rewardsContainer = document.getElementById('promocodeRewards');
-            const remainingEl = document.getElementById('promocodeRemaining');
-            const expiresEl = document.getElementById('promocodeExpires');
-            
-            if (promocode.rewards) {
-                let rewardsText = '';
-                if (promocode.rewards.samd) {
-                    rewardsText += `${promocode.rewards.samd} SAMD `;
-                }
-                if (promocode.rewards.tickets) {
-                    rewardsText += `${promocode.rewards.tickets} 🎟️ `;
-                }
-                if (promocode.rewards.nft) {
-                    rewardsText += `NFT "${promocode.rewards.nft.name}" `;
-                }
-                
-                rewardsList.textContent = rewardsText || 'Секретная награда';
-                rewardsContainer.style.display = 'block';
-            } else {
-                rewardsContainer.style.display = 'none';
-            }
-            
-            // Показываем статистику
-            if (promocode.maxActivations > 0) {
-                const remaining = promocode.maxActivations - promocode.currentActivations;
-                remainingEl.textContent = remaining;
-            } else {
-                remainingEl.textContent = '∞';
-            }
-            
-            if (promocode.expiresAt) {
-                const expiresDate = new Date(promocode.expiresAt);
-                expiresEl.textContent = expiresDate.toLocaleDateString('ru-RU');
-            } else {
-                expiresEl.textContent = '∞';
-            }
-            
-            currentPromocodeCheck = promocode;
-            return { success: true, promocode: promocode };
-        }
-
         // Обновление UI активированных промокодов
         function updateActivatedPromocodesUI() {
             const container = document.getElementById('activatedPromocodes');
@@ -2261,7 +2339,6 @@
             container.style.display = 'block';
             list.innerHTML = '';
             
-            // Показываем только последние 10 промокодов
             const recentPromocodes = userData.activatedPromocodes.slice(-10);
             
             recentPromocodes.forEach(promoId => {
@@ -2274,22 +2351,6 @@
                 badge.title = `Промокод ID: ${promoId}`;
                 list.appendChild(badge);
             });
-        }
-
-        // Открытие модального окна промокода
-        function openPromocodeModal() {
-            document.getElementById('promocodeModal').style.display = 'flex';
-            document.getElementById('promocodeInput').value = '';
-            document.getElementById('promocodeInput').focus();
-            document.getElementById('promocodeRewards').style.display = 'none';
-            document.getElementById('promocodeModalTitle').textContent = 'Активация промокода';
-            document.getElementById('promocodeModalText').textContent = 'Введите промокод для получения награды';
-        }
-
-        // Закрытие модального окна промокода
-        function closePromocodeModal() {
-            document.getElementById('promocodeModal').style.display = 'none';
-            currentPromocodeCheck = null;
         }
 
         // ==================== СИСТЕМА ПОДТВЕРЖДЕНИЙ ====================
@@ -2321,7 +2382,7 @@
             pendingActionData = null;
         }
 
-        // ==================== ОБНОВЛЕННЫЕ ФУНКЦИИ ПОКУПКИ ====================
+        // ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
 
         async function buyShopItem(itemId) {
             const item = shopItems.find(i => i.id === itemId);
@@ -2338,10 +2399,8 @@
                 }
                 
                 const actualItem = itemDoc.data();
-                const userDoc = await db.collection('users').doc(USER_ID).get();
-                const actualUserData = userDoc.exists ? userDoc.data() : null;
                 
-                if (actualUserData && actualUserData.samd < item.price) {
+                if (userData.samd < item.price) {
                     showNotification('Недостаточно SAMD', true);
                     return;
                 }
@@ -2377,9 +2436,7 @@
                     userData.tickets += item.value;
                 }
                 
-                if (actualUserData) {
-                    userData.samd = actualUserData.samd - item.price;
-                }
+                userData.samd -= item.price;
                 
                 showNotification(`Куплено: ${item.name}`);
                 
@@ -2404,10 +2461,8 @@
                 }
                 
                 const actualNFT = nftDoc.data();
-                const userDoc = await db.collection('users').doc(USER_ID).get();
-                const actualUserData = userDoc.exists ? userDoc.data() : null;
                 
-                if (actualUserData && actualUserData.samd < nft.price) {
+                if (userData.samd < nft.price) {
                     showNotification('Недостаточно SAMD', true);
                     return;
                 }
@@ -2485,17 +2540,8 @@
             }
             
             try {
-                const userDoc = await db.collection('users').doc(USER_ID).get();
-                if (!userDoc.exists) {
-                    showNotification('Ошибка: пользователь не найден', true);
-                    return;
-                }
-                
-                const actualUserData = userDoc.data();
-                if (actualUserData.tickets < caseItem.cost) {
+                if (userData.tickets < caseItem.cost) {
                     showNotification('Недостаточно билетов!', true);
-                    userData.tickets = actualUserData.tickets;
-                    updateUI();
                     return;
                 }
                 
@@ -2611,76 +2657,6 @@
                 console.error('Ошибка продажи NFT:', error);
                 showNotification('Ошибка продажи NFT', true);
             }
-        }
-
-        // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
-
-        function calculateOfflineMining() {
-            const lastUpdate = new Date(userData.lastMiningUpdate);
-            const now = new Date();
-            const diffSeconds = (now - lastUpdate) / 1000;
-            
-            if (diffSeconds > 0 && userData.isMining) {
-                const mined = diffSeconds * userData.incomePerSecond;
-                userData.currentMining = Math.min(userData.currentMining + mined, userData.maxMining);
-                if (mined > 0) {
-                    showNotification(`За время отсутствия намайнено: ${mined.toFixed(1)} SAMD`);
-                }
-            }
-        }
-
-        function updateMiningStatus() {
-            const mineBtn = document.getElementById('mineBtn');
-            if (!mineBtn) return;
-
-            if (userData.isMining && userData.currentMining < userData.maxMining) {
-                mineBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Майнинг...';
-                mineBtn.className = 'mine-btn mining';
-                mineBtn.disabled = true;
-            } else if (userData.currentMining >= userData.maxMining) {
-                mineBtn.innerHTML = '<i class="fas fa-coins"></i> Забрать SAMD';
-                mineBtn.className = 'mine-btn collect';
-                mineBtn.disabled = false;
-            } else {
-                mineBtn.innerHTML = '<i class="fas fa-digging"></i> Майнить SAMD';
-                mineBtn.className = 'mine-btn';
-                mineBtn.disabled = false;
-            }
-        }
-
-        function startMining() {
-            if (userData.isMining) return;
-            
-            userData.isMining = true;
-            updateMiningStatus();
-            saveUserData();
-            
-            showNotification('Майнинг начат!');
-        }
-
-        function collectMining() {
-            if (userData.currentMining > 0) {
-                userData.samd += userData.currentMining;
-                const collected = userData.currentMining;
-                userData.currentMining = 0;
-                userData.isMining = false;
-                
-                updateUI();
-                showNotification(`Собрано: ${collected.toFixed(1)} SAMD`);
-                saveUserData();
-            }
-        }
-
-        function handleMiningClick() {
-            askConfirmation(() => {
-                if (userData.currentMining >= userData.maxMining) {
-                    collectMining();
-                } else if (!userData.isMining) {
-                    startMining();
-                }
-            }, userData.currentMining >= userData.maxMining ? 
-                `Забрать ${userData.currentMining.toFixed(1)} SAMD?` : 
-                'Начать майнинг SAMD?');
         }
 
         function openCaseConfirmModal(caseId) {
@@ -2864,8 +2840,8 @@
             document.getElementById('incomePerSec').textContent = userData.incomePerSecond.toFixed(1);
             document.getElementById('ticketsCount').textContent = userData.tickets;
             
-            // Профиль
-            document.getElementById('profileName').textContent = user.first_name || USERNAME;
+            // Профиль с ИСПРАВЛЕННОЙ аватаркой
+            document.getElementById('profileName').textContent = FIRST_NAME;
             document.getElementById('profileUsername').textContent = user.username ? `@${user.username}` : '';
             document.getElementById('profileSAMD').textContent = Math.floor(userData.samd);
             document.getElementById('profileTickets').textContent = userData.tickets;
@@ -2873,10 +2849,18 @@
             document.getElementById('profileMax').textContent = userData.maxMining;
             document.getElementById('userId').textContent = USER_ID;
             
-            if (user.photo_url) {
+            // ИСПРАВЛЕНИЕ: Загружаем аватарку из Telegram
+            if (user && user.photo_url) {
                 document.getElementById('profileAvatar').src = user.photo_url;
                 document.getElementById('userAvatar').src = user.photo_url;
+            } else {
+                // Используем дефолтную аватарку
+                document.getElementById('profileAvatar').src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+                document.getElementById('userAvatar').src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
             }
+            
+            // Имя пользователя
+            document.getElementById('userName').textContent = FIRST_NAME;
             
             updateMiningStatus();
         }
@@ -3060,38 +3044,13 @@
             }, 3000);
         }
 
-        function displayUserProfile() {
-            if (user) {
-                const userNameEl = document.getElementById('userName');
-                const userAvatarEl = document.getElementById('userAvatar');
-                const userProfileEl = document.getElementById('userProfile');
-                
-                let displayName = user.first_name || user.username || 'User';
-                userNameEl.textContent = displayName;
-                
-                if (user.photo_url) {
-                    userAvatarEl.src = user.photo_url;
-                }
-                
-                userProfileEl.style.display = 'flex';
-            }
-        }
-
         function switchTab(tabName) {
-            // Обновляем активные классы
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
-            // Активируем выбранную вкладку
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
             document.querySelector(`#${tabName}-content`).classList.add('active');
-            
-            // Обновляем позицию индикатора
-            const tabs = document.querySelectorAll('.nav-tab');
-            const activeIndex = Array.from(tabs).findIndex(tab => tab.dataset.tab === tabName);
-            const navTabs = document.getElementById('navTabs');
-            navTabs.setAttribute('data-active-tab', tabName);
             
             if (tabName === 'inventory') {
                 updateInventoryUI();
@@ -3106,13 +3065,13 @@
                     currentMining: 0,
                     maxMining: 500,
                     incomePerSecond: 0.1,
-                    lastMiningUpdate: new Date().toISOString(),
+                    lastMiningUpdate: Date.now(),
                     isMining: false,
                     upgrades: [],
                     nfts: [],
                     activatedPromocodes: []
                 };
-                await saveUserData(true);
+                await saveUserData();
                 updateUI();
                 showNotification('Прогресс сброшен');
             }, 'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!', 'Сброс прогресса');
@@ -3145,7 +3104,6 @@
                 if (activateResult.success) {
                     showNotification(activateResult.message);
                     
-                    // Показываем детали наград
                     let rewardDetails = 'Получено: ';
                     if (activateResult.rewards.samd) {
                         rewardDetails += `${activateResult.rewards.samd} SAMD `;
@@ -3161,27 +3119,11 @@
                         showNotification(rewardDetails, false, true);
                     }
                     
-                    // Очищаем поле ввода
                     document.getElementById('profilePromocodeInput').value = '';
                 } else {
                     showNotification(activateResult.message, true);
                 }
             }, `Активировать промокод "${code}"?`);
-        });
-
-        // Автопроверка промокода при вводе
-        document.getElementById('profilePromocodeInput').addEventListener('input', async (e) => {
-            const code = e.target.value.trim().toUpperCase();
-            if (code.length >= 3) {
-                const checkResult = await checkPromocode(code);
-                if (checkResult.success) {
-                    e.target.style.borderColor = 'var(--accent-green)';
-                } else {
-                    e.target.style.borderColor = 'var(--danger-color)';
-                }
-            } else {
-                e.target.style.borderColor = 'var(--glass-border)';
-            }
         });
 
         // Подтверждение покупки NFT
@@ -3224,55 +3166,6 @@
             }
         });
 
-        // Промокод модальное окно
-        document.getElementById('promocodeSubmitBtn').addEventListener('click', async () => {
-            const code = document.getElementById('promocodeInput').value.trim().toUpperCase();
-            if (!code) {
-                showNotification('Введите промокод', true);
-                return;
-            }
-            
-            const activateResult = await activatePromocode(code);
-            if (activateResult.success) {
-                showNotification(activateResult.message);
-                closePromocodeModal();
-                
-                if (activateResult.rewards) {
-                    let rewardDetails = 'Получено: ';
-                    if (activateResult.rewards.samd) {
-                        rewardDetails += `${activateResult.rewards.samd} SAMD `;
-                    }
-                    if (activateResult.rewards.tickets) {
-                        rewardDetails += `${activateResult.rewards.tickets} 🎟️ `;
-                    }
-                    if (activateResult.rewards.nft) {
-                        rewardDetails += `NFT "${activateResult.rewards.nft.name}" `;
-                    }
-                    
-                    if (rewardDetails !== 'Получено: ') {
-                        showNotification(rewardDetails, false, true);
-                    }
-                }
-            } else {
-                showNotification(activateResult.message, true);
-            }
-        });
-
-        document.getElementById('promocodeCancelBtn').addEventListener('click', closePromocodeModal);
-
-        // Автопроверка промокода в модальном окне
-        document.getElementById('promocodeInput').addEventListener('input', async (e) => {
-            const code = e.target.value.trim().toUpperCase();
-            if (code.length >= 3) {
-                const infoResult = await showPromocodeInfo(code);
-                if (!infoResult.success) {
-                    document.getElementById('promocodeRewards').style.display = 'none';
-                }
-            } else {
-                document.getElementById('promocodeRewards').style.display = 'none';
-            }
-        });
-
         // Обработчики подтверждения действий
         document.getElementById('confirmYesBtn').addEventListener('click', () => {
             executePendingAction();
@@ -3297,18 +3190,38 @@
             btn.addEventListener('click', () => filterInventory(btn.dataset.filter));
         });
 
-        // Авто-сохранение и майнинг
+        // ==================== ИСПРАВЛЕННЫЙ АВТОМАТИЧЕСКИЙ МАЙНИНГ ====================
+
+        // Таймер для обновления майнинга в реальном времени
         setInterval(() => {
             if (userData.isMining && userData.currentMining < userData.maxMining) {
-                userData.currentMining = Math.min(userData.currentMining + userData.incomePerSecond, userData.maxMining);
+                // Добавляем доход каждую секунду
+                userData.currentMining += userData.incomePerSecond;
+                
+                // Если достигли максимума, останавливаем майнинг
+                if (userData.currentMining >= userData.maxMining) {
+                    userData.currentMining = userData.maxMining;
+                    userData.isMining = false;
+                    showNotification(`Майнинг завершен! Намайнено: ${userData.maxMining.toFixed(1)} SAMD`);
+                }
+                
+                // Обновляем UI
                 updateMiningUI();
+                
+                // Сохраняем каждые 10 секунд
+                if (Date.now() - lastSave > 10000) {
+                    saveUserData();
+                    lastSave = Date.now();
+                }
             }
-            
-            if (Date.now() - lastSave > 30000) {
+        }, 1000); // Обновляем каждую секунду
+
+        // Авто-сохранение каждые 30 секунд
+        setInterval(() => {
+            if (userData.isMining || userData.currentMining > 0) {
                 saveUserData();
-                lastSave = Date.now();
             }
-        }, 1000);
+        }, 30000);
 
         // Очистка слушателей
         window.addEventListener('beforeunload', cleanupListeners);
@@ -3317,14 +3230,13 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Инициализация приложения...');
-            displayUserProfile();
             await loadUserData();
-            
-            // Инициализируем индикатор навигации
-            const navTabs = document.getElementById('navTabs');
-            navTabs.setAttribute('data-active-tab', 'base');
-            
             console.log('Приложение инициализировано');
+            
+            // Показываем приветственное сообщение
+            setTimeout(() => {
+                showNotification(`Добро пожаловать, ${FIRST_NAME}!`);
+            }, 1000);
         });
 
     </script>
