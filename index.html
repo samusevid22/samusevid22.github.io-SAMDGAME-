@@ -1431,6 +1431,15 @@
             border-radius: var(--border-radius);
             border: 1px solid var(--glass-border);
         }
+        
+        /* Форсированное отображение GIF */
+.nft-image img[src*=".gif"],
+.inventory-image img[src*=".gif"] {
+    object-fit: contain !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    min-height: 100%;
+    min-width: 100%;
+}
 
         /* Адаптивность */
         @media (max-width: 768px) {
@@ -3073,11 +3082,18 @@
                 const card = document.createElement('div');
                 card.className = 'nft-card';
                 card.innerHTML = `
-                    <div class="nft-image">
-                        <img src="${nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'}" 
-                             alt="${nft.name}" 
-                             onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'"
-                             onload="if(this.src.toLowerCase().endsWith('.gif')) this.style.objectFit='contain';">
+    <div class="nft-image">
+        <img src="${nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'}" 
+             alt="${nft.name}" 
+             onerror="if(!this.src.toLowerCase().includes('.gif')) {
+                        this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'
+                      }"
+             onload="if(this.src.toLowerCase().endsWith('.gif')) {
+                        this.style.objectFit='contain';
+                        this.style.background='rgba(0,0,0,0.2)';
+                      }">
+    </div>
+    
                     </div>
                     <div class="nft-info">
                         <div class="nft-name">${nft.name}</div>
@@ -3144,12 +3160,17 @@
                 card.className = `inventory-card ${nft.rarity || 'common'}`;
                 
                 const imageContent = nft.imageUrl 
-                    ? `<img src="${nft.imageUrl}" alt="${nft.name}" 
-                         onerror="this.onerror=null; 
-                                  this.style.display='none';
-                                  this.parentElement.innerHTML='<div class=\\'nft-placeholder\\'><i class=\\'fas fa-gem\\'></i></div>';"
-                         onload="if(this.src.toLowerCase().endsWith('.gif')) this.style.objectFit='contain';">`
-                    : `<div class="nft-placeholder"><i class="fas fa-gem"></i></div>`;
+    ? `<img src="${nft.imageUrl}" alt="${nft.name}" 
+         onerror="if(!this.src.toLowerCase().includes('.gif')) {
+                    this.onerror=null; 
+                    this.style.display='none';
+                    this.parentElement.innerHTML='<div class=\\'nft-placeholder\\'><i class=\\'fas fa-gem\\'></i></div>';
+                  }"
+         onload="if(this.src.toLowerCase().endsWith('.gif')) {
+                    this.style.objectFit='contain';
+                    this.style.background='rgba(0,0,0,0.2)';
+                  }">`
+    : `<div class="nft-placeholder"><i class="fas fa-gem"></i></div>`;
                 
                 card.innerHTML = `
                     <div class="inventory-image">
@@ -3421,4 +3442,4 @@
 
     </script>
 </body>
-</html>
+</html>tml>
