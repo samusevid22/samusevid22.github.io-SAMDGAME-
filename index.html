@@ -1091,10 +1091,10 @@
         }
 
         .inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Изменил с 240px на 180px */
-    gap: 15px; /* Уменьшил gap для плотности */
-}
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
 
         .inventory-card {
             background: rgba(0, 0, 0, 0.2);
@@ -1121,22 +1121,39 @@
             border-color: var(--warning-color);
         }
 
-     .inventory-image {
-    width: 100%;
-    aspect-ratio: 1/1; /* Квадратное соотношение */
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.2);
-}
+        .inventory-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-.inventory-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Картинка заполнит квадрат */
-}
+        .inventory-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
 
-       .inventory-info {
-    padding: 15px; /* Уменьшил с 20px */
-}
+        .inventory-image .nft-placeholder {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(58, 134, 255, 0.1);
+            border-radius: 8px;
+            font-size: 24px;
+            color: var(--accent-blue);
+        }
+
+        .inventory-info {
+            padding: 15px;
+        }
 
         .inventory-name {
             font-size: 16px;
@@ -1216,7 +1233,107 @@
             justify-content: space-around;
             width: 100%;
         }
+/* Экран загрузки с дисклеймером */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-dark);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
 
+.loading-content {
+    background: var(--secondary-dark);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-spinner {
+    margin-bottom: 30px;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(58, 134, 255, 0.2);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.disclaimer-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: var(--warning-color);
+}
+
+.disclaimer-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: var(--accent-blue);
+    font-weight: 700;
+}
+
+.disclaimer-text {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.disclaimer-text p {
+    margin-bottom: 10px;
+}
+
+.loading-progress {
+    margin-top: 30px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-bar::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 30%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+    border-radius: 3px;
+    animation: progress 2s infinite ease-in-out;
+}
+
+@keyframes progress {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+}
+
+.progress-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
         .mobile-nav-item {
             display: flex;
             flex-direction: column;
@@ -1407,9 +1524,9 @@
                 grid-template-columns: 1fr;
             }
             
-           .inventory-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-}
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
             
             .warning-content,
             .confirmation-content,
@@ -1425,17 +1542,26 @@
 </head>
 <body>
     <!-- Предупреждение -->
-    <div class="warning-modal" id="warningModal">
-        <div class="warning-content">
-            <div class="warning-icon">⚠️</div>
-            <h2 class="warning-title">ВНИМАНИЕ</h2>
-            <p class="warning-text">
-                Данный app создан ИСКЛЮЧИТЕЛЬНО в развлекательных целях. 
-                "SAMD" является вымышленной монетой и ничего не стоит в реальном мире.
-            </p>
-            <button class="confirm-btn" id="acceptWarning">Понятно</button>
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+        <div class="disclaimer-content">
+            <div class="disclaimer-icon">⚠️</div>
+            <h2 class="disclaimer-title">SAMDCOIN</h2>
+            <div class="disclaimer-text">
+                <p>Данное приложение создано исключительно в развлекательных целях.</p>
+                <p>Криптовалюта "SAMD" является виртуальной и не имеет реальной ценности.</p>
+                <p>Все полученные NFT и монеты существуют только внутри игры.</p>
+            </div>
+            <div class="loading-progress">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-text" id="progressText">Подключение к серверу...</div>
+            </div>
         </div>
     </div>
+</div>
 
     <!-- Модальное окно подтверждения действия -->
     <div class="confirmation-modal" id="confirmationModal" style="display: none;">
@@ -2291,7 +2417,7 @@
                             nfts.push({
                                 nftId: `promocode_${promocode.id}_${Date.now()}`,
                                 name: rewards.nft.name || 'Промо NFT',
-                                imageUrl: rewards.nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f',
+                                imageUrl: rewards.nft.imageUrl || '',
                                 rarity: rewards.nft.rarity || 'common',
                                 price: rewards.nft.price || 100,
                                 fromPromocode: promocodeData.code,
@@ -2592,10 +2718,10 @@
                     });
                     
                     const newNFTs = [...(userDataInTrans.nfts || []), {
-                        nftId: selectedReward.id || 'case_reward_' + Date.now(),
+                        nftId: `case_reward_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                         name: selectedReward.name,
-                        imageUrl: selectedReward.imageUrl,
-                        rarity: selectedReward.rarity,
+                        imageUrl: selectedReward.imageUrl || '',
+                        rarity: selectedReward.rarity || 'common',
                         price: selectedReward.price || 0,
                         fromCase: caseItem.name,
                         receivedAt: new Date().toISOString()
@@ -2687,9 +2813,9 @@
         }
 
         function showCaseReward(reward) {
-            document.getElementById('rewardImage').src = reward.imageUrl;
+            document.getElementById('rewardImage').src = reward.imageUrl || '';
             document.getElementById('rewardName').textContent = reward.name;
-            document.getElementById('rewardRarity').textContent = `Редкость: ${reward.rarity}`;
+            document.getElementById('rewardRarity').textContent = `Редкость: ${reward.rarity || 'common'}`;
             document.getElementById('caseOpening').classList.add('active');
         }
 
@@ -2922,7 +3048,9 @@
                 card.className = 'nft-card';
                 card.innerHTML = `
                     <div class="nft-image">
-                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
+                        <img src="${nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'}" 
+                             alt="${nft.name}" 
+                             onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
                     </div>
                     <div class="nft-info">
                         <div class="nft-name">${nft.name}</div>
@@ -2975,7 +3103,7 @@
             
             let filteredNFTs = userData.nfts;
             if (currentInventoryFilter !== 'all') {
-                filteredNFTs = userData.nfts.filter(nft => nft.rarity === currentInventoryFilter);
+                filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
             }
             
             if (filteredNFTs.length === 0) {
@@ -2987,15 +3115,21 @@
                 const sellPrice = Math.floor(nft.price * 0.7);
                 const card = document.createElement('div');
                 card.className = `inventory-card ${nft.rarity || 'common'}`;
+                
+                const imageContent = nft.imageUrl 
+                    ? `<img src="${nft.imageUrl}" alt="${nft.name}" 
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'nft-placeholder\\'><i class=\\'fas fa-gem\\'></i></div>';">`
+                    : `<div class="nft-placeholder"><i class="fas fa-gem"></i></div>`;
+                
                 card.innerHTML = `
                     <div class="inventory-image">
-                        <img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'">
+                        ${imageContent}
                     </div>
                     <div class="inventory-info">
                         <div class="inventory-name">${nft.name}</div>
                         <div class="inventory-details">
                             ${nft.fromCase ? 'Из кейса' : nft.fromPromocode ? 'Из промокода' : `Куплено за: ${nft.price} SAMD`}
-                            <br>Редкость: ${getRarityName(nft.rarity)}
+                            <br>Редкость: ${getRarityName(nft.rarity || 'common')}
                         </div>
                         <div class="inventory-actions">
                             <button class="send-nft-btn" onclick="askConfirmation(() => openSendModal('${nft.nftId}'), 'Отправить NFT ${nft.name} другому пользователю?')">
@@ -3085,9 +3219,31 @@
 
         // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
 
-        document.getElementById('acceptWarning').addEventListener('click', () => {
-            document.getElementById('warningModal').style.display = 'none';
-        });
+        // Скрываем экран загрузки после инициализации
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Инициализация приложения...');
+    
+    // Обновляем текст прогресса
+    const progressText = document.getElementById('progressText');
+    
+    progressText.textContent = 'Загрузка данных пользователя...';
+    await loadUserData();
+    
+    progressText.textContent = 'Подключение к серверам...';
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Имитация загрузки
+    
+    progressText.textContent = 'Загрузка завершена!';
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Скрываем экран загрузки
+    document.getElementById('loadingScreen').style.display = 'none';
+    console.log('Приложение инициализировано');
+    
+    // Показываем приветственное сообщение
+    setTimeout(() => {
+        showNotification(`Добро пожаловать, ${FIRST_NAME}!`);
+    }, 1000);
+});
 
         document.getElementById('mineBtn').addEventListener('click', handleMiningClick);
 
