@@ -821,17 +821,59 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nft-image-content img {
+        .nft-media {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .nft-media.video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nft-media.gif, .nft-media.image {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            transition: transform 0.5s ease;
         }
 
-        .nft-card:hover .nft-image-content img {
-            transform: scale(1.05);
+        .nft-placeholder {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.2), rgba(131, 56, 236, 0.2));
+            border-radius: 12px;
+            font-size: 24px;
+            color: var(--accent-blue);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nft-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                transparent 100%);
+            animation: placeholderShine 2s infinite;
+        }
+
+        @keyframes placeholderShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .nft-info {
@@ -867,6 +909,29 @@
             padding: 4px 12px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 20px;
+        }
+
+        /* Индикатор анимации */
+        .animated-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--accent-purple);
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .animated-badge i {
+            font-size: 10px;
+            animation: pulse 2s infinite;
         }
 
         /* Кейсы */
@@ -982,12 +1047,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
-        .reward-image img {
+        .reward-media {
             width: 100%;
             height: 100%;
             object-fit: contain;
+        }
+
+        .reward-media.video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .reward-name {
@@ -1241,39 +1313,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .inventory-image-content img {
+        .inventory-media {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .inventory-media.video {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            transition: transform 0.5s ease;
-        }
-
-        .nft-placeholder {
-            width: 80%;
-            height: 80%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(58, 134, 255, 0.1);
-            border-radius: 8px;
-            font-size: 24px;
-            color: var(--accent-blue);
-        }
-
-        /* Поддержка GIF изображений */
-        .nft-image-content img[src*=".gif"],
-        .inventory-image-content img[src*=".gif"],
-        .reward-image img[src*=".gif"] {
-            object-fit: contain !important;
-            background: rgba(0, 0, 0, 0.2) !important;
-        }
-
-        /* Анимация загрузки GIF */
-        .nft-card:hover .nft-image-content img[src*=".gif"],
-        .inventory-card:hover .inventory-image-content img[src*=".gif"] {
-            transform: scale(1.03);
+            object-fit: cover;
         }
 
         .inventory-info {
@@ -2009,133 +2062,253 @@
         // Промокоды
         let currentPromocodeCheck = null;
 
-        // ==================== НОВАЯ СИСТЕМА ОТОБРАЖЕНИЯ NFT ====================
+        // ==================== НОВАЯ СИСТЕМА ОТОБРАЖЕНИЯ NFT С АНИМАЦИЯМИ ====================
 
-        // Функция для создания изображения NFT с правильной обработкой GIF
-        function createNFTImage(imageUrl, nftName) {
+        // Определяем тип медиа по расширению файла
+        function getMediaType(url) {
+            if (!url) return 'image';
+            
+            const urlLower = url.toLowerCase();
+            if (urlLower.includes('.webm') || urlLower.includes('.mp4') || urlLower.includes('.mov')) {
+                return 'video';
+            } else if (urlLower.includes('.gif') || urlLower.includes('.apng')) {
+                return 'gif';
+            } else {
+                return 'image';
+            }
+        }
+
+        // Создание медиа-элемента для NFT
+        function createNFTMedia(imageUrl, nftName, isAnimated = false) {
+            const mediaType = getMediaType(imageUrl);
+            
+            if (!imageUrl) {
+                return createPlaceholder(nftName);
+            }
+            
             const container = document.createElement('div');
             container.className = 'nft-image-content';
             
-            const img = document.createElement('img');
-            img.alt = nftName;
-            
-            // Устанавливаем источник изображения
-            if (imageUrl) {
-                img.src = imageUrl;
+            if (mediaType === 'video') {
+                // Создаем видео элемент для WebM/MP4
+                const video = document.createElement('video');
+                video.className = 'nft-media video';
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.src = imageUrl;
+                video.alt = nftName;
                 
-                // Проверяем, является ли это GIF
-                const isGif = imageUrl.toLowerCase().includes('.gif');
+                // Предзагрузка для плавного воспроизведения
+                video.preload = 'auto';
                 
-                // Для GIF используем особую обработку
-                if (isGif) {
-                    img.style.objectFit = 'contain';
-                    img.style.background = 'rgba(0, 0, 0, 0.2)';
-                    
-                    // Для GIF игнорируем ошибки загрузки
-                    img.onerror = function() {
-                        console.log('GIF загружается:', imageUrl);
-                        // Ничего не делаем при ошибке загрузки GIF
-                        // Позволяем браузеру продолжить попытки загрузки
-                    };
-                    
-                    img.onload = function() {
-                        console.log('GIF загружен успешно:', imageUrl);
-                        img.style.opacity = '1';
-                    };
-                } else {
-                    // Для обычных изображений используем стандартную обработку ошибок
-                    img.onerror = function() {
-                        console.log('Ошибка загрузки изображения:', imageUrl);
-                        // Создаем placeholder
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'nft-placeholder';
-                        placeholder.innerHTML = '<i class="fas fa-gem"></i>';
-                        
-                        // Заменяем изображение на placeholder
-                        if (container.parentNode) {
-                            container.innerHTML = '';
-                            container.appendChild(placeholder);
-                        }
-                    };
-                    
-                    img.onload = function() {
-                        img.style.opacity = '1';
-                    };
+                // Обработчики для видео
+                video.onerror = function() {
+                    console.log('Ошибка загрузки видео:', imageUrl);
+                    fallbackToPlaceholder(container, nftName);
+                };
+                
+                video.onloadeddata = function() {
+                    console.log('Видео загружено:', imageUrl);
+                    video.style.opacity = '1';
+                };
+                
+                container.appendChild(video);
+                
+                // Добавляем индикатор анимации
+                if (isAnimated) {
+                    const badge = document.createElement('div');
+                    badge.className = 'animated-badge';
+                    badge.innerHTML = '<i class="fas fa-play-circle"></i>АНИМАЦИЯ';
+                    container.appendChild(badge);
                 }
                 
+            } else if (mediaType === 'gif') {
+                // Для GIF используем изображение
+                const img = document.createElement('img');
+                img.className = 'nft-media gif';
+                img.src = imageUrl;
+                img.alt = nftName;
+                
+                img.onerror = function() {
+                    console.log('Ошибка загрузки GIF:', imageUrl);
+                    fallbackToPlaceholder(container, nftName);
+                };
+                
+                img.onload = function() {
+                    console.log('GIF загружено:', imageUrl);
+                    img.style.opacity = '1';
+                    
+                    // Добавляем индикатор анимации
+                    if (isAnimated) {
+                        const badge = document.createElement('div');
+                        badge.className = 'animated-badge';
+                        badge.innerHTML = '<i class="fas fa-play-circle"></i>АНИМАЦИЯ';
+                        container.appendChild(badge);
+                    }
+                };
+                
                 container.appendChild(img);
+                
             } else {
-                // Если нет изображения, создаем placeholder
-                const placeholder = document.createElement('div');
-                placeholder.className = 'nft-placeholder';
-                placeholder.innerHTML = '<i class="fas fa-gem"></i>';
-                container.appendChild(placeholder);
+                // Обычное изображение
+                const img = document.createElement('img');
+                img.className = 'nft-media image';
+                img.src = imageUrl;
+                img.alt = nftName;
+                
+                img.onerror = function() {
+                    console.log('Ошибка загрузки изображения:', imageUrl);
+                    fallbackToPlaceholder(container, nftName);
+                };
+                
+                img.onload = function() {
+                    img.style.opacity = '1';
+                };
+                
+                container.appendChild(img);
             }
             
             return container;
         }
 
-        // Функция для создания изображения инвентаря
-        function createInventoryImage(imageUrl, nftName) {
+        // Создание медиа-элемента для инвентаря
+        function createInventoryMedia(imageUrl, nftName, isAnimated = false) {
+            const mediaType = getMediaType(imageUrl);
+            
+            if (!imageUrl) {
+                return createPlaceholder(nftName);
+            }
+            
             const container = document.createElement('div');
             container.className = 'inventory-image-content';
             
-            const img = document.createElement('img');
-            img.alt = nftName;
-            
-            // Устанавливаем источник изображения
-            if (imageUrl) {
-                img.src = imageUrl;
+            if (mediaType === 'video') {
+                const video = document.createElement('video');
+                video.className = 'inventory-media video';
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.src = imageUrl;
+                video.alt = nftName;
                 
-                // Проверяем, является ли это GIF
-                const isGif = imageUrl.toLowerCase().includes('.gif');
+                video.preload = 'auto';
                 
-                // Для GIF используем особую обработку
-                if (isGif) {
-                    img.style.objectFit = 'contain';
-                    img.style.background = 'rgba(0, 0, 0, 0.2)';
-                    
-                    // Для GIF игнорируем ошибки загрузки
-                    img.onerror = function() {
-                        console.log('GIF загружается (инвентарь):', imageUrl);
-                        // Ничего не делаем при ошибке загрузки GIF
-                    };
-                    
-                    img.onload = function() {
-                        console.log('GIF загружен успешно (инвентарь):', imageUrl);
-                        img.style.opacity = '1';
-                    };
-                } else {
-                    // Для обычных изображений используем стандартную обработку ошибок
-                    img.onerror = function() {
-                        console.log('Ошибка загрузки изображения (инвентарь):', imageUrl);
-                        // Создаем placeholder
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'nft-placeholder';
-                        placeholder.innerHTML = '<i class="fas fa-gem"></i>';
-                        
-                        // Заменяем изображение на placeholder
-                        if (container.parentNode) {
-                            container.innerHTML = '';
-                            container.appendChild(placeholder);
-                        }
-                    };
-                    
-                    img.onload = function() {
-                        img.style.opacity = '1';
-                    };
+                video.onerror = function() {
+                    fallbackToPlaceholder(container, nftName);
+                };
+                
+                video.onloadeddata = function() {
+                    video.style.opacity = '1';
+                };
+                
+                container.appendChild(video);
+                
+                // Индикатор анимации
+                if (isAnimated) {
+                    const badge = document.createElement('div');
+                    badge.className = 'animated-badge';
+                    badge.innerHTML = '<i class="fas fa-play-circle"></i>АНИМАЦИЯ';
+                    container.appendChild(badge);
                 }
                 
-                container.appendChild(img);
             } else {
-                // Если нет изображения, создаем placeholder
-                const placeholder = document.createElement('div');
-                placeholder.className = 'nft-placeholder';
-                placeholder.innerHTML = '<i class="fas fa-gem"></i>';
-                container.appendChild(placeholder);
+                const img = document.createElement('img');
+                img.className = 'inventory-media';
+                img.src = imageUrl;
+                img.alt = nftName;
+                
+                img.onerror = function() {
+                    fallbackToPlaceholder(container, nftName);
+                };
+                
+                img.onload = function() {
+                    img.style.opacity = '1';
+                };
+                
+                container.appendChild(img);
             }
             
             return container;
+        }
+
+        // Создание медиа-элемента для награды
+        function createRewardMedia(imageUrl, rewardName) {
+            const mediaType = getMediaType(imageUrl);
+            
+            const container = document.createElement('div');
+            container.style.width = '100%';
+            container.style.height = '100%';
+            container.style.display = 'flex';
+            container.style.alignItems = 'center';
+            container.style.justifyContent = 'center';
+            
+            if (!imageUrl) {
+                const placeholder = createPlaceholder(rewardName);
+                container.appendChild(placeholder);
+                return container;
+            }
+            
+            if (mediaType === 'video') {
+                const video = document.createElement('video');
+                video.className = 'reward-media video';
+                video.autoplay = true;
+                video.muted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.src = imageUrl;
+                video.alt = rewardName;
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.style.objectFit = 'contain';
+                
+                video.preload = 'auto';
+                video.onloadeddata = () => video.style.opacity = '1';
+                
+                container.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.className = 'reward-media';
+                img.src = imageUrl;
+                img.alt = rewardName;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain';
+                
+                img.onload = () => img.style.opacity = '1';
+                container.appendChild(img);
+            }
+            
+            return container;
+        }
+
+        // Создание placeholder при ошибке загрузки
+        function createPlaceholder(name) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'nft-placeholder';
+            
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-gem';
+            
+            const text = document.createElement('div');
+            text.textContent = name.substring(0, 1).toUpperCase();
+            text.style.fontSize = '32px';
+            text.style.fontWeight = 'bold';
+            text.style.color = 'var(--accent-blue)';
+            
+            placeholder.appendChild(icon);
+            placeholder.appendChild(text);
+            
+            return placeholder;
+        }
+
+        // Fallback на placeholder
+        function fallbackToPlaceholder(container, name) {
+            const placeholder = createPlaceholder(name);
+            container.innerHTML = '';
+            container.appendChild(placeholder);
         }
 
         // ==================== ИСПРАВЛЕННЫЙ МАЙНИНГ ====================
@@ -2978,14 +3151,12 @@
         }
 
         function showCaseReward(reward) {
-            const rewardImage = document.getElementById('rewardImage');
-            rewardImage.src = reward.imageUrl || '';
+            const rewardImageContainer = document.getElementById('rewardImage');
+            rewardImageContainer.innerHTML = '';
             
-            // Особые настройки для GIF
-            if (reward.imageUrl && reward.imageUrl.toLowerCase().includes('.gif')) {
-                rewardImage.style.objectFit = 'contain';
-                rewardImage.style.background = 'rgba(0, 0, 0, 0.2)';
-            }
+            // Используем новую систему отображения
+            const rewardMedia = createRewardMedia(reward.imageUrl || '', reward.name);
+            rewardImageContainer.appendChild(rewardMedia);
             
             document.getElementById('rewardName').textContent = reward.name;
             document.getElementById('rewardRarity').textContent = `Редкость: ${reward.rarity || 'common'}`;
@@ -3223,8 +3394,13 @@
                 const nftImageContainer = document.createElement('div');
                 nftImageContainer.className = 'nft-image';
                 
-                // Используем новую систему отображения изображений
-                const nftImage = createNFTImage(nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop', nft.name);
+                // Используем новую систему отображения с анимациями
+                // Проверяем, есть ли у NFT анимация
+                const isAnimated = nft.animated || 
+                                  getMediaType(nft.imageUrl) === 'video' ||
+                                  getMediaType(nft.imageUrl) === 'gif';
+                
+                const nftImage = createNFTMedia(nft.imageUrl, nft.name, isAnimated);
                 nftImageContainer.appendChild(nftImage);
                 
                 const nftInfo = document.createElement('div');
@@ -3298,8 +3474,12 @@
                 const inventoryImageContainer = document.createElement('div');
                 inventoryImageContainer.className = 'inventory-image';
                 
-                // Используем новую систему отображения изображений
-                const inventoryImage = createInventoryImage(nft.imageUrl, nft.name);
+                // Проверяем, есть ли у NFT анимация
+                const isAnimated = nft.animated || 
+                                  getMediaType(nft.imageUrl) === 'video' ||
+                                  getMediaType(nft.imageUrl) === 'gif';
+                
+                const inventoryImage = createInventoryMedia(nft.imageUrl, nft.name, isAnimated);
                 inventoryImageContainer.appendChild(inventoryImage);
                 
                 const inventoryInfo = document.createElement('div');
