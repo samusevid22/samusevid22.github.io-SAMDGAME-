@@ -812,17 +812,25 @@
             aspect-ratio: 1/1;
             overflow: hidden;
             background: rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
-        .nft-image img {
+        .nft-image-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nft-image-content img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             transition: transform 0.5s ease;
-            background: rgba(0, 0, 0, 0.1);
         }
 
-        .nft-card:hover .nft-image img {
+        .nft-card:hover .nft-image-content img {
             transform: scale(1.05);
         }
 
@@ -971,6 +979,9 @@
             overflow: hidden;
             border: 2px solid var(--accent-blue);
             background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .reward-image img {
@@ -1224,15 +1235,22 @@
             position: relative;
         }
 
-        .inventory-image img {
+        .inventory-image-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .inventory-image-content img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             transition: transform 0.5s ease;
-            background: rgba(0, 0, 0, 0.1);
         }
 
-        .inventory-image .nft-placeholder {
+        .nft-placeholder {
             width: 80%;
             height: 80%;
             display: flex;
@@ -1245,16 +1263,16 @@
         }
 
         /* Поддержка GIF изображений */
-        .nft-image img[src*=".gif"],
-        .inventory-image img[src*=".gif"],
+        .nft-image-content img[src*=".gif"],
+        .inventory-image-content img[src*=".gif"],
         .reward-image img[src*=".gif"] {
             object-fit: contain !important;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.2) !important;
         }
 
         /* Анимация загрузки GIF */
-        .nft-card:hover .nft-image img[src*=".gif"],
-        .inventory-card:hover .inventory-image img[src*=".gif"] {
+        .nft-card:hover .nft-image-content img[src*=".gif"],
+        .inventory-card:hover .inventory-image-content img[src*=".gif"] {
             transform: scale(1.03);
         }
 
@@ -1431,15 +1449,6 @@
             border-radius: var(--border-radius);
             border: 1px solid var(--glass-border);
         }
-        
-        /* Форсированное отображение GIF */
-.nft-image img[src*=".gif"],
-.inventory-image img[src*=".gif"] {
-    object-fit: contain !important;
-    background: rgba(0, 0, 0, 0.2) !important;
-    min-height: 100%;
-    min-width: 100%;
-}
 
         /* Адаптивность */
         @media (max-width: 768px) {
@@ -1999,6 +2008,135 @@
 
         // Промокоды
         let currentPromocodeCheck = null;
+
+        // ==================== НОВАЯ СИСТЕМА ОТОБРАЖЕНИЯ NFT ====================
+
+        // Функция для создания изображения NFT с правильной обработкой GIF
+        function createNFTImage(imageUrl, nftName) {
+            const container = document.createElement('div');
+            container.className = 'nft-image-content';
+            
+            const img = document.createElement('img');
+            img.alt = nftName;
+            
+            // Устанавливаем источник изображения
+            if (imageUrl) {
+                img.src = imageUrl;
+                
+                // Проверяем, является ли это GIF
+                const isGif = imageUrl.toLowerCase().includes('.gif');
+                
+                // Для GIF используем особую обработку
+                if (isGif) {
+                    img.style.objectFit = 'contain';
+                    img.style.background = 'rgba(0, 0, 0, 0.2)';
+                    
+                    // Для GIF игнорируем ошибки загрузки
+                    img.onerror = function() {
+                        console.log('GIF загружается:', imageUrl);
+                        // Ничего не делаем при ошибке загрузки GIF
+                        // Позволяем браузеру продолжить попытки загрузки
+                    };
+                    
+                    img.onload = function() {
+                        console.log('GIF загружен успешно:', imageUrl);
+                        img.style.opacity = '1';
+                    };
+                } else {
+                    // Для обычных изображений используем стандартную обработку ошибок
+                    img.onerror = function() {
+                        console.log('Ошибка загрузки изображения:', imageUrl);
+                        // Создаем placeholder
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'nft-placeholder';
+                        placeholder.innerHTML = '<i class="fas fa-gem"></i>';
+                        
+                        // Заменяем изображение на placeholder
+                        if (container.parentNode) {
+                            container.innerHTML = '';
+                            container.appendChild(placeholder);
+                        }
+                    };
+                    
+                    img.onload = function() {
+                        img.style.opacity = '1';
+                    };
+                }
+                
+                container.appendChild(img);
+            } else {
+                // Если нет изображения, создаем placeholder
+                const placeholder = document.createElement('div');
+                placeholder.className = 'nft-placeholder';
+                placeholder.innerHTML = '<i class="fas fa-gem"></i>';
+                container.appendChild(placeholder);
+            }
+            
+            return container;
+        }
+
+        // Функция для создания изображения инвентаря
+        function createInventoryImage(imageUrl, nftName) {
+            const container = document.createElement('div');
+            container.className = 'inventory-image-content';
+            
+            const img = document.createElement('img');
+            img.alt = nftName;
+            
+            // Устанавливаем источник изображения
+            if (imageUrl) {
+                img.src = imageUrl;
+                
+                // Проверяем, является ли это GIF
+                const isGif = imageUrl.toLowerCase().includes('.gif');
+                
+                // Для GIF используем особую обработку
+                if (isGif) {
+                    img.style.objectFit = 'contain';
+                    img.style.background = 'rgba(0, 0, 0, 0.2)';
+                    
+                    // Для GIF игнорируем ошибки загрузки
+                    img.onerror = function() {
+                        console.log('GIF загружается (инвентарь):', imageUrl);
+                        // Ничего не делаем при ошибке загрузки GIF
+                    };
+                    
+                    img.onload = function() {
+                        console.log('GIF загружен успешно (инвентарь):', imageUrl);
+                        img.style.opacity = '1';
+                    };
+                } else {
+                    // Для обычных изображений используем стандартную обработку ошибок
+                    img.onerror = function() {
+                        console.log('Ошибка загрузки изображения (инвентарь):', imageUrl);
+                        // Создаем placeholder
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'nft-placeholder';
+                        placeholder.innerHTML = '<i class="fas fa-gem"></i>';
+                        
+                        // Заменяем изображение на placeholder
+                        if (container.parentNode) {
+                            container.innerHTML = '';
+                            container.appendChild(placeholder);
+                        }
+                    };
+                    
+                    img.onload = function() {
+                        img.style.opacity = '1';
+                    };
+                }
+                
+                container.appendChild(img);
+            } else {
+                // Если нет изображения, создаем placeholder
+                const placeholder = document.createElement('div');
+                placeholder.className = 'nft-placeholder';
+                placeholder.innerHTML = '<i class="fas fa-gem"></i>';
+                container.appendChild(placeholder);
+            }
+            
+            return container;
+        }
 
         // ==================== ИСПРАВЛЕННЫЙ МАЙНИНГ ====================
 
@@ -2844,7 +2982,7 @@
             rewardImage.src = reward.imageUrl || '';
             
             // Особые настройки для GIF
-            if (reward.imageUrl && reward.imageUrl.toLowerCase().endsWith('.gif')) {
+            if (reward.imageUrl && reward.imageUrl.toLowerCase().includes('.gif')) {
                 rewardImage.style.objectFit = 'contain';
                 rewardImage.style.background = 'rgba(0, 0, 0, 0.2)';
             }
@@ -3081,33 +3219,31 @@
             nftItems.forEach(nft => {
                 const card = document.createElement('div');
                 card.className = 'nft-card';
-                card.innerHTML = `
-    <div class="nft-image">
-        <img src="${nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'}" 
-             alt="${nft.name}" 
-             onerror="if(!this.src.toLowerCase().includes('.gif')) {
-                        this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop'
-                      }"
-             onload="if(this.src.toLowerCase().endsWith('.gif')) {
-                        this.style.objectFit='contain';
-                        this.style.background='rgba(0,0,0,0.2)';
-                      }">
-    </div>
-    
+                
+                const nftImageContainer = document.createElement('div');
+                nftImageContainer.className = 'nft-image';
+                
+                // Используем новую систему отображения изображений
+                const nftImage = createNFTImage(nft.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop', nft.name);
+                nftImageContainer.appendChild(nftImage);
+                
+                const nftInfo = document.createElement('div');
+                nftInfo.className = 'nft-info';
+                nftInfo.innerHTML = `
+                    <div class="nft-name">${nft.name}</div>
+                    <div class="nft-price">
+                        <div class="nft-current-price">${nft.price} SAMD</div>
+                        <div class="nft-stock">Осталось: ${nft.currentStock}</div>
                     </div>
-                    <div class="nft-info">
-                        <div class="nft-name">${nft.name}</div>
-                        <div class="nft-price">
-                            <div class="nft-current-price">${nft.price} SAMD</div>
-                            <div class="nft-stock">Осталось: ${nft.currentStock}</div>
-                        </div>
-                        <button class="buy-btn" onclick="openBuyConfirmModal('${nft.id}')" 
-                                ${userData.samd < nft.price || nft.currentStock <= 0 ? 'disabled' : ''}>
-                            ${userData.samd < nft.price ? 'Недостаточно SAMD' : 
-                              nft.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
-                        </button>
-                    </div>
+                    <button class="buy-btn" onclick="openBuyConfirmModal('${nft.id}')" 
+                            ${userData.samd < nft.price || nft.currentStock <= 0 ? 'disabled' : ''}>
+                        ${userData.samd < nft.price ? 'Недостаточно SAMD' : 
+                          nft.currentStock <= 0 ? 'Раскуплено' : 'Купить'}
+                    </button>
                 `;
+                
+                card.appendChild(nftImageContainer);
+                card.appendChild(nftInfo);
                 nftContainer.appendChild(card);
             });
         }
@@ -3159,39 +3295,33 @@
                 const card = document.createElement('div');
                 card.className = `inventory-card ${nft.rarity || 'common'}`;
                 
-                const imageContent = nft.imageUrl 
-    ? `<img src="${nft.imageUrl}" alt="${nft.name}" 
-         onerror="if(!this.src.toLowerCase().includes('.gif')) {
-                    this.onerror=null; 
-                    this.style.display='none';
-                    this.parentElement.innerHTML='<div class=\\'nft-placeholder\\'><i class=\\'fas fa-gem\\'></i></div>';
-                  }"
-         onload="if(this.src.toLowerCase().endsWith('.gif')) {
-                    this.style.objectFit='contain';
-                    this.style.background='rgba(0,0,0,0.2)';
-                  }">`
-    : `<div class="nft-placeholder"><i class="fas fa-gem"></i></div>`;
+                const inventoryImageContainer = document.createElement('div');
+                inventoryImageContainer.className = 'inventory-image';
                 
-                card.innerHTML = `
-                    <div class="inventory-image">
-                        ${imageContent}
+                // Используем новую систему отображения изображений
+                const inventoryImage = createInventoryImage(nft.imageUrl, nft.name);
+                inventoryImageContainer.appendChild(inventoryImage);
+                
+                const inventoryInfo = document.createElement('div');
+                inventoryInfo.className = 'inventory-info';
+                inventoryInfo.innerHTML = `
+                    <div class="inventory-name">${nft.name}</div>
+                    <div class="inventory-details">
+                        ${nft.fromCase ? 'Из кейса' : nft.fromPromocode ? 'Из промокода' : `Куплено за: ${nft.price} SAMD`}
+                        <br>Редкость: ${getRarityName(nft.rarity || 'common')}
                     </div>
-                    <div class="inventory-info">
-                        <div class="inventory-name">${nft.name}</div>
-                        <div class="inventory-details">
-                            ${nft.fromCase ? 'Из кейса' : nft.fromPromocode ? 'Из промокода' : `Куплено за: ${nft.price} SAMD`}
-                            <br>Редкость: ${getRarityName(nft.rarity || 'common')}
-                        </div>
-                        <div class="inventory-actions">
-                            <button class="send-nft-btn" onclick="askConfirmation(() => openSendModal('${nft.nftId}'), 'Отправить NFT ${nft.name} другому пользователю?')">
-                                Отправить
-                            </button>
-                            ${!nft.fromCase && !nft.fromPromocode ? `<button class="sell-nft-btn" onclick="askConfirmation(() => openSellModal('${nft.nftId}'), 'Продать NFT ${nft.name} за ${sellPrice} SAMD? (70% от стоимости)')">
-                                Продать (${sellPrice})
-                            </button>` : ''}
-                        </div>
+                    <div class="inventory-actions">
+                        <button class="send-nft-btn" onclick="askConfirmation(() => openSendModal('${nft.nftId}'), 'Отправить NFT ${nft.name} другому пользователю?')">
+                            Отправить
+                        </button>
+                        ${!nft.fromCase && !nft.fromPromocode ? `<button class="sell-nft-btn" onclick="askConfirmation(() => openSellModal('${nft.nftId}'), 'Продать NFT ${nft.name} за ${sellPrice} SAMD? (70% от стоимости)')">
+                            Продать (${sellPrice})
+                        </button>` : ''}
                     </div>
                 `;
+                
+                card.appendChild(inventoryImageContainer);
+                card.appendChild(inventoryInfo);
                 inventoryContainer.appendChild(card);
             });
         }
@@ -3442,4 +3572,4 @@
 
     </script>
 </body>
-</html>tml>
+</html>
