@@ -9,125 +9,136 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
-        :root {
-            --dark-bg: #0a0b15;
-            --dark-card: #111426;
-            --accent-blue: #3a86ff;
-            --accent-purple: #8338ec;
-            --accent-green: #38b000;
-            --accent-gold: #ffbe0b;
-            --text-color: #ffffff;
-            --text-secondary: #8b9bb5;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
+        /* СБРОС И БАЗОВЫЕ СТИЛИ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            position: fixed; /* Фиксируем для мобильных */
         }
 
         body {
-            background: var(--dark-bg);
-            color: var(--text-color);
-            min-height: 100vh;
-            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0b15 0%, #111426 100%);
+            color: white;
+            touch-action: pan-y pinch-zoom;
+            overscroll-behavior: none;
         }
 
-        /* Экран загрузки */
-        .loading-screen {
+        /* ЭКРАН ЗАГРУЗКИ */
+        #loadingScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--dark-bg);
-            z-index: 1000;
+            background: #0a0b15;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            z-index: 10000;
+            transition: opacity 0.3s;
         }
 
         .spinner {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border: 4px solid rgba(58, 134, 255, 0.2);
-            border-top-color: var(--accent-blue);
+            border-top-color: #3a86ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Контейнеры */
-        .container {
-            max-width: 100%;
-            padding: 0;
+        #loadingText {
+            color: #8b9bb5;
+            font-size: 16px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        /* ОСНОВНОЙ КОНТЕЙНЕР */
+        #appContainer {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.3s;
         }
 
-        .container.show {
+        #appContainer.show {
             opacity: 1;
-            transform: translateY(0);
         }
 
-        /* Слайды */
+        /* СЛАЙДЫ */
         .slide {
-            min-height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            position: relative;
-            overflow: hidden;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, rgba(10, 11, 21, 0.95), rgba(17, 20, 38, 0.95));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .slide::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(17, 20, 38, 0.9), rgba(10, 11, 21, 0.9));
-            z-index: -1;
+        .slide.active {
+            transform: translateX(0);
         }
 
-        /* Заголовки */
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        /* ЗАГОЛОВКИ */
         .slide-title {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            font-size: min(10vw, 42px);
+            font-weight: 800;
+            background: linear-gradient(135deg, #3a86ff, #8338ec);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.2;
         }
 
         .slide-subtitle {
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
+            font-size: min(4vw, 18px);
+            color: #8b9bb5;
+            margin-bottom: 30px;
+            line-height: 1.4;
             max-width: 600px;
-            line-height: 1.5;
         }
 
-        /* Статистика */
-        .stats-container {
+        /* СТАТИСТИКА */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             width: 100%;
             max-width: 500px;
-            margin: 2rem 0;
+            margin: 30px 0;
         }
 
         .stat-card {
@@ -135,41 +146,49 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 20px;
-            transition: var(--transition);
+            padding: 25px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s, border-color 0.3s;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-blue);
+        .stat-card:active {
+            transform: scale(0.98);
         }
 
         .stat-value {
-            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-size: min(10vw, 40px);
             font-weight: 800;
             margin-bottom: 8px;
-            color: var(--accent-blue);
+            color: #3a86ff;
+        }
+
+        .global-stat {
+            color: #8338ec;
         }
 
         .stat-label {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: #8b9bb5;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .global-stat {
-            color: var(--accent-purple);
-        }
-
-        /* NFT сетка для телефона */
+        /* NFT ГРИД */
         .nft-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             width: 100%;
-            max-width: 600px;
-            margin: 2rem 0;
+            max-width: 500px;
+            margin: 30px 0;
+        }
+
+        @media (min-width: 480px) {
+            .nft-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         .nft-item {
@@ -177,73 +196,78 @@
             border-radius: 16px;
             padding: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .nft-item:hover {
-            transform: scale(1.05);
-            border-color: var(--accent-gold);
+        .nft-item:active {
+            transform: scale(0.98);
         }
 
         .nft-image {
             width: 80px;
             height: 80px;
             border-radius: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             object-fit: cover;
-            border: 2px solid var(--accent-blue);
+            border: 2px solid #3a86ff;
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .nft-name {
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            width: 100%;
+            text-align: center;
         }
 
         .nft-rarity {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: #8b9bb5;
         }
 
-        /* Кнопки для телефона */
+        /* КНОПКИ */
         .btn {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            background: linear-gradient(135deg, #3a86ff, #8338ec);
             color: white;
             border: none;
-            padding: 16px 32px;
+            padding: 18px 32px;
             border-radius: 50px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             align-items: center;
             gap: 10px;
-            text-decoration: none;
             margin: 10px;
             min-width: 200px;
             justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(58, 134, 255, 0.3);
+        .btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 5px 15px rgba(58, 134, 255, 0.4);
         }
 
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--accent-blue);
-            color: var(--accent-blue);
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
-        /* Прогресс бар */
+        /* ПРОГРЕСС БАР */
         .progress-container {
             width: 100%;
             max-width: 500px;
-            margin: 2rem 0;
+            margin: 30px 0;
         }
 
         .progress-bar {
@@ -257,61 +281,35 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            background: linear-gradient(90deg, #3a86ff, #8338ec);
             border-radius: 3px;
             width: 0%;
-            transition: width 1s ease;
+            transition: width 0.3s ease;
         }
 
         .progress-text {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: #8b9bb5;
             display: flex;
             justify-content: space-between;
         }
 
-        /* Новогодний стиль */
-        .new-year-theme .slide::before {
+        /* ЭКРАН СЕЗОНА 2 */
+        .new-year-theme {
             background: linear-gradient(135deg, 
-                rgba(17, 20, 38, 0.9),
-                rgba(30, 41, 59, 0.9));
+                rgba(10, 11, 21, 0.95),
+                rgba(30, 41, 59, 0.95));
         }
 
-        .new-year-theme .slide::after {
-            content: '❄️';
-            position: absolute;
-            font-size: 20px;
-            animation: snowfall 10s linear infinite;
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        @keyframes snowfall {
-            0% {
-                transform: translateY(-100px) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* Таймер */
         .countdown {
-            margin: 2rem 0;
+            margin: 30px 0;
         }
 
         .countdown-title {
-            font-size: clamp(1.2rem, 3vw, 1.5rem);
-            color: var(--accent-green);
-            margin-bottom: 1rem;
+            font-size: min(6vw, 24px);
+            color: #38b000;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
 
         .countdown-timer {
@@ -324,260 +322,221 @@
         .countdown-unit {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
-            padding: 15px;
+            padding: 20px;
             min-width: 70px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .countdown-value {
-            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-size: min(10vw, 32px);
             font-weight: 700;
-            color: var(--accent-green);
+            color: #38b000;
             margin-bottom: 5px;
         }
 
         .countdown-label {
             font-size: 12px;
-            color: var(--text-secondary);
+            color: #8b9bb5;
         }
 
-        /* Навигация для телефона */
-        .mobile-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--dark-card);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        /* НАВИГАЦИЯ */
+        .nav-buttons {
             display: flex;
-            justify-content: space-around;
-            padding: 10px;
-            z-index: 100;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            padding: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-            border-radius: 12px;
-            min-width: 60px;
-        }
-
-        .nav-btn.active {
-            color: var(--accent-blue);
-            background: rgba(58, 134, 255, 0.1);
-        }
-
-        .nav-btn i {
-            font-size: 18px;
-        }
-
-        /* Иконки достижений */
-        .achievement-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+        /* ИКОНКИ */
+        .icon-large {
+            font-size: 60px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #3a86ff, #8338ec);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* Адаптивность */
-        @media (max-width: 480px) {
-            .slide {
-                padding: 15px;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-
-            .stat-card {
-                padding: 15px;
-            }
-
-            .stat-value {
-                font-size: 1.8rem;
-            }
-
-            .nft-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 10px;
-            }
-
-            .nft-image {
-                width: 70px;
-                height: 70px;
-            }
-
-            .btn {
-                padding: 14px 28px;
-                min-width: 180px;
-            }
-
-            .countdown-unit {
-                min-width: 60px;
-                padding: 12px;
-            }
+        /* ОШИБКИ */
+        .error-message {
+            color: #ff4757;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 71, 87, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 71, 87, 0.2);
         }
 
-        @media (max-width: 360px) {
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
-
-            .nft-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
+        /* СВАЙП ИНДИКАТОР */
+        .swipe-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: rgba(139, 155, 181, 0.5);
+            font-size: 14px;
+            animation: fadeInOut 3s infinite;
         }
 
-        /* Свайпы */
-        .slide {
-            touch-action: pan-y;
-            user-select: none;
-        }
-
-        /* Плавные переходы */
-        * {
-            -webkit-tap-highlight-color: transparent;
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- Экран загрузки -->
-    <div class="loading-screen" id="loadingScreen">
+    <!-- ЭКРАН ЗАГРУЗКИ -->
+    <div id="loadingScreen">
         <div class="spinner"></div>
-        <div style="color: var(--text-secondary); text-align: center; padding: 0 20px;">
-            Загрузка итогов сезона...
-        </div>
+        <div id="loadingText">Загрузка данных...</div>
     </div>
 
-    <!-- Контейнер приложения -->
-    <div class="container" id="appContainer">
-        <!-- Слайд 1: Введение -->
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div id="appContainer">
+        <!-- СЛАЙД 1: ВВЕДЕНИЕ -->
         <div class="slide active" id="slide1">
-            <div class="achievement-icon">
+            <div class="icon-large">
                 <i class="fas fa-trophy"></i>
             </div>
-            <h1 class="slide-title">СЕЗОН 1 ЗАВЕРШЕН!</h1>
+            <h1 class="slide-title">СЕЗОН 1 ЗАВЕРШЁН!</h1>
             <p class="slide-subtitle">Время подвести итоги ваших достижений</p>
             
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 14%"></div>
+                    <div class="progress-fill" id="slideProgress"></div>
                 </div>
                 <div class="progress-text">
                     <span>Слайд 1 из 7</span>
-                    <span id="userStatsInfo">Загрузка...</span>
+                    <span id="userInfo">Загрузка...</span>
                 </div>
             </div>
             
-            <button class="btn" id="startResultsBtn" onclick="nextSlide()">
+            <button class="btn" id="startBtn">
                 <i class="fas fa-chart-bar"></i>
                 Посмотреть итоги
             </button>
         </div>
 
-        <!-- Слайд 2: Ваши Самдкоины -->
+        <!-- СЛАЙД 2: САМДКОИНЫ -->
         <div class="slide" id="slide2">
-            <div class="achievement-icon">
+            <div class="icon-large">
                 <i class="fas fa-coins"></i>
             </div>
             <h1 class="slide-title">Ваши Самдкоины</h1>
             <p class="slide-subtitle">Сколько вы заработали в первом сезоне</p>
             
-            <div class="stats-container">
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="userCoins">0</div>
                     <div class="stat-label">Ваши Самдкоины</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value global-stat" id="globalCoins">0</div>
+                    <div class="stat-value global-stat" id="totalCoins">0</div>
                     <div class="stat-label">Всего у игроков</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgCoins">0</div>
+                    <div class="stat-label">Среднее на игрока</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="maxCoins">0</div>
+                    <div class="stat-label">Максимум</div>
                 </div>
             </div>
             
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 28%"></div>
-                </div>
-                <div class="progress-text">
-                    <span>Слайд 2 из 7</span>
-                    <span>В среднем: <span id="avgCoins">0</span> на игрока</span>
-                </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </button>
+                <button class="btn" onclick="nextSlide()">
+                    Далее
+                    <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Слайд 3: Ваши Тикеты -->
+        <!-- СЛАЙД 3: БИЛЕТЫ -->
         <div class="slide" id="slide3">
-            <div class="achievement-icon">
+            <div class="icon-large">
                 <i class="fas fa-ticket-alt"></i>
             </div>
             <h1 class="slide-title">Ваши Билеты</h1>
             <p class="slide-subtitle">Ваши достижения в получении билетов</p>
             
-            <div class="stats-container">
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="userTickets">0</div>
                     <div class="stat-label">Ваши Билеты</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value global-stat" id="globalTickets">0</div>
+                    <div class="stat-value global-stat" id="totalTickets">0</div>
                     <div class="stat-label">Всего у игроков</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="casesOpened">0</div>
+                    <div class="stat-label">Кейсов открыто</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgTickets">0</div>
+                    <div class="stat-label">Среднее на игрока</div>
                 </div>
             </div>
             
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 42%"></div>
-                </div>
-                <div class="progress-text">
-                    <span>Слайд 3 из 7</span>
-                    <span>Открыто кейсов: <span id="casesOpened">0</span></span>
-                </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </button>
+                <button class="btn" onclick="nextSlide()">
+                    Далее
+                    <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Слайд 4: Ваши NFT -->
+        <!-- СЛАЙД 4: NFT -->
         <div class="slide" id="slide4">
-            <div class="achievement-icon">
+            <div class="icon-large">
                 <i class="fas fa-gem"></i>
             </div>
             <h1 class="slide-title">Ваша Коллекция NFT</h1>
             <p class="slide-subtitle">Уникальные предметы, которые вы собрали</p>
             
-            <div class="stats-container">
+            <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-value" id="userNFTsCount">0</div>
+                    <div class="stat-value" id="userNFTs">0</div>
                     <div class="stat-label">Ваши NFT</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value global-stat" id="globalNFTsCount">0</div>
+                    <div class="stat-value global-stat" id="totalNFTs">0</div>
                     <div class="stat-label">Всего у игроков</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="collectionValue">0</div>
+                    <div class="stat-label">Стоимость (SAMD)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgNFTs">0</div>
+                    <div class="stat-label">Среднее на игрока</div>
                 </div>
             </div>
             
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 57%"></div>
-                </div>
-                <div class="progress-text">
-                    <span>Слайд 4 из 7</span>
-                    <span>Стоимость коллекции: <span id="nftValue">0</span> SAMD</span>
-                </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </button>
+                <button class="btn" onclick="nextSlide()">
+                    Далее
+                    <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Слайд 5: Детали NFT -->
+        <!-- СЛАЙД 5: NFT КОЛЛЕКЦИЯ -->
         <div class="slide" id="slide5">
             <h1 class="slide-title">Ваши NFT Коллекции</h1>
             <p class="slide-subtitle">Просмотрите все ваши уникальные предметы</p>
@@ -586,84 +545,95 @@
                 <!-- NFT будут добавлены динамически -->
             </div>
             
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 71%"></div>
-                </div>
-                <div class="progress-text">
-                    <span>Слайд 5 из 7</span>
-                    <span id="nftRarityInfo">Загрузка...</span>
-                </div>
+            <div style="color: #8b9bb5; margin: 20px 0; font-size: 14px;">
+                <div id="rarityStats">Загрузка редкостей...</div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </button>
+                <button class="btn" onclick="nextSlide()">
+                    Далее
+                    <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Слайд 6: Глобальная статистика -->
+        <!-- СЛАЙД 6: СТАТИСТИКА -->
         <div class="slide" id="slide6">
-            <div class="achievement-icon">
+            <div class="icon-large">
                 <i class="fas fa-globe"></i>
             </div>
             <h1 class="slide-title">Глобальная Статистика</h1>
             <p class="slide-subtitle">Как вы выглядите на фоне других игроков</p>
             
-            <div class="stats-container">
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="totalPlayers">0</div>
                     <div class="stat-label">Всего игроков</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="userRank">0</div>
+                    <div class="stat-value" id="userRank">#0</div>
                     <div class="stat-label">Ваше место</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="daysPlayed">45</div>
+                    <div class="stat-value" id="topPlayer">-</div>
+                    <div class="stat-label">Лучший игрок</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">45</div>
                     <div class="stat-label">Дней сезона</div>
                 </div>
             </div>
             
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 85%"></div>
-                </div>
-                <div class="progress-text">
-                    <span>Слайд 6 из 7</span>
-                    <span>Лучший в сезоне: <span id="topPlayer">Загрузка...</span></span>
-                </div>
+            <div style="margin: 20px 0; padding: 15px; background: rgba(58, 134, 255, 0.1); border-radius: 15px; border: 1px solid rgba(58, 134, 255, 0.2);">
+                <div style="color: #3a86ff; font-weight: 600; margin-bottom: 8px;">Ваши показатели:</div>
+                <div id="performanceStats" style="color: #8b9bb5; font-size: 14px;">Загрузка...</div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </button>
+                <button class="btn" onclick="nextSlide()">
+                    Далее
+                    <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Слайд 7: Завершение итогов -->
+        <!-- СЛАЙД 7: ЗАВЕРШЕНИЕ -->
         <div class="slide" id="slide7">
-            <div class="achievement-icon">
+            <div class="icon-large">
                 <i class="fas fa-award"></i>
             </div>
             <h1 class="slide-title">Итоги Подведены!</h1>
             <p class="slide-subtitle">Спасибо за участие в первом сезоне SamdGame!</p>
             
-            <div style="margin: 2rem 0; padding: 20px; background: rgba(255, 190, 11, 0.1); border-radius: 20px; border: 1px solid rgba(255, 190, 11, 0.3);">
-                <h3 style="color: var(--accent-gold); margin-bottom: 10px;">Участник 1 сезона</h3>
-                <p style="color: var(--text-secondary); font-size: 14px;">Вы получили специальный статус участника первого сезона!</p>
+            <div style="margin: 30px 0; padding: 20px; background: rgba(255, 190, 11, 0.1); border-radius: 20px; border: 1px solid rgba(255, 190, 11, 0.3); width: 100%; max-width: 500px;">
+                <div style="color: #ffbe0b; font-size: 20px; font-weight: 700; margin-bottom: 10px;">Участник 1 сезона</div>
+                <div style="color: rgba(255, 190, 11, 0.8); font-size: 14px;">Вы получили специальный статус участника первого сезона!</div>
             </div>
             
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 100%"></div>
-                </div>
-                <div class="progress-text">
-                    <span>Слайд 7 из 7</span>
-                    <span>Готовы к сезону 2?</span>
-                </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="prevSlide()">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад
+                </button>
+                <button class="btn" id="season2Btn">
+                    К сезону 2
+                    <i class="fas fa-rocket"></i>
+                </button>
             </div>
-            
-            <button class="btn" id="nextSeasonBtn">
-                <i class="fas fa-rocket"></i>
-                Перейти к сезону 2
-            </button>
         </div>
 
-        <!-- Экран сезона 2 -->
+        <!-- ЭКРАН СЕЗОНА 2 -->
         <div class="slide new-year-theme" id="season2Screen">
-            <h1 class="slide-title">СЕЗОН 2</h1>
-            <p class="slide-subtitle" style="color: var(--accent-green);">Новогоднее Приключение начинается!</p>
+            <h1 class="slide-title" style="color: #38b000;">СЕЗОН 2</h1>
+            <p class="slide-subtitle" style="color: #38b000;">Новогоднее Приключение начинается!</p>
             
             <div class="countdown">
                 <div class="countdown-title">До начала осталось:</div>
@@ -681,67 +651,46 @@
                         <div class="countdown-label">Минут</div>
                     </div>
                     <div class="countdown-unit">
-                        <div class="count-value" id="seconds">00</div>
+                        <div class="countdown-value" id="seconds">00</div>
                         <div class="countdown-label">Секунд</div>
                     </div>
                 </div>
             </div>
             
-            <div style="margin: 2rem 0; max-width: 500px;">
-                <h3 style="color: var(--accent-purple); margin-bottom: 1rem;">Что нового в сезоне 2:</h3>
-                <ul style="text-align: left; color: var(--text-secondary); list-style: none; padding: 0;">
-                    <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
-                        <i class="fas fa-star" style="color: var(--accent-gold); position: absolute; left: 0;"></i>
-                        Новые NFT коллекции
-                    </li>
-                    <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
-                        <i class="fas fa-gift" style="color: var(--accent-purple); position: absolute; left: 0;"></i>
-                        Новогодние сюрпризы
-                    </li>
-                    <li style="margin-bottom: 10px; padding-left: 20px; position: relative;">
-                        <i class="fas fa-trophy" style="color: var(--accent-green); position: absolute; left: 0;"></i>
-                        Еженедельные турниры
-                    </li>
-                </ul>
+            <div style="margin: 30px 0; width: 100%; max-width: 500px;">
+                <h3 style="color: #8338ec; margin-bottom: 15px; font-size: 20px;">Что нового в сезоне 2:</h3>
+                <div style="text-align: left; color: #8b9bb5; font-size: 14px; line-height: 1.6;">
+                    <div style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fas fa-star" style="color: #ffbe0b; margin-top: 2px;"></i>
+                        <span>Новые NFT коллекции с уникальными эффектами</span>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fas fa-gift" style="color: #8338ec; margin-top: 2px;"></i>
+                        <span>Новогодние сюрпризы и промокоды</span>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fas fa-trophy" style="color: #38b000; margin-top: 2px;"></i>
+                        <span>Еженедельные турниры с наградами</span>
+                    </div>
+                </div>
             </div>
             
-            <button class="btn" id="viewResultsAgainBtn">
+            <button class="btn" id="backToResultsBtn">
                 <i class="fas fa-history"></i>
                 Посмотреть итоги
             </button>
         </div>
-    </div>
 
-    <!-- Мобильная навигация -->
-    <div class="mobile-nav" id="mobileNav">
-        <button class="nav-btn active" data-slide="1">
-            <i class="fas fa-home"></i>
-            <span>Начало</span>
-        </button>
-        <button class="nav-btn" data-slide="2">
-            <i class="fas fa-coins"></i>
-            <span>SAMD</span>
-        </button>
-        <button class="nav-btn" data-slide="3">
-            <i class="fas fa-ticket-alt"></i>
-            <span>Билеты</span>
-        </button>
-        <button class="nav-btn" data-slide="4">
-            <i class="fas fa-gem"></i>
-            <span>NFT</span>
-        </button>
-        <button class="nav-btn" data-slide="6">
-            <i class="fas fa-globe"></i>
-            <span>Статистика</span>
-        </button>
-        <button class="nav-btn" data-slide="7">
-            <i class="fas fa-award"></i>
-            <span>Итоги</span>
-        </button>
+        <!-- СВАЙП ПОДСКАЗКА -->
+        <div class="swipe-hint" id="swipeHint">
+            <i class="fas fa-arrows-alt-h"></i> Свайп для навигации
+        </div>
     </div>
 
     <script>
-        // ==================== КОНФИГУРАЦИЯ FIREBASE ====================
+        // =============================================
+        // КОНФИГУРАЦИЯ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // =============================================
         const firebaseConfig = {
             apiKey: "AIzaSyCcxotG6DNpkUxTXplC4DURNe-S02otuc4",
             authDomain: "samdcoin-e65a5.firebaseapp.com",
@@ -752,165 +701,157 @@
             measurementId: "G-BBPFLK9DMS"
         };
 
-        // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // ==================== TELEGRAM WEB APP ====================
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.expand();
-            tg.ready();
-        }
-
-        // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
+        // Глобальные переменные
         let currentUser = null;
-        let userData = null;
-        let allUsersData = [];
+        let allUsers = [];
+        let globalStats = null;
         let currentSlide = 1;
         const totalSlides = 7;
-        const season2StartDate = new Date('2025-12-19T17:00:00').getTime();
-        let hasViewedResults = false;
-        
-        // Инициализация при загрузке
+        const season2Date = new Date('2025-12-19T17:00:00').getTime();
+        let isInitialized = false;
+
+        // =============================================
+        // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+        // =============================================
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Инициализация приложения...');
-            
-            // Проверяем, смотрел ли пользователь уже итоги
-            hasViewedResults = localStorage.getItem('samdgame_results_viewed') === 'true';
+            console.log('🚀 Инициализация приложения...');
             
             try {
-                // Получаем данные пользователя из Telegram
-                const telegramUser = tg?.initDataUnsafe?.user;
+                // 1. Инициализация Firebase
+                await initFirebase();
+                
+                // 2. Получение пользователя Telegram
+                const telegramUser = await getTelegramUser();
                 if (!telegramUser) {
-                    throw new Error('Telegram данные не доступны');
+                    showError('Требуется Telegram для входа');
+                    return;
                 }
                 
-                // Ищем пользователя в Firestore
-                currentUser = await findCurrentUser(telegramUser);
+                // 3. Поиск пользователя в Firestore
+                currentUser = await findUserInFirestore(telegramUser);
                 if (!currentUser) {
-                    throw new Error('Пользователь не найден в базе данных');
+                    showError('Пользователь не найден');
+                    return;
                 }
                 
-                // Загружаем данные всех пользователей для расчета статистики
-                console.log('Загрузка данных всех пользователей...');
-                allUsersData = await loadAllUsers();
+                console.log('✅ Пользователь найден:', currentUser.id);
                 
-                // Рассчитываем глобальную статистику
-                const globalStats = calculateGlobalStats(allUsersData);
+                // 4. Загрузка всех пользователей
+                allUsers = await loadAllUsers();
+                console.log('✅ Загружено пользователей:', allUsers.length);
                 
-                // Рассчитываем рейтинг пользователя
-                const userRank = calculateUserRank(currentUser, allUsersData);
+                // 5. Расчет статистики
+                globalStats = calculateGlobalStats(allUsers);
                 
-                // Обновляем UI с реальными данными
-                updateUIWithData(currentUser, globalStats, userRank);
+                // 6. Расчет рейтинга пользователя
+                const userRank = calculateUserRank(currentUser, allUsers);
                 
-                // Показываем правильный экран
-                if (!hasViewedResults) {
-                    showSlide(1); // Показываем введение
-                } else {
-                    showSeason2Screen(); // Показываем экран сезона 2
-                }
+                // 7. Обновление интерфейса
+                updateUI(currentUser, globalStats, userRank);
                 
-                // Скрываем экран загрузки и показываем приложение
+                // 8. Показ приложения
                 setTimeout(() => {
-                    document.getElementById('loadingScreen').style.display = 'none';
-                    document.getElementById('appContainer').classList.add('show');
-                    console.log('Приложение запущено');
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        document.getElementById('appContainer').classList.add('show');
+                    }, 300);
                 }, 500);
                 
+                isInitialized = true;
+                
             } catch (error) {
-                console.error('Ошибка инициализации:', error);
-                showErrorScreen('Не удалось загрузить данные. Проверьте подключение к интернету.');
+                console.error('❌ Ошибка инициализации:', error);
+                showError('Ошибка загрузки. Попробуйте позже.');
             }
-            
-            // Запускаем таймер обратного отсчета
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-            
-            // Инициализируем свайпы
-            initSwipeGestures();
         });
 
-        // ==================== FIRESTORE ФУНКЦИИ ====================
+        // =============================================
+        // FIREBASE ФУНКЦИИ
+        // =============================================
+        async function initFirebase() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                window.db = firebase.firestore();
+                console.log('✅ Firebase инициализирован');
+            } catch (error) {
+                console.error('❌ Ошибка Firebase:', error);
+                throw error;
+            }
+        }
 
-        // Поиск текущего пользователя
-        async function findCurrentUser(telegramUser) {
-            console.log('Поиск пользователя с Telegram ID:', telegramUser.id);
+        async function getTelegramUser() {
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.expand();
+                tg.ready();
+                return tg.initDataUnsafe?.user;
+            }
+            return null;
+        }
+
+        async function findUserInFirestore(telegramUser) {
+            const searchFields = [
+                { field: 'telegramId', value: telegramUser.id.toString() },
+                { field: 'telegram_id', value: telegramUser.id.toString() },
+                { field: 'userId', value: telegramUser.id.toString() }
+            ];
             
-            // Пробуем разные варианты поиска
-            const searchFields = ['telegramId', 'telegram_id', 'userId'];
+            if (telegramUser.username) {
+                searchFields.push({ field: 'username', value: telegramUser.username });
+            }
             
-            for (const field of searchFields) {
+            for (const query of searchFields) {
                 try {
-                    const query = db.collection('users')
-                        .where(field, '==', telegramUser.id.toString())
-                        .limit(1);
-                    
-                    const snapshot = await query.get();
+                    const snapshot = await db.collection('users')
+                        .where(query.field, '==', query.value)
+                        .limit(1)
+                        .get();
                     
                     if (!snapshot.empty) {
-                        const userDoc = snapshot.docs[0];
-                        console.log('Пользователь найден по полю', field, ':', userDoc.id);
+                        const doc = snapshot.docs[0];
+                        const data = doc.data();
                         return {
-                            id: userDoc.id,
-                            ...userDoc.data()
+                            id: doc.id,
+                            name: telegramUser.first_name || 'Игрок',
+                            username: telegramUser.username,
+                            coins: parseInt(data.coins || data.samd || 0),
+                            tickets: parseInt(data.tickets || 0),
+                            nfts: data.nfts || [],
+                            upgrades: data.upgrades || []
                         };
                     }
                 } catch (error) {
-                    console.log('Поиск по полю', field, 'не удался:', error.message);
+                    console.log(`Поиск по ${query.field} пропущен`);
                 }
-            }
-            
-            // Если пользователь не найден, пробуем получить первый документ (для тестирования)
-            try {
-                const snapshot = await db.collection('users').limit(1).get();
-                if (!snapshot.empty) {
-                    const userDoc = snapshot.docs[0];
-                    console.log('Используем тестового пользователя:', userDoc.id);
-                    return {
-                        id: userDoc.id,
-                        ...userDoc.data()
-                    };
-                }
-            } catch (error) {
-                console.log('Не удалось получить ни одного пользователя');
             }
             
             return null;
         }
 
-        // Загрузка всех пользователей
         async function loadAllUsers() {
-            console.log('Загрузка всех пользователей из Firestore...');
-            
             try {
                 const snapshot = await db.collection('users').get();
                 const users = [];
                 
                 snapshot.forEach(doc => {
-                    const userData = doc.data();
+                    const data = doc.data();
                     users.push({
                         id: doc.id,
-                        ...userData,
-                        // Нормализуем данные
-                        coins: parseInt(userData.coins || userData.samd || 0),
-                        tickets: parseInt(userData.tickets || 0),
-                        nfts: userData.nfts || [],
-                        username: userData.username || userData.telegramData?.username || 'user'
+                        coins: parseInt(data.coins || data.samd || 0),
+                        tickets: parseInt(data.tickets || 0),
+                        nfts: data.nfts || [],
+                        username: data.username || data.telegramData?.username || 'user'
                     });
                 });
                 
-                console.log('Загружено пользователей:', users.length);
                 return users;
-                
             } catch (error) {
-                console.error('Ошибка загрузки пользователей:', error);
+                console.error('❌ Ошибка загрузки пользователей:', error);
                 return [];
             }
         }
 
-        // Расчет глобальной статистики
         function calculateGlobalStats(users) {
             if (users.length === 0) {
                 return {
@@ -920,7 +861,9 @@
                     totalPlayers: 0,
                     avgCoins: 0,
                     avgTickets: 0,
-                    avgNFTs: 0
+                    avgNFTs: 0,
+                    maxCoins: 0,
+                    topPlayer: '-'
                 };
             }
             
@@ -928,7 +871,7 @@
             let totalTickets = 0;
             let totalNFTs = 0;
             let maxCoins = 0;
-            let topPlayer = '';
+            let topPlayer = '-';
             
             users.forEach(user => {
                 totalCoins += user.coins || 0;
@@ -937,7 +880,7 @@
                 
                 if (user.coins > maxCoins) {
                     maxCoins = user.coins;
-                    topPlayer = user.username || 'unknown';
+                    topPlayer = user.username;
                 }
             });
             
@@ -949,43 +892,121 @@
                 avgCoins: Math.round(totalCoins / users.length),
                 avgTickets: Math.round(totalTickets / users.length),
                 avgNFTs: Math.round(totalNFTs / users.length),
-                topPlayer,
-                maxCoins
+                maxCoins,
+                topPlayer
             };
         }
 
-        // Расчет рейтинга пользователя
-        function calculateUserRank(currentUser, allUsers) {
-            if (!currentUser || allUsers.length === 0) return allUsers.length + 1;
-            
-            // Сортируем пользователей по количеству монет (по убыванию)
+        function calculateUserRank(user, allUsers) {
             const sortedUsers = [...allUsers].sort((a, b) => (b.coins || 0) - (a.coins || 0));
-            
-            // Находим индекс текущего пользователя
-            const userIndex = sortedUsers.findIndex(user => user.id === currentUser.id);
-            
-            return userIndex !== -1 ? userIndex + 1 : sortedUsers.length + 1;
+            const rank = sortedUsers.findIndex(u => u.id === user.id) + 1;
+            return rank || allUsers.length + 1;
         }
 
-        // Расчет стоимости коллекции NFT
+        // =============================================
+        // UI ФУНКЦИИ
+        // =============================================
+        function updateUI(user, stats, userRank) {
+            if (!user || !stats) return;
+            
+            // Форматирование чисел
+            function format(num) {
+                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+                return num.toString();
+            }
+            
+            // Основные данные пользователя
+            document.getElementById('userCoins').textContent = format(user.coins);
+            document.getElementById('userTickets').textContent = format(user.tickets);
+            document.getElementById('userNFTs').textContent = format(user.nfts.length);
+            
+            // Глобальная статистика
+            document.getElementById('totalCoins').textContent = format(stats.totalCoins);
+            document.getElementById('totalTickets').textContent = format(stats.totalTickets);
+            document.getElementById('totalNFTs').textContent = format(stats.totalNFTs);
+            document.getElementById('totalPlayers').textContent = format(stats.totalPlayers);
+            
+            // Средние значения
+            document.getElementById('avgCoins').textContent = format(stats.avgCoins);
+            document.getElementById('avgTickets').textContent = format(stats.avgTickets);
+            document.getElementById('avgNFTs').textContent = format(stats.avgNFTs);
+            
+            // Дополнительные данные
+            document.getElementById('maxCoins').textContent = format(stats.maxCoins);
+            document.getElementById('topPlayer').textContent = '@' + stats.topPlayer;
+            document.getElementById('userRank').textContent = '#' + userRank;
+            
+            // Расчет открытых кейсов (пример: 10 билетов на кейс)
+            const casesOpened = Math.floor(user.tickets / 10);
+            document.getElementById('casesOpened').textContent = casesOpened;
+            
+            // Стоимость коллекции NFT
+            const nftValue = calculateNFTValue(user.nfts);
+            document.getElementById('collectionValue').textContent = format(nftValue);
+            
+            // Информация о пользователе
+            const userInfo = user.username ? `@${user.username}` : 'Игрок';
+            document.getElementById('userInfo').textContent = userInfo;
+            
+            // Статистика производительности
+            const performance = `В топ ${Math.round((userRank / stats.totalPlayers) * 100)}% игроков`;
+            document.getElementById('performanceStats').textContent = performance;
+            
+            // Отображение NFT
+            displayNFTs(user.nfts);
+            
+            // Статистика редкости NFT
+            updateRarityStats(user.nfts);
+        }
+
         function calculateNFTValue(nfts) {
-            if (!nfts || !Array.isArray(nfts)) return 0;
-            
-            return nfts.reduce((total, nft) => {
-                return total + (parseInt(nft.price) || 0);
-            }, 0);
+            if (!Array.isArray(nfts)) return 0;
+            return nfts.reduce((sum, nft) => sum + (parseInt(nft.price) || 0), 0);
         }
 
-        // Анализ редкости NFT
-        function analyzeNFTs(nfts) {
-            if (!nfts || !Array.isArray(nfts)) return { common: 0, rare: 0, epic: 0, legendary: 0 };
+        function displayNFTs(nfts) {
+            const container = document.getElementById('nftGrid');
+            container.innerHTML = '';
             
-            const rarityCount = {
-                common: 0,
-                rare: 0,
-                epic: 0,
-                legendary: 0
-            };
+            if (!nfts || nfts.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #8b9bb5;">
+                        <i class="fas fa-gem" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <div style="font-size: 16px;">NFT не найдены</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Ограничиваем количество для производительности
+            const displayNFTs = nfts.slice(0, 12);
+            
+            displayNFTs.forEach(nft => {
+                const rarityColor = getRarityColor(nft.rarity);
+                const item = document.createElement('div');
+                item.className = 'nft-item';
+                item.innerHTML = `
+                    <img class="nft-image" 
+                         src="${nft.imageUrl || getPlaceholder(nft.rarity)}" 
+                         alt="${nft.name || 'NFT'}"
+                         onerror="this.src='${getPlaceholder(nft.rarity)}'">
+                    <div class="nft-name">${nft.name || 'NFT'}</div>
+                    <div class="nft-rarity" style="color: ${rarityColor}">
+                        ${getRarityName(nft.rarity || 'common')}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateRarityStats(nfts) {
+            if (!Array.isArray(nfts)) {
+                document.getElementById('rarityStats').textContent = 'Нет NFT';
+                return;
+            }
+            
+            const rarityCount = { common: 0, rare: 0, epic: 0, legendary: 0 };
             
             nfts.forEach(nft => {
                 const rarity = (nft.rarity || 'common').toLowerCase();
@@ -996,215 +1017,105 @@
                 }
             });
             
-            return rarityCount;
+            const statsText = `Легенд: ${rarityCount.legendary} | Эпич: ${rarityCount.epic} | Редких: ${rarityCount.rare} | Обычн: ${rarityCount.common}`;
+            document.getElementById('rarityStats').textContent = statsText;
         }
 
-        // ==================== UI ФУНКЦИИ ====================
-
-        // Обновление UI с данными
-        function updateUIWithData(user, globalStats, userRank) {
-            console.log('Обновление UI с данными пользователя:', user.id);
-            
-            // Форматирование больших чисел
-            function formatNumber(num) {
-                if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-                if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-                return num.toString();
-            }
-            
-            // Данные пользователя
-            const userCoins = user.coins || 0;
-            const userTickets = user.tickets || 0;
-            const userNFTs = user.nfts || [];
-            const userNFTsCount = userNFTs.length;
-            const nftValue = calculateNFTValue(userNFTs);
-            const nftAnalysis = analyzeNFTs(userNFTs);
-            
-            // Обновляем статистику
-            document.getElementById('userCoins').textContent = formatNumber(userCoins);
-            document.getElementById('globalCoins').textContent = formatNumber(globalStats.totalCoins);
-            document.getElementById('avgCoins').textContent = formatNumber(globalStats.avgCoins);
-            
-            document.getElementById('userTickets').textContent = formatNumber(userTickets);
-            document.getElementById('globalTickets').textContent = formatNumber(globalStats.totalTickets);
-            
-            document.getElementById('userNFTsCount').textContent = formatNumber(userNFTsCount);
-            document.getElementById('globalNFTsCount').textContent = formatNumber(globalStats.totalNFTs);
-            document.getElementById('nftValue').textContent = formatNumber(nftValue);
-            
-            // Рассчитываем примерное количество открытых кейсов
-            const casesOpened = Math.floor(userTickets / 10); // Пример: 10 билетов на кейс
-            document.getElementById('casesOpened').textContent = casesOpened;
-            
-            // Глобальная статистика
-            document.getElementById('totalPlayers').textContent = formatNumber(globalStats.totalPlayers);
-            document.getElementById('userRank').textContent = '#' + userRank;
-            document.getElementById('topPlayer').textContent = '@' + globalStats.topPlayer;
-            
-            // Информация о пользователе
-            const userStats = `Игрок ${user.username ? '@' + user.username : ''} | Рейтинг #${userRank}`;
-            document.getElementById('userStatsInfo').textContent = userStats;
-            
-            // Информация о редкости NFT
-            const rarityInfo = `${nftAnalysis.legendary} Легенд. | ${nftAnalysis.epic} Эпич. | ${nftAnalysis.rare} Редких`;
-            document.getElementById('nftRarityInfo').textContent = rarityInfo;
-            
-            // Отображаем NFT
-            displayUserNFTs(userNFTs);
-        }
-
-        // Отображение NFT пользователя
-        function displayUserNFTs(nfts) {
-            const nftGrid = document.getElementById('nftGrid');
-            nftGrid.innerHTML = '';
-            
-            if (!nfts || nfts.length === 0) {
-                nftGrid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
-                        <i class="fas fa-gem" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;"></i>
-                        <p>NFT не найдены</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Показываем только последние 12 NFT (для оптимизации)
-            const recentNFTs = nfts.slice(-12);
-            
-            recentNFTs.forEach((nft, index) => {
-                const nftItem = document.createElement('div');
-                nftItem.className = 'nft-item';
-                
-                // Определяем цвет редкости
-                let rarityColor = '#8b9bb5';
-                if (nft.rarity === 'legendary') rarityColor = '#ffbe0b';
-                else if (nft.rarity === 'epic') rarityColor = '#8338ec';
-                else if (nft.rarity === 'rare') rarityColor = '#3a86ff';
-                
-                nftItem.innerHTML = `
-                    <img class="nft-image" 
-                         src="${nft.imageUrl || getNFTPlaceholder(nft.rarity)}" 
-                         alt="${nft.name || 'NFT ' + (index + 1)}"
-                         onerror="this.src='${getNFTPlaceholder(nft.rarity)}'">
-                    <div class="nft-name">${nft.name || 'NFT ' + (index + 1)}</div>
-                    <div class="nft-rarity" style="color: ${rarityColor}">
-                        ${getRarityName(nft.rarity || 'common')}
-                    </div>
-                `;
-                
-                nftGrid.appendChild(nftItem);
-            });
-        }
-
-        // Получение имени редкости
-        function getRarityName(rarity) {
+        function getRarityColor(rarity) {
             switch(rarity) {
-                case 'common': return 'Обычная';
-                case 'rare': return 'Редкая';
-                case 'epic': return 'Эпическая';
-                case 'legendary': return 'Легендарная';
-                default: return rarity;
+                case 'legendary': return '#ffbe0b';
+                case 'epic': return '#8338ec';
+                case 'rare': return '#3a86ff';
+                default: return '#8b9bb5';
             }
         }
 
-        // Получение placeholder для NFT
-        function getNFTPlaceholder(rarity) {
-            const colors = {
-                common: '#8b9bb5',
-                rare: '#3a86ff',
-                epic: '#8338ec',
-                legendary: '#ffbe0b'
+        function getRarityName(rarity) {
+            const names = {
+                common: 'Обычная',
+                rare: 'Редкая',
+                epic: 'Эпическая',
+                legendary: 'Легендарная'
             };
-            
-            const color = colors[rarity] || colors.common;
-            return `https://api.dicebear.com/7.x/shapes/svg?seed=${rarity}&backgroundColor=${color.replace('#', '')}`;
+            return names[rarity] || rarity;
         }
 
-        // ==================== НАВИГАЦИЯ ====================
+        function getPlaceholder(rarity) {
+            const colors = {
+                common: '8b9bb5',
+                rare: '3a86ff',
+                epic: '8338ec',
+                legendary: 'ffbe0b'
+            };
+            const color = colors[rarity] || colors.common;
+            return `https://api.dicebear.com/7.x/shapes/svg?seed=${rarity}&backgroundColor=${color}`;
+        }
 
-        // Показать слайд
+        // =============================================
+        // НАВИГАЦИЯ
+        // =============================================
         function showSlide(slideNumber) {
-            // Скрыть все слайды
-            for (let i = 1; i <= totalSlides; i++) {
-                const slide = document.getElementById(`slide${i}`);
-                if (slide) slide.classList.remove('active');
-            }
+            if (slideNumber < 1 || slideNumber > totalSlides + 1) return;
+            
+            // Обновление прогресса
+            const progress = ((slideNumber - 1) / totalSlides) * 100;
+            document.getElementById('slideProgress').style.width = `${progress}%`;
+            
+            // Скрытие всех слайдов
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active', 'prev');
+            });
             
             // Показать нужный слайд
-            const slide = document.getElementById(`slide${slideNumber}`);
-            if (slide) {
-                slide.classList.add('active');
-                currentSlide = slideNumber;
-                
-                // Обновить активную кнопку в навигации
-                updateMobileNav(slideNumber);
-                
-                // Прокрутить к верху
-                window.scrollTo(0, 0);
-            }
-        }
-
-        // Показать экран сезона 2
-        function showSeason2Screen() {
-            // Скрыть все слайды
-            for (let i = 1; i <= totalSlides; i++) {
-                const slide = document.getElementById(`slide${i}`);
-                if (slide) slide.classList.remove('active');
+            const targetSlide = document.getElementById(`slide${slideNumber}`);
+            if (targetSlide) {
+                targetSlide.classList.add('active');
+            } else if (slideNumber === totalSlides + 1) {
+                document.getElementById('season2Screen').classList.add('active');
             }
             
-            // Показать экран сезона 2
-            document.getElementById('season2Screen').classList.add('active');
+            currentSlide = slideNumber;
             
-            // Обновить навигацию
-            document.getElementById('mobileNav').style.display = 'none';
-            
-            // Прокрутить к верху
+            // Прокрутка к верху
             window.scrollTo(0, 0);
         }
 
-        // Обновить мобильную навигацию
-        function updateMobileNav(slideNumber) {
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            const activeBtn = document.querySelector(`.nav-btn[data-slide="${slideNumber}"]`);
-            if (activeBtn) {
-                activeBtn.classList.add('active');
-            }
-        }
-
-        // Следующий слайд
         function nextSlide() {
             if (currentSlide < totalSlides) {
                 showSlide(currentSlide + 1);
-            } else {
-                // Последний слайд - переход к сезону 2
-                hasViewedResults = true;
+            } else if (currentSlide === totalSlides) {
+                // Сохраняем просмотр и переходим к сезону 2
                 localStorage.setItem('samdgame_results_viewed', 'true');
-                showSeason2Screen();
+                showSlide(totalSlides + 1);
             }
         }
 
-        // Предыдущий слайд
         function prevSlide() {
             if (currentSlide > 1) {
                 showSlide(currentSlide - 1);
             }
         }
 
-        // ==================== ТАЙМЕР ====================
+        function showSeason2() {
+            showSlide(totalSlides + 1);
+        }
 
-        // Обновление обратного отсчета
+        function showResults() {
+            showSlide(1);
+        }
+
+        // =============================================
+        // ТАЙМЕР
+        // =============================================
         function updateCountdown() {
-            const now = new Date().getTime();
-            const timeLeft = season2StartDate - now;
+            const now = Date.now();
+            const diff = season2Date - now;
             
-            if (timeLeft > 0) {
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
                 
                 document.getElementById('days').textContent = days.toString().padStart(2, '0');
                 document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
@@ -1212,158 +1123,133 @@
                 document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
             } else {
                 document.querySelector('.countdown-title').textContent = 'Сезон начался!';
-                document.querySelector('.countdown-timer').innerHTML = '<div style="color: var(--accent-green); font-size: 1.5rem; font-weight: bold;">🎉 Начинаем! 🎉</div>';
+                document.querySelector('.countdown-timer').innerHTML = `
+                    <div style="color: #38b000; font-size: 24px; font-weight: bold;">
+                        🎉 Начинаем! 🎉
+                    </div>
+                `;
             }
         }
 
-        // ==================== СВАЙПЫ ====================
-
-        // Инициализация жестов свайпа
-        function initSwipeGestures() {
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let touchEndX = 0;
-            let touchEndY = 0;
+        // =============================================
+        // СВАЙПЫ
+        // =============================================
+        function initSwipe() {
+            let startX = 0;
+            let startY = 0;
             
-            document.addEventListener('touchstart', function(event) {
-                touchStartX = event.changedTouches[0].screenX;
-                touchStartY = event.changedTouches[0].screenY;
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
             }, { passive: true });
             
-            document.addEventListener('touchend', function(event) {
-                touchEndX = event.changedTouches[0].screenX;
-                touchEndY = event.changedTouches[0].screenY;
+            document.addEventListener('touchend', (e) => {
+                if (!startX || !startY) return;
                 
-                handleSwipe();
-            }, { passive: true });
-            
-            function handleSwipe() {
-                const diffX = touchEndX - touchStartX;
-                const diffY = Math.abs(touchEndY - touchStartY);
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                
+                const diffX = startX - endX;
+                const diffY = Math.abs(startY - endY);
                 
                 // Минимальная дистанция для свайпа
-                const minSwipeDistance = 50;
+                const minSwipe = 50;
                 
-                // Проверяем, что свайп был в основном горизонтальным
-                if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffX) > diffY) {
+                // Если свайп горизонтальный и достаточно длинный
+                if (Math.abs(diffX) > minSwipe && Math.abs(diffX) > diffY) {
                     if (diffX > 0) {
-                        // Свайп вправо - предыдущий слайд
-                        prevSlide();
-                    } else {
                         // Свайп влево - следующий слайд
                         nextSlide();
+                    } else {
+                        // Свайп вправо - предыдущий слайд
+                        prevSlide();
                     }
                 }
-            }
+                
+                startX = 0;
+                startY = 0;
+            }, { passive: true });
         }
 
-        // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
-
-        // Кнопка начала просмотра итогов
-        document.getElementById('startResultsBtn').addEventListener('click', nextSlide);
-
-        // Кнопка перехода к сезону 2
-        document.getElementById('nextSeasonBtn').addEventListener('click', () => {
-            hasViewedResults = true;
-            localStorage.setItem('samdgame_results_viewed', 'true');
-            showSeason2Screen();
-        });
-
-        // Кнопка повторного просмотра итогов
-        document.getElementById('viewResultsAgainBtn').addEventListener('click', () => {
-            document.getElementById('mobileNav').style.display = 'flex';
-            showSlide(1);
-        });
-
-        // Мобильная навигация
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const slideNumber = parseInt(btn.dataset.slide);
-                showSlide(slideNumber);
+        // =============================================
+        // ОБРАБОТЧИКИ СОБЫТИЙ
+        // =============================================
+        function initEventListeners() {
+            // Кнопка начала
+            document.getElementById('startBtn').addEventListener('click', nextSlide);
+            
+            // Кнопка перехода к сезону 2
+            document.getElementById('season2Btn').addEventListener('click', function() {
+                localStorage.setItem('samdgame_results_viewed', 'true');
+                showSeason2();
             });
-        });
+            
+            // Кнопка возврата к итогам
+            document.getElementById('backToResultsBtn').addEventListener('click', showResults);
+            
+            // Клавиши
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+            
+            // Инициализация свайпов
+            initSwipe();
+            
+            // Запуск таймера
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
 
-        // Клавиши для навигации
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                prevSlide();
-            }
-        });
-
-        // ==================== ОШИБКИ ====================
-
-        // Показать экран ошибки
-        function showErrorScreen(message) {
-            document.getElementById('loadingScreen').innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <div class="spinner" style="border-top-color: #ff4757;"></div>
-                    <h2 style="color: #ff4757; margin: 20px 0;">Ошибка загрузки</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 20px;">${message}</p>
-                    <button class="btn" onclick="location.reload()" style="background: #ff4757;">
-                        <i class="fas fa-redo"></i>
-                        Попробовать снова
+        // =============================================
+        // ОШИБКИ
+        // =============================================
+        function showError(message) {
+            document.getElementById('loadingText').innerHTML = `
+                <div style="color: #ff4757; text-align: center;">
+                    <div style="font-size: 20px; margin-bottom: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div style="margin-bottom: 20px;">${message}</div>
+                    <button onclick="location.reload()" style="
+                        background: #ff4757;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 25px;
+                        font-size: 16px;
+                        cursor: pointer;
+                    ">
+                        <i class="fas fa-redo"></i> Обновить
                     </button>
                 </div>
             `;
         }
 
-        // ==================== АДАПТИВНОСТЬ ====================
-
-        // Адаптация под ориентацию экрана
-        function handleOrientationChange() {
-            const isPortrait = window.innerHeight > window.innerWidth;
-            
-            if (isPortrait) {
-                // Вертикальная ориентация
-                document.body.style.paddingBottom = '70px';
-            } else {
-                // Горизонтальная ориентация
-                document.body.style.paddingBottom = '0';
-                document.getElementById('mobileNav').style.display = 'none';
-            }
+        // =============================================
+        // ЗАПУСК ПРИЛОЖЕНИЯ
+        // =============================================
+        // Инициализация обработчиков
+        initEventListeners();
+        
+        // Адаптация под мобильные
+        function handleResize() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
-
-        window.addEventListener('resize', handleOrientationChange);
-        handleOrientationChange();
-
-        // Предотвращение масштабирования
-        document.addEventListener('touchmove', function(event) {
-            if (event.scale !== 1) {
-                event.preventDefault();
-            }
-        }, { passive: false });
-
-        // ==================== АНИМАЦИИ СНЕЖИНОК ====================
-
-        function createSnowflakes() {
-            const season2Screen = document.getElementById('season2Screen');
-            if (!season2Screen) return;
-            
-            // Добавляем снежинки только в новогоднюю тему
-            for (let i = 0; i < 20; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.style.cssText = `
-                    position: absolute;
-                    width: ${Math.random() * 10 + 5}px;
-                    height: ${Math.random() * 10 + 5}px;
-                    background: white;
-                    border-radius: 50%;
-                    opacity: ${Math.random() * 0.5 + 0.3};
-                    animation: snowfall ${Math.random() * 5 + 5}s linear infinite;
-                    left: ${Math.random() * 100}%;
-                    animation-delay: ${Math.random() * 5}s;
-                    pointer-events: none;
-                    z-index: -1;
-                `;
-                season2Screen.appendChild(snowflake);
-            }
-        }
-
-        // Создаем снежинки при показе новогодней темы
-        setTimeout(createSnowflakes, 1000);
-
+        
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        
+        // Предотвращение контекстного меню
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        
+        console.log('✅ Приложение готово');
     </script>
 </body>
 </html>
