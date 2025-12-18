@@ -860,6 +860,8 @@
             cursor: not-allowed;
         }
 
+        /* ==================== ПЕРЕРАБОТАННЫЙ ДИЗАЙН ИНВЕНТАРЯ ==================== */
+        
         .inventory-section {
             background: linear-gradient(135deg, 
                 rgba(255, 255, 255, 0.05), 
@@ -868,6 +870,8 @@
             padding: 30px;
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
+            min-height: 500px;
+            position: relative;
         }
 
         .inventory-header {
@@ -883,6 +887,10 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--glass-border);
         }
 
         .filter-btn {
@@ -896,93 +904,171 @@
             font-weight: 600;
             font-size: 13px;
             backdrop-filter: blur(10px);
+            min-width: 80px;
         }
 
         .filter-btn:hover {
-            background: rgba(77, 171, 247, 0.1);
+            background: rgba(77, 171, 247, 0.2);
+            transform: translateY(-2px);
         }
 
         .filter-btn.active {
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             color: white;
             border-color: transparent;
+            box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
         }
 
+        /* НОВЫЙ ДИЗАЙН ГРИДА ИНВЕНТАРЯ */
         .inventory-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            min-height: 200px; /* Фикс для серого экрана */
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            min-height: 300px;
+            position: relative;
         }
 
         .inventory-card {
-            background: var(--glass-bg);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.05), 
+                rgba(255, 255, 255, 0.02));
             border-radius: var(--border-radius);
             overflow: hidden;
             transition: var(--transition);
             border: 2px solid transparent;
             backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 320px;
+            position: relative;
         }
 
         .inventory-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .inventory-card.common {
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         .inventory-card.rare {
             border-color: var(--accent-blue);
+            box-shadow: 0 0 20px rgba(77, 171, 247, 0.2);
         }
 
         .inventory-card.epic {
             border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(151, 117, 250, 0.2);
         }
 
         .inventory-card.legendary {
-            border-color: var(--warning-color);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(255, 217, 61, 0.3);
+        }
+
+        /* Индикатор редкости в углу */
+        .rarity-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+        }
+
+        .rarity-badge.common {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+
+        .rarity-badge.rare {
+            background: rgba(77, 171, 247, 0.3);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .rarity-badge.epic {
+            background: rgba(151, 117, 250, 0.3);
+            color: var(--accent-purple);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .rarity-badge.legendary {
+            background: rgba(255, 217, 61, 0.3);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
         }
 
         .inventory-image {
             width: 100%;
-            aspect-ratio: 1/1;
+            height: 180px;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            flex-shrink: 0;
         }
 
         .inventory-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .inventory-card:hover .inventory-image img {
+            transform: scale(1.05);
         }
 
         .inventory-info {
-            padding: 15px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
         }
 
         .inventory-name {
             font-size: 16px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: var(--text-color);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            line-height: 1.3;
         }
 
         .inventory-details {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
-            margin-bottom: 16px;
-            line-height: 1.5;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .inventory-source {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 5px;
+            font-size: 10px;
         }
 
         .inventory-actions {
             display: flex;
             gap: 8px;
-            margin-top: 16px;
+            margin-top: auto;
         }
 
         .send-nft-btn {
@@ -993,9 +1079,14 @@
             padding: 10px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             transition: var(--transition);
+            text-align: center;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .send-nft-btn:hover {
@@ -1011,14 +1102,123 @@
             padding: 10px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             transition: var(--transition);
+            text-align: center;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .sell-nft-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(255, 217, 61, 0.3);
+        }
+
+        /* Новогодние украшения для инвентаря */
+        .inventory-card::before {
+            content: '❄️';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            font-size: 20px;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .inventory-card::after {
+            content: '🎄';
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            font-size: 16px;
+            opacity: 0.2;
+            z-index: 1;
+        }
+
+        /* Состояние пустого инвентаря */
+        .inventory-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.03), 
+                rgba(255, 255, 255, 0.01));
+            border-radius: var(--border-radius);
+            border: 2px dashed var(--glass-border);
+            backdrop-filter: blur(10px);
+            min-height: 300px;
+        }
+
+        .inventory-empty i {
+            font-size: 64px;
+            color: var(--accent-blue);
+            opacity: 0.5;
+            margin-bottom: 10px;
+        }
+
+        .inventory-empty h3 {
+            font-size: 24px;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .inventory-empty p {
+            color: var(--text-secondary);
+            max-width: 400px;
+            line-height: 1.5;
+        }
+
+        /* Загрузка инвентаря */
+        .inventory-loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .inventory-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(77, 171, 247, 0.2);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .inventory-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--glass-border);
+            flex-wrap: wrap;
+        }
+
+        .inventory-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .inventory-stat-value {
+            font-weight: 700;
+            color: var(--text-color);
         }
 
         .mobile-menu {
@@ -1469,12 +1669,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Исправление для серого экрана в инвентаре */
-        .inventory-container {
-            min-height: 300px;
-            position: relative;
-        }
-
         @media (max-width: 768px) {
             .container {
                 padding: 0 15px;
@@ -1521,6 +1715,20 @@
                 width: 100%;
                 overflow-x: auto;
                 padding-bottom: 8px;
+                justify-content: flex-start;
+            }
+            
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+            
+            .inventory-card {
+                min-height: 280px;
+            }
+            
+            .inventory-image {
+                height: 140px;
             }
             
             .promocode-input-container {
@@ -1577,6 +1785,10 @@
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             }
             
+            .inventory-card {
+                min-height: 260px;
+            }
+            
             .confirmation-content,
             .promocode-content,
             .buy-confirm-content,
@@ -1597,61 +1809,6 @@
             .disclaimer-text {
                 font-size: 14px;
             }
-            
-            /* Добавьте это в конец блока стилей после media queries */
-
-.fix-height {
-    min-height: 400px !important;
-}
-
-.inventory-grid {
-    min-height: 400px; /* Добавьте это свойство */
-    contain: paint; /* Это предотвращает баги с отображением */
-}
-
-.inventory-card {
-    height: 320px; /* Фиксированная высота карточки */
-    display: flex;
-    flex-direction: column;
-}
-
-.inventory-image {
-    flex-shrink: 0; /* Предотвращает сжатие изображения */
-}
-
-.inventory-info {
-    flex-grow: 1; /* Занимает оставшееся пространство */
-    display: flex;
-    flex-direction: column;
-}
-
-.inventory-actions {
-    margin-top: auto; /* Кнопки всегда внизу */
-}
-
-/* Улучшенный empty-state */
-.inventory-empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-secondary);
-    font-size: 16px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-}
-
-.inventory-empty-state i {
-    font-size: 48px;
-    color: var(--accent-blue);
-    opacity: 0.5;
-}
         }
     </style>
 </head>
@@ -1892,7 +2049,7 @@
         <div class="tab-content" id="inventory-content">
             <div class="inventory-section">
                 <div class="inventory-header">
-                    <h2>🎄 Ваши NFT</h2>
+                    <h2>🎄 Ваши NFT <span id="inventoryCount" style="font-size: 16px; color: var(--accent-blue); margin-left: 10px;">(0)</span></h2>
                     <div class="inventory-filters">
                         <button class="filter-btn active" data-filter="all">Все</button>
                         <button class="filter-btn" data-filter="common">Обычные</button>
@@ -1901,8 +2058,35 @@
                         <button class="filter-btn" data-filter="legendary">Легендарные</button>
                     </div>
                 </div>
+                
+                <div class="inventory-stats">
+                    <div class="inventory-stat">
+                        <span>Всего NFT:</span>
+                        <span class="inventory-stat-value" id="totalNFTs">0</span>
+                    </div>
+                    <div class="inventory-stat">
+                        <span>Обычные:</span>
+                        <span class="inventory-stat-value" id="commonNFTs">0</span>
+                    </div>
+                    <div class="inventory-stat">
+                        <span>Редкие:</span>
+                        <span class="inventory-stat-value" id="rareNFTs">0</span>
+                    </div>
+                    <div class="inventory-stat">
+                        <span>Эпические:</span>
+                        <span class="inventory-stat-value" id="epicNFTs">0</span>
+                    </div>
+                    <div class="inventory-stat">
+                        <span>Легендарные:</span>
+                        <span class="inventory-stat-value" id="legendaryNFTs">0</span>
+                    </div>
+                </div>
+                
                 <div class="inventory-grid" id="inventoryItems">
-                    <div class="loading">Загрузка инвентаря...</div>
+                    <div class="inventory-loading">
+                        <div class="inventory-loading-spinner"></div>
+                        <div>Загрузка инвентаря...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2019,7 +2203,6 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // Исправление: проверяем существование user перед доступом к свойствам
         let user = null;
         let USER_ID = 'demo-user';
         let USERNAME = 'user';
@@ -2080,7 +2263,7 @@
 
         // ==================== ИСПРАВЛЕННАЯ СИСТЕМА БЛОКИРОВКИ ====================
         let isTransactionInProgress = false;
-        let activeTransactions = new Map(); // Используем Map для хранения статусов операций
+        let activeTransactions = new Map();
 
         function startTransaction(id) {
             if (activeTransactions.has(id) && activeTransactions.get(id) === 'in_progress') {
@@ -2094,11 +2277,10 @@
         function endTransaction(id) {
             activeTransactions.set(id, 'completed');
             
-            // Удаляем старые завершенные операции
             setTimeout(() => {
                 activeTransactions.delete(id);
                 isTransactionInProgress = activeTransactions.size > 0;
-            }, 1000); // Задержка перед удалением
+            }, 1000);
         }
 
         function lockButton(button) {
@@ -2120,13 +2302,11 @@
 
         // ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
 
-        // Исправленная загрузка данных пользователя
         async function loadUserData() {
             try {
                 console.log('Загрузка данных пользователя ID:', USER_ID);
                 const progressText = document.getElementById('progressText');
                 
-                // Шаг 1: Проверяем существование пользователя
                 progressText.textContent = 'Проверка пользователя...';
                 const userDoc = await db.collection('users').doc(USER_ID).get();
                 
@@ -2135,7 +2315,6 @@
                     progressText.textContent = 'Загрузка данных...';
                     const data = userDoc.data();
                     
-                    // Сохраняем только безопасные данные
                     userData = {
                         samd: data.samd || 0,
                         tickets: data.tickets || 0,
@@ -2149,14 +2328,12 @@
                         activatedPromocodes: data.activatedPromocodes || []
                     };
                     
-                    // Исправленный расчет оффлайн майнинга
                     await calculateOfflineMining();
                     
                 } else {
                     console.log('Пользователь не найден, создаем нового...');
                     progressText.textContent = 'Создание нового пользователя...';
                     
-                    // Создаем безопасные данные для нового пользователя
                     const safeUserData = {
                         samd: 0,
                         tickets: 0,
@@ -2176,7 +2353,6 @@
                         updatedAt: Date.now()
                     };
                     
-                    // Только если есть реальные данные Telegram
                     if (user) {
                         safeUserData.telegramData = {
                             id: user.id,
@@ -2191,11 +2367,9 @@
                     userData = safeUserData;
                 }
                 
-                // Обновляем UI
                 updateUI();
                 updateMiningStatus();
                 
-                // Шаг 2: Загружаем остальные данные
                 progressText.textContent = 'Загрузка магазина...';
                 await loadShopItems();
                 
@@ -2208,7 +2382,6 @@
                 progressText.textContent = 'Настройка обновлений...';
                 setupRealtimeListeners();
                 
-                // Показываем уведомление о намайненном в оффлайне
                 showOfflineEarnings();
                 
                 console.log('Данные успешно загружены');
@@ -2221,7 +2394,6 @@
             }
         }
 
-        // Загрузка товаров магазина
         async function loadShopItems() {
             try {
                 const snapshot = await db.collection('shopItems').get();
@@ -2239,7 +2411,6 @@
             }
         }
 
-        // Загрузка NFT
         async function loadNFTItems() {
             try {
                 const snapshot = await db.collection('nftItems').get();
@@ -2257,7 +2428,6 @@
             }
         }
 
-        // Загрузка кейсов
         async function loadCases() {
             try {
                 const snapshot = await db.collection('cases').get();
@@ -2275,7 +2445,6 @@
             }
         }
 
-        // ИСПРАВЛЕННЫЙ расчет оффлайн майнинга
         async function calculateOfflineMining() {
             try {
                 const lastUpdate = userData.lastMiningUpdate || Date.now();
@@ -2286,7 +2455,6 @@
                     const mined = diffSeconds * userData.incomePerSecond;
                     const newMining = userData.currentMining + mined;
                     
-                    // Если превысили максимум, останавливаем майнинг
                     if (newMining >= userData.maxMining) {
                         userData.currentMining = userData.maxMining;
                         userData.isMining = false;
@@ -2294,7 +2462,6 @@
                         userData.currentMining = newMining;
                     }
                     
-                    // Обновляем время последнего обновления
                     userData.lastMiningUpdate = now;
                     
                     console.log('Оффлайн майнинг начислен:', {
@@ -2303,7 +2470,6 @@
                         isMiningNow: userData.isMining
                     });
                     
-                    // Сохраняем обновленные данные
                     await saveUserData();
                     
                     return mined;
@@ -2315,7 +2481,6 @@
             }
         }
 
-        // Показ оффлайн заработка
         function showOfflineEarnings() {
             const lastUpdate = userData.lastMiningUpdate || Date.now();
             const now = Date.now();
@@ -2330,13 +2495,10 @@
             }
         }
 
-        // ИСПРАВЛЕННОЕ сохранение данных пользователя
         async function saveUserData() {
             try {
-                // Обновляем время последнего обновления
                 userData.lastMiningUpdate = Date.now();
                 
-                // Создаем безопасный объект для сохранения
                 const safeData = {
                     samd: userData.samd || 0,
                     tickets: userData.tickets || 0,
@@ -2355,7 +2517,6 @@
                     updatedAt: Date.now()
                 };
                 
-                // Добавляем Telegram данные только если они существуют
                 if (user) {
                     safeData.telegramData = {
                         id: user.id,
@@ -2386,13 +2547,11 @@
         function setupRealtimeListeners() {
             console.log('Настройка realtime listeners...');
             
-            // Слушатель данных пользователя
             if (userListener) userListener();
             userListener = db.collection('users').doc(USER_ID)
                 .onSnapshot((doc) => {
                     if (doc.exists) {
                         const data = doc.data();
-                        // Обновляем только основные данные
                         if (data.samd !== undefined) userData.samd = data.samd;
                         if (data.tickets !== undefined) userData.tickets = data.tickets;
                         if (data.currentMining !== undefined) userData.currentMining = data.currentMining;
@@ -2404,12 +2563,12 @@
                         
                         updateUI();
                         updateMiningStatus();
+                        updateInventoryStats();
                     }
                 }, (error) => {
                     console.error('Ошибка слушателя пользователя:', error);
                 });
 
-            // Слушатель магазина
             if (shopListener) shopListener();
             shopListener = db.collection('shopItems')
                 .onSnapshot((snapshot) => {
@@ -2425,7 +2584,6 @@
                     console.error('Ошибка слушателя магазина:', error);
                 });
 
-            // Слушатель NFT магазина
             if (nftListener) nftListener();
             nftListener = db.collection('nftItems')
                 .onSnapshot((snapshot) => {
@@ -2441,7 +2599,6 @@
                     console.error('Ошибка слушателя NFT:', error);
                 });
 
-            // Слушатель кейсов
             if (casesListener) casesListener();
             casesListener = db.collection('cases')
                 .onSnapshot((snapshot) => {
@@ -2525,7 +2682,6 @@
         async function buyNFTItem(nftId) {
             const transactionId = `nft_${nftId}_${Date.now()}`;
             
-            // Проверяем, не идет ли уже эта операция
             if (activeTransactions.has(transactionId) && activeTransactions.get(transactionId) === 'in_progress') {
                 showNotification('Операция уже выполняется', true);
                 return;
@@ -2543,7 +2699,6 @@
                 return;
             }
 
-            // Проверяем наличие и баланс перед покупкой
             if (userData.samd < nft.price) {
                 showNotification('Недостаточно SAMD', true);
                 endTransaction(transactionId);
@@ -2582,17 +2737,14 @@
                         throw new Error("Недостаточно SAMD");
                     }
 
-                    // Уменьшаем количество
                     transaction.update(nftRef, {
                         currentStock: firebase.firestore.FieldValue.increment(-1)
                     });
 
-                    // Списываем деньги
                     transaction.update(userRef, {
                         samd: firebase.firestore.FieldValue.increment(-nft.price)
                     });
 
-                    // Добавляем NFT пользователю
                     const newNFTs = [...(userDataInTrans.nfts || []), {
                         nftId: `${nftId}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
                         name: nft.name,
@@ -2611,7 +2763,6 @@
                     return { success: true, nftName: nft.name, price: nft.price };
                 });
 
-                // Обновляем локальные данные
                 userData.samd -= nft.price;
                 userData.nfts.push({
                     nftId: `${nftId}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
@@ -2627,7 +2778,6 @@
                 updateUI();
                 showNotification(`✅ Куплено NFT: ${nft.name} за ${nft.price} SAMD`);
                 
-                // Обновляем UI магазина с задержкой
                 setTimeout(() => {
                     updateNFTUI();
                 }, 1000);
@@ -2671,7 +2821,6 @@
                 return;
             }
 
-            // Проверяем наличие и баланс
             if (userData.samd < item.price) {
                 showNotification('Недостаточно SAMD', true);
                 endTransaction(transactionId);
@@ -2710,17 +2859,14 @@
                         throw new Error("Недостаточно SAMD");
                     }
 
-                    // Уменьшаем количество
                     transaction.update(itemRef, {
                         currentStock: firebase.firestore.FieldValue.increment(-1)
                     });
 
-                    // Списываем деньги
                     transaction.update(userRef, {
                         samd: firebase.firestore.FieldValue.increment(-item.price)
                     });
 
-                    // Применяем эффект предмета
                     if (item.type === 'income') {
                         transaction.update(userRef, {
                             incomePerSecond: firebase.firestore.FieldValue.increment(item.value)
@@ -2738,7 +2884,6 @@
                     return true;
                 });
 
-                // Обновляем локальные данные
                 userData.samd -= item.price;
                 if (item.type === 'income') userData.incomePerSecond += item.value;
                 else if (item.type === 'max') userData.maxMining += item.value;
@@ -2747,7 +2892,6 @@
                 updateUI();
                 showNotification(`✅ Куплено: ${item.name}`);
 
-                // Обновляем UI магазина с задержкой
                 setTimeout(() => {
                     updateShopUI();
                 }, 1000);
@@ -2827,7 +2971,6 @@
                     return true;
                 });
 
-                // Обновляем локальные данные
                 userData.samd += sellPrice;
                 userData.nfts.splice(nftIndex, 1);
 
@@ -2879,7 +3022,6 @@
                     return;
                 }
 
-                // Выбор награды
                 const totalWeight = rewards.reduce((sum, reward) => sum + (reward.weight || 1), 0);
                 let random = Math.random() * totalWeight;
                 let selectedReward = null;
@@ -2908,12 +3050,10 @@
                         throw new Error("Недостаточно билетов");
                     }
 
-                    // Списываем билеты
                     transaction.update(userRef, {
                         tickets: firebase.firestore.FieldValue.increment(-caseItem.cost)
                     });
 
-                    // Добавляем NFT
                     const newNFTs = [...(userDataInTrans.nfts || []), {
                         nftId: `case_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                         name: selectedReward.name,
@@ -2934,7 +3074,6 @@
                     return selectedReward;
                 });
 
-                // Обновляем локальные данные
                 userData.tickets -= caseItem.cost;
                 userData.nfts.push({
                     nftId: `case_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -2964,21 +3103,159 @@
             }
         }
 
+        // ==================== ПЕРЕРАБОТАННЫЙ ИНВЕНТАРЬ ====================
+
+        function updateInventoryStats() {
+            if (!userData.nfts) return;
+            
+            const total = userData.nfts.length;
+            const common = userData.nfts.filter(nft => (nft.rarity || 'common') === 'common').length;
+            const rare = userData.nfts.filter(nft => (nft.rarity || 'common') === 'rare').length;
+            const epic = userData.nfts.filter(nft => (nft.rarity || 'common') === 'epic').length;
+            const legendary = userData.nfts.filter(nft => (nft.rarity || 'common') === 'legendary').length;
+            
+            document.getElementById('inventoryCount').textContent = `(${total})`;
+            document.getElementById('totalNFTs').textContent = total;
+            document.getElementById('commonNFTs').textContent = common;
+            document.getElementById('rareNFTs').textContent = rare;
+            document.getElementById('epicNFTs').textContent = epic;
+            document.getElementById('legendaryNFTs').textContent = legendary;
+        }
+
+        function updateInventoryUI() {
+            console.log('Обновление инвентаря с фильтром:', currentInventoryFilter);
+            
+            const inventoryContainer = document.getElementById('inventoryItems');
+            if (!inventoryContainer) return;
+            
+            // Очищаем контейнер
+            inventoryContainer.innerHTML = '';
+            
+            // Если нет NFT
+            if (!userData.nfts || userData.nfts.length === 0) {
+                inventoryContainer.innerHTML = `
+                    <div class="inventory-empty">
+                        <i class="fas fa-box-open"></i>
+                        <h3>🎁 Ваш инвентарь пуст</h3>
+                        <p>Купите NFT в магазине или откройте кейсы, чтобы получить первые предметы!</p>
+                    </div>
+                `;
+                updateInventoryStats();
+                return;
+            }
+            
+            // Фильтруем NFT
+            let filteredNFTs = [...userData.nfts];
+            if (currentInventoryFilter !== 'all') {
+                filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
+            }
+            
+            console.log('Отфильтровано NFT:', filteredNFTs.length);
+            
+            // Если после фильтрации ничего нет
+            if (filteredNFTs.length === 0) {
+                const rarityName = getRarityName(currentInventoryFilter);
+                inventoryContainer.innerHTML = `
+                    <div class="inventory-empty">
+                        <i class="fas fa-filter"></i>
+                        <h3>Нет ${rarityName.toLowerCase()} NFT</h3>
+                        <p>У вас нет NFT с редкостью "${rarityName}". Попробуйте другой фильтр или получите больше NFT!</p>
+                    </div>
+                `;
+                updateInventoryStats();
+                return;
+            }
+            
+            // Сортируем по времени получения (новые сначала)
+            filteredNFTs.sort((a, b) => {
+                const timeA = a.createdAt || a.purchasedAt || a.receivedAt || 0;
+                const timeB = b.createdAt || b.purchasedAt || b.receivedAt || 0;
+                return timeB - timeA;
+            });
+            
+            // Создаем карточки
+            filteredNFTs.forEach((nft, index) => {
+                const basePrice = nft.basePrice || nft.price || 100;
+                const sellPrice = Math.floor(basePrice * 0.7);
+                const isSellable = !nft.nonSellable && basePrice > 0;
+                const rarity = nft.rarity || 'common';
+                const rarityName = getRarityName(rarity);
+                
+                // Форматируем дату
+                let dateStr = '';
+                if (nft.purchasedAt) {
+                    dateStr = new Date(nft.purchasedAt).toLocaleDateString();
+                } else if (nft.receivedAt) {
+                    dateStr = new Date(nft.receivedAt).toLocaleDateString();
+                } else {
+                    dateStr = 'Недавно';
+                }
+                
+                // Определяем источник
+                let sourceText = '';
+                if (nft.fromCase) {
+                    sourceText = `🎁 ${nft.fromCase}`;
+                } else if (nft.fromPromocode) {
+                    sourceText = '🎫 Промокод';
+                } else if (nft.source === 'marketplace') {
+                    sourceText = '🛒 Куплено';
+                } else {
+                    sourceText = '✨ Получено';
+                }
+                
+                const card = document.createElement('div');
+                card.className = `inventory-card ${rarity}`;
+                card.innerHTML = `
+                    <div class="rarity-badge ${rarity}">${rarityName}</div>
+                    <div class="inventory-image">
+                        <img src="${nft.imageUrl || 'https://via.placeholder.com/300'}" 
+                             alt="${nft.name}"
+                             onerror="this.src='https://via.placeholder.com/300'">
+                    </div>
+                    <div class="inventory-info">
+                        <div class="inventory-name">${nft.name}</div>
+                        <div class="inventory-details">
+                            <div class="inventory-source">${sourceText}</div>
+                            <div>📅 ${dateStr}</div>
+                            ${nft.basePrice ? `<div>💰 ${nft.basePrice} SAMD</div>` : ''}
+                        </div>
+                        <div class="inventory-actions">
+                            <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
+                                📤 Отправить
+                            </button>
+                            ${isSellable ? `
+                            <button class="sell-nft-btn" onclick="askConfirmation(() => sellNFT('${nft.nftId}'), 'Продать NFT &quot;${nft.name}&quot; за ${sellPrice} SAMD?')">
+                                💰 ${sellPrice} SAMD
+                            </button>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                inventoryContainer.appendChild(card);
+            });
+            
+            updateInventoryStats();
+            
+            // Принудительный рефлоу для исправления отображения
+            setTimeout(() => {
+                inventoryContainer.style.display = 'none';
+                void inventoryContainer.offsetHeight;
+                inventoryContainer.style.display = 'grid';
+            }, 50);
+        }
+
         // ==================== UI ФУНКЦИИ ====================
 
         function updateUI() {
-            // Баланс
             document.getElementById('balanceSAMD').textContent = Math.floor(userData.samd);
             document.getElementById('balanceTickets').textContent = userData.tickets;
             
-            // База
             document.getElementById('baseTitle').textContent = `🎄 Новогодняя База |${USERNAME}|`;
             document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
             document.getElementById('maxSAMD').textContent = userData.maxMining;
             document.getElementById('incomePerSec').textContent = userData.incomePerSecond.toFixed(1);
             document.getElementById('ticketsCount').textContent = userData.tickets;
             
-            // Профиль
             document.getElementById('profileName').textContent = FIRST_NAME;
             document.getElementById('profileUsername').textContent = USERNAME ? `@${USERNAME}` : '';
             document.getElementById('profileSAMD').textContent = Math.floor(userData.samd);
@@ -2987,7 +3264,6 @@
             document.getElementById('profileMax').textContent = userData.maxMining;
             document.getElementById('userId').textContent = USER_ID;
             
-            // Аватарка
             if (user && user.photo_url) {
                 document.getElementById('profileAvatar').src = user.photo_url;
             }
@@ -3102,108 +3378,6 @@
             });
         }
 
-        // ИСПРАВЛЕННЫЙ ИНВЕНТАРЬ - без серого экрана
-        // ==================== ПЕРЕРАБОТАННЫЙ ИНВЕНТАРЬ ====================
-
-function updateInventoryUI() {
-    console.log('Обновление инвентаря...', { 
-        totalNFTs: userData.nfts?.length || 0,
-        filter: currentInventoryFilter 
-    });
-    
-    const inventoryContainer = document.getElementById('inventoryItems');
-    if (!inventoryContainer) {
-        console.error('Контейнер инвентаря не найден');
-        return;
-    }
-    
-    // Очищаем контейнер правильно
-    inventoryContainer.innerHTML = '';
-    
-    // Проверяем наличие NFT
-    if (!userData.nfts || userData.nfts.length === 0) {
-        console.log('Инвентарь пуст');
-        inventoryContainer.innerHTML = `
-            <div class="inventory-empty-state">
-                <i class="fas fa-box-open"></i>
-                <div>🎁 Ваш инвентарь пуст</div>
-                <div style="font-size: 14px;">Купите NFT в магазине или откройте кейсы!</div>
-            </div>
-        `;
-        return;
-    }
-    
-    // Фильтруем NFT
-    let filteredNFTs = userData.nfts;
-    if (currentInventoryFilter !== 'all') {
-        filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
-    }
-    
-    console.log('Отфильтровано NFT:', filteredNFTs.length);
-    
-    if (filteredNFTs.length === 0) {
-        inventoryContainer.innerHTML = `
-            <div class="inventory-empty-state">
-                <i class="fas fa-filter"></i>
-                <div>Нет NFT с фильтром "${currentInventoryFilter}"</div>
-                <div style="font-size: 14px;">Попробуйте другой фильтр или проверьте инвентарь</div>
-            </div>
-        `;
-        return;
-    }
-    
-    // Создаем карточки
-    filteredNFTs.forEach((nft, index) => {
-        const basePrice = nft.basePrice || nft.price || 100;
-        const sellPrice = Math.floor(basePrice * 0.7);
-        const isSellable = !nft.nonSellable && basePrice > 0;
-        
-        // Создаем элемент карточки
-        const card = document.createElement('div');
-        card.className = `inventory-card ${nft.rarity || 'common'}`;
-        card.dataset.index = index;
-        
-        // Создаем HTML структуру
-        card.innerHTML = `
-            <div class="inventory-image">
-                <img src="${nft.imageUrl || 'https://via.placeholder.com/300'}" 
-                     alt="${nft.name}"
-                     onerror="this.src='https://via.placeholder.com/300'">
-            </div>
-            <div class="inventory-info">
-                <div class="inventory-name">${nft.name}</div>
-                <div class="inventory-details">
-                    ${nft.fromCase ? '🎁 Из кейса' : 
-                      nft.fromPromocode ? '🎫 Из промокода' : 
-                      nft.source === 'marketplace' ? '🛒 Куплено' : '✨ Получено'}
-                    <br>Редкость: ${getRarityName(nft.rarity || 'common')}
-                    ${nft.purchasedAt ? `<br>Получено: ${new Date(nft.purchasedAt).toLocaleDateString()}` : ''}
-                </div>
-                <div class="inventory-actions">
-                    <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
-                        📤 Отправить
-                    </button>
-                    ${isSellable ? `
-                    <button class="sell-nft-btn" onclick="askConfirmation(() => sellNFT('${nft.nftId}'), 'Продать NFT &quot;${nft.name}&quot; за ${sellPrice} SAMD?')">
-                        💰 Продать (${sellPrice})
-                    </button>` : ''}
-                </div>
-            </div>
-        `;
-        
-        inventoryContainer.appendChild(card);
-    });
-    
-    // Принудительный рефлоу для предотвращения бага
-    setTimeout(() => {
-        inventoryContainer.style.display = 'none';
-        void inventoryContainer.offsetHeight; // trigger reflow
-        inventoryContainer.style.display = 'grid';
-        
-        console.log('Инвентарь обновлен, элементов:', inventoryContainer.children.length);
-    }, 10);
-}
-
         function showCaseReward(reward) {
             document.getElementById('rewardImage').src = reward.imageUrl || 'https://via.placeholder.com/300';
             document.getElementById('rewardName').textContent = reward.name;
@@ -3263,10 +3437,14 @@ function updateInventoryUI() {
             document.querySelector(`#${tabName}-content`).classList.add('active');
             
             if (tabName === 'inventory') {
-                // Принудительное обновление инвентаря при переключении
+                // Двойное обновление для гарантии
                 setTimeout(() => {
                     updateInventoryUI();
-                }, 100);
+                }, 50);
+                
+                setTimeout(() => {
+                    updateInventoryUI();
+                }, 200);
             }
         }
 
@@ -3507,10 +3685,8 @@ function updateInventoryUI() {
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Инициализация приложения...');
             
-            // Создаем снег
             createSnow();
             
-            // Обновляем текст прогресса
             const progressText = document.getElementById('progressText');
             
             try {
@@ -3520,11 +3696,9 @@ function updateInventoryUI() {
                 progressText.textContent = 'Загрузка завершена!';
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
-                // Скрываем экран загрузки
                 document.getElementById('loadingScreen').style.display = 'none';
                 console.log('Приложение инициализировано');
                 
-                // Показываем приветственное сообщение
                 setTimeout(() => {
                     showNotification(`🎄 С Новым Годом, ${FIRST_NAME}! 🎁`);
                 }, 1000);
@@ -3535,10 +3709,8 @@ function updateInventoryUI() {
                 showNotification('Ошибка загрузки приложения', true);
             }
             
-            // Обновляем снег каждую минуту
             setInterval(createSnow, 60000);
             
-            // Таймер для обновления майнинга
             setInterval(() => {
                 if (userData.isMining && userData.currentMining < userData.maxMining) {
                     userData.currentMining += userData.incomePerSecond;
@@ -3558,18 +3730,21 @@ function updateInventoryUI() {
                 }
             }, 1000);
             
-            // Авто-сохранение
             setInterval(() => {
                 if (userData.isMining || userData.currentMining > 0) {
                     saveUserData();
                 }
             }, 30000);
             
-            // Исправление бага с серым экраном при зуме
+            // Исправление бага с зумированием
+            let resizeTimer;
             window.addEventListener('resize', () => {
-                if (currentInventoryFilter === 'all') {
-                    updateInventoryUI();
-                }
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (document.getElementById('inventory-content').classList.contains('active')) {
+                        updateInventoryUI();
+                    }
+                }, 250);
             });
         });
 
