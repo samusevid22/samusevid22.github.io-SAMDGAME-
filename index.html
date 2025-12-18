@@ -1597,6 +1597,61 @@
             .disclaimer-text {
                 font-size: 14px;
             }
+            
+            /* Добавьте это в конец блока стилей после media queries */
+
+.fix-height {
+    min-height: 400px !important;
+}
+
+.inventory-grid {
+    min-height: 400px; /* Добавьте это свойство */
+    contain: paint; /* Это предотвращает баги с отображением */
+}
+
+.inventory-card {
+    height: 320px; /* Фиксированная высота карточки */
+    display: flex;
+    flex-direction: column;
+}
+
+.inventory-image {
+    flex-shrink: 0; /* Предотвращает сжатие изображения */
+}
+
+.inventory-info {
+    flex-grow: 1; /* Занимает оставшееся пространство */
+    display: flex;
+    flex-direction: column;
+}
+
+.inventory-actions {
+    margin-top: auto; /* Кнопки всегда внизу */
+}
+
+/* Улучшенный empty-state */
+.inventory-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.inventory-empty-state i {
+    font-size: 48px;
+    color: var(--accent-blue);
+    opacity: 0.5;
+}
         }
     </style>
 </head>
@@ -3048,88 +3103,106 @@
         }
 
         // ИСПРАВЛЕННЫЙ ИНВЕНТАРЬ - без серого экрана
-        function updateInventoryUI() {
-            const inventoryContainer = document.getElementById('inventoryItems');
-            if (!inventoryContainer) return;
-            
-            // Очищаем контейнер
-            while (inventoryContainer.firstChild) {
-                inventoryContainer.removeChild(inventoryContainer.firstChild);
-            }
-            
-            if (!userData.nfts || userData.nfts.length === 0) {
-                inventoryContainer.innerHTML = '<div class="empty-state">🎁 Ваш инвентарь пуст</div>';
-                return;
-            }
-            
-            let filteredNFTs = userData.nfts;
-            if (currentInventoryFilter !== 'all') {
-                filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
-            }
-            
-            if (filteredNFTs.length === 0) {
-                inventoryContainer.innerHTML = '<div class="empty-state">Нет NFT с выбранной редкостью</div>';
-                return;
-            }
-            
-            filteredNFTs.forEach(nft => {
-                const basePrice = nft.basePrice || nft.price || 100;
-                const sellPrice = Math.floor(basePrice * 0.7);
-                const isSellable = !nft.nonSellable && basePrice > 0;
-                
-                const card = document.createElement('div');
-                card.className = `inventory-card ${nft.rarity || 'common'}`;
-                
-                const inventoryImage = document.createElement('div');
-                inventoryImage.className = 'inventory-image';
-                
-                const img = document.createElement('img');
-                img.src = nft.imageUrl || 'https://via.placeholder.com/300';
-                img.alt = nft.name;
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.objectFit = 'cover';
-                
-                // Предотвращаем серый экран при загрузке изображений
-                img.onerror = function() {
-                    this.src = 'https://via.placeholder.com/300';
-                };
-                
-                inventoryImage.appendChild(img);
-                
-                const inventoryInfo = document.createElement('div');
-                inventoryInfo.className = 'inventory-info';
-                inventoryInfo.innerHTML = `
-                    <div class="inventory-name">${nft.name}</div>
-                    <div class="inventory-details">
-                        ${nft.fromCase ? '🎁 Из кейса' : 
-                          nft.fromPromocode ? '🎫 Из промокода' : 
-                          nft.source === 'marketplace' ? '🛒 Куплено' : '✨ Получено'}
-                        <br>Редкость: ${getRarityName(nft.rarity || 'common')}
-                    </div>
-                    <div class="inventory-actions">
-                        <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
-                            📤 Отправить
-                        </button>
-                        ${isSellable ? `
-                        <button class="sell-nft-btn" onclick="askConfirmation(() => sellNFT('${nft.nftId}'), 'Продать NFT &quot;${nft.name}&quot; за ${sellPrice} SAMD?')">
-                            💰 Продать (${sellPrice})
-                        </button>` : ''}
-                    </div>
-                `;
-                
-                card.appendChild(inventoryImage);
-                card.appendChild(inventoryInfo);
-                inventoryContainer.appendChild(card);
-            });
-            
-            // Принудительный рефлоу для предотвращения бага с отображением
-            setTimeout(() => {
-                inventoryContainer.style.display = 'none';
-                inventoryContainer.offsetHeight; // trigger reflow
-                inventoryContainer.style.display = 'grid';
-            }, 50);
-        }
+        // ==================== ПЕРЕРАБОТАННЫЙ ИНВЕНТАРЬ ====================
+
+function updateInventoryUI() {
+    console.log('Обновление инвентаря...', { 
+        totalNFTs: userData.nfts?.length || 0,
+        filter: currentInventoryFilter 
+    });
+    
+    const inventoryContainer = document.getElementById('inventoryItems');
+    if (!inventoryContainer) {
+        console.error('Контейнер инвентаря не найден');
+        return;
+    }
+    
+    // Очищаем контейнер правильно
+    inventoryContainer.innerHTML = '';
+    
+    // Проверяем наличие NFT
+    if (!userData.nfts || userData.nfts.length === 0) {
+        console.log('Инвентарь пуст');
+        inventoryContainer.innerHTML = `
+            <div class="inventory-empty-state">
+                <i class="fas fa-box-open"></i>
+                <div>🎁 Ваш инвентарь пуст</div>
+                <div style="font-size: 14px;">Купите NFT в магазине или откройте кейсы!</div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Фильтруем NFT
+    let filteredNFTs = userData.nfts;
+    if (currentInventoryFilter !== 'all') {
+        filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
+    }
+    
+    console.log('Отфильтровано NFT:', filteredNFTs.length);
+    
+    if (filteredNFTs.length === 0) {
+        inventoryContainer.innerHTML = `
+            <div class="inventory-empty-state">
+                <i class="fas fa-filter"></i>
+                <div>Нет NFT с фильтром "${currentInventoryFilter}"</div>
+                <div style="font-size: 14px;">Попробуйте другой фильтр или проверьте инвентарь</div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Создаем карточки
+    filteredNFTs.forEach((nft, index) => {
+        const basePrice = nft.basePrice || nft.price || 100;
+        const sellPrice = Math.floor(basePrice * 0.7);
+        const isSellable = !nft.nonSellable && basePrice > 0;
+        
+        // Создаем элемент карточки
+        const card = document.createElement('div');
+        card.className = `inventory-card ${nft.rarity || 'common'}`;
+        card.dataset.index = index;
+        
+        // Создаем HTML структуру
+        card.innerHTML = `
+            <div class="inventory-image">
+                <img src="${nft.imageUrl || 'https://via.placeholder.com/300'}" 
+                     alt="${nft.name}"
+                     onerror="this.src='https://via.placeholder.com/300'">
+            </div>
+            <div class="inventory-info">
+                <div class="inventory-name">${nft.name}</div>
+                <div class="inventory-details">
+                    ${nft.fromCase ? '🎁 Из кейса' : 
+                      nft.fromPromocode ? '🎫 Из промокода' : 
+                      nft.source === 'marketplace' ? '🛒 Куплено' : '✨ Получено'}
+                    <br>Редкость: ${getRarityName(nft.rarity || 'common')}
+                    ${nft.purchasedAt ? `<br>Получено: ${new Date(nft.purchasedAt).toLocaleDateString()}` : ''}
+                </div>
+                <div class="inventory-actions">
+                    <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
+                        📤 Отправить
+                    </button>
+                    ${isSellable ? `
+                    <button class="sell-nft-btn" onclick="askConfirmation(() => sellNFT('${nft.nftId}'), 'Продать NFT &quot;${nft.name}&quot; за ${sellPrice} SAMD?')">
+                        💰 Продать (${sellPrice})
+                    </button>` : ''}
+                </div>
+            </div>
+        `;
+        
+        inventoryContainer.appendChild(card);
+    });
+    
+    // Принудительный рефлоу для предотвращения бага
+    setTimeout(() => {
+        inventoryContainer.style.display = 'none';
+        void inventoryContainer.offsetHeight; // trigger reflow
+        inventoryContainer.style.display = 'grid';
+        
+        console.log('Инвентарь обновлен, элементов:', inventoryContainer.children.length);
+    }, 10);
+}
 
         function showCaseReward(reward) {
             document.getElementById('rewardImage').src = reward.imageUrl || 'https://via.placeholder.com/300';
