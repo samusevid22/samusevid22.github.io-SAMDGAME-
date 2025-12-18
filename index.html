@@ -1117,27 +1117,6 @@
             box-shadow: 0 4px 12px rgba(255, 217, 61, 0.3);
         }
 
-        /* Новогодние украшения для инвентаря */
-        .inventory-card::before {
-            content: '❄️';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            font-size: 20px;
-            opacity: 0.3;
-            z-index: 1;
-        }
-
-        .inventory-card::after {
-            content: '🎄';
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            font-size: 16px;
-            opacity: 0.2;
-            z-index: 1;
-        }
-
         /* Состояние пустого инвентаря */
         .inventory-empty {
             grid-column: 1 / -1;
@@ -2051,8 +2030,7 @@
                 <div class="inventory-header">
                     <h2>🎄 Ваши NFT <span id="inventoryCount" style="font-size: 16px; color: var(--accent-blue); margin-left: 10px;">(0)</span></h2>
                     <div class="inventory-filters">
-                        <button class="filter-btn active" data-filter="all">Все</button>
-                        <button class="filter-btn" data-filter="common">Обычные</button>
+                        <button class="filter-btn active" data-filter="common">Обычные</button>
                         <button class="filter-btn" data-filter="rare">Редкие</button>
                         <button class="filter-btn" data-filter="epic">Эпические</button>
                         <button class="filter-btn" data-filter="legendary">Легендарные</button>
@@ -2241,7 +2219,7 @@
         let cases = [];
         let promocodes = [];
         let lastSave = Date.now();
-        let currentInventoryFilter = 'all';
+        let currentInventoryFilter = 'common'; // ИЗМЕНЕНО: по умолчанию обычные
 
         // Модальные окна
         let selectedNFT = null;
@@ -3144,11 +3122,8 @@
                 return;
             }
             
-            // Фильтруем NFT
-            let filteredNFTs = [...userData.nfts];
-            if (currentInventoryFilter !== 'all') {
-                filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
-            }
+            // Фильтруем NFT по редкости (ИЗМЕНЕНО: без проверки на 'all')
+            let filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
             
             console.log('Отфильтровано NFT:', filteredNFTs.length);
             
