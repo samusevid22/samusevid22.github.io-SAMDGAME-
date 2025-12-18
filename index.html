@@ -912,6 +912,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 15px;
+            min-height: 200px; /* Фикс для серого экрана */
         }
 
         .inventory-card {
@@ -1468,6 +1469,12 @@
             backdrop-filter: blur(10px);
         }
 
+        /* Исправление для серого экрана в инвентаре */
+        .inventory-container {
+            min-height: 300px;
+            position: relative;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 0 15px;
@@ -2016,22 +2023,27 @@
         // Промокоды
         let currentPromocodeCheck = null;
 
-        // ==================== СИСТЕМА БЛОКИРОВКИ ====================
+        // ==================== ИСПРАВЛЕННАЯ СИСТЕМА БЛОКИРОВКИ ====================
         let isTransactionInProgress = false;
-        let activeTransactions = new Set();
+        let activeTransactions = new Map(); // Используем Map для хранения статусов операций
 
         function startTransaction(id) {
-            if (isTransactionInProgress || activeTransactions.has(id)) {
+            if (activeTransactions.has(id) && activeTransactions.get(id) === 'in_progress') {
                 return false;
             }
+            activeTransactions.set(id, 'in_progress');
             isTransactionInProgress = true;
-            activeTransactions.add(id);
             return true;
         }
 
         function endTransaction(id) {
-            activeTransactions.delete(id);
-            isTransactionInProgress = activeTransactions.size > 0;
+            activeTransactions.set(id, 'completed');
+            
+            // Удаляем старые завершенные операции
+            setTimeout(() => {
+                activeTransactions.delete(id);
+                isTransactionInProgress = activeTransactions.size > 0;
+            }, 1000); // Задержка перед удалением
         }
 
         function lockButton(button) {
@@ -2456,7 +2468,15 @@
         // ==================== ИСПРАВЛЕННАЯ ПОКУПКА NFT ====================
 
         async function buyNFTItem(nftId) {
-            if (!startTransaction(`nft_${nftId}_${Date.now()}`)) {
+            const transactionId = `nft_${nftId}_${Date.now()}`;
+            
+            // Проверяем, не идет ли уже эта операция
+            if (activeTransactions.has(transactionId) && activeTransactions.get(transactionId) === 'in_progress') {
+                showNotification('Операция уже выполняется', true);
+                return;
+            }
+            
+            if (!startTransaction(transactionId)) {
                 showNotification('Подождите, идет другая операция', true);
                 return;
             }
@@ -2464,7 +2484,20 @@
             const nft = nftItems.find(i => i.id === nftId);
             if (!nft) {
                 showNotification('NFT не найдено', true);
-                endTransaction(`nft_${nftId}_${Date.now()}`);
+                endTransaction(transactionId);
+                return;
+            }
+
+            // Проверяем наличие и баланс перед покупкой
+            if (userData.samd < nft.price) {
+                showNotification('Недостаточно SAMD', true);
+                endTransaction(transactionId);
+                return;
+            }
+
+            if ((nft.currentStock || 0) <= 0) {
+                showNotification('NFT закончилось', true);
+                endTransaction(transactionId);
                 return;
             }
 
@@ -2475,7 +2508,7 @@
                 const nftRef = db.collection('nftItems').doc(nftId);
                 const userRef = db.collection('users').doc(USER_ID);
 
-                const result = await db.runTransaction(async (transaction) => {
+                await db.runTransaction(async (transaction) => {
                     const nftDoc = await transaction.get(nftRef);
                     const userDoc = await transaction.get(userRef);
 
@@ -2537,12 +2570,12 @@
                 });
 
                 updateUI();
-                showNotification(`✅ Куплено NFT: ${result.nftName} за ${result.price} SAMD`);
+                showNotification(`✅ Куплено NFT: ${nft.name} за ${nft.price} SAMD`);
                 
-                // Обновляем UI магазина
+                // Обновляем UI магазина с задержкой
                 setTimeout(() => {
                     updateNFTUI();
-                }, 500);
+                }, 1000);
 
             } catch (error) {
                 console.error('Ошибка покупки NFT:', error);
@@ -2557,14 +2590,21 @@
                 }
             } finally {
                 unlockButton(buyBtn, originalHTML);
-                endTransaction(`nft_${nftId}_${Date.now()}`);
+                endTransaction(transactionId);
             }
         }
 
         // ==================== ИСПРАВЛЕННАЯ ПОКУПКА В МАГАЗИНЕ ====================
 
         async function buyShopItem(itemId) {
-            if (!startTransaction(`shop_${itemId}_${Date.now()}`)) {
+            const transactionId = `shop_${itemId}_${Date.now()}`;
+            
+            if (activeTransactions.has(transactionId) && activeTransactions.get(transactionId) === 'in_progress') {
+                showNotification('Операция уже выполняется', true);
+                return;
+            }
+            
+            if (!startTransaction(transactionId)) {
                 showNotification('Подождите, идет другая операция', true);
                 return;
             }
@@ -2572,7 +2612,20 @@
             const item = shopItems.find(i => i.id === itemId);
             if (!item) {
                 showNotification('Товар не найден', true);
-                endTransaction(`shop_${itemId}_${Date.now()}`);
+                endTransaction(transactionId);
+                return;
+            }
+
+            // Проверяем наличие и баланс
+            if (userData.samd < item.price) {
+                showNotification('Недостаточно SAMD', true);
+                endTransaction(transactionId);
+                return;
+            }
+
+            if ((item.currentStock || 0) <= 0) {
+                showNotification('Товар закончился', true);
+                endTransaction(transactionId);
                 return;
             }
 
@@ -2639,10 +2692,10 @@
                 updateUI();
                 showNotification(`✅ Куплено: ${item.name}`);
 
-                // Обновляем UI магазина
+                // Обновляем UI магазина с задержкой
                 setTimeout(() => {
                     updateShopUI();
-                }, 500);
+                }, 1000);
 
             } catch (error) {
                 console.error('Ошибка покупки:', error);
@@ -2657,13 +2710,20 @@
                 }
             } finally {
                 unlockButton(buyBtn, originalHTML);
-                endTransaction(`shop_${itemId}_${Date.now()}`);
+                endTransaction(transactionId);
             }
         }
 
         // ==================== УНИВЕРСАЛЬНАЯ ФУНКЦИЯ ПРОДАЖИ NFT ====================
 
         async function sellNFT(nftId) {
+            const transactionId = `sell_${nftId}_${Date.now()}`;
+            
+            if (activeTransactions.has(transactionId) && activeTransactions.get(transactionId) === 'in_progress') {
+                showNotification('Операция уже выполняется', true);
+                return;
+            }
+            
             const nftIndex = userData.nfts.findIndex(nft => nft.nftId === nftId);
             if (nftIndex === -1) {
                 showNotification('NFT не найдено в вашем инвентаре', true);
@@ -2680,7 +2740,7 @@
             const basePrice = nft.basePrice || nft.price || 100;
             const sellPrice = Math.floor(basePrice * 0.7);
 
-            if (!startTransaction(`sell_${nftId}_${Date.now()}`)) {
+            if (!startTransaction(transactionId)) {
                 showNotification('Подождите, идет другая операция', true);
                 return;
             }
@@ -2725,20 +2785,27 @@
                 console.error('Ошибка продажи NFT:', error);
                 showNotification('Ошибка продажи NFT', true);
             } finally {
-                endTransaction(`sell_${nftId}_${Date.now()}`);
+                endTransaction(transactionId);
             }
         }
 
         // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТКРЫТИЯ КЕЙСА ====================
 
         async function openCase(caseId) {
+            const transactionId = `case_${caseId}_${Date.now()}`;
+            
+            if (activeTransactions.has(transactionId) && activeTransactions.get(transactionId) === 'in_progress') {
+                showNotification('Операция уже выполняется', true);
+                return;
+            }
+            
             const caseItem = cases.find(c => c.id === caseId);
             if (!caseItem) {
                 showNotification('Кейс не найден', true);
                 return;
             }
 
-            if (!startTransaction(`case_${caseId}_${Date.now()}`)) {
+            if (!startTransaction(transactionId)) {
                 showNotification('Подождите, идет другая операция', true);
                 return;
             }
@@ -2746,14 +2813,14 @@
             try {
                 if (userData.tickets < caseItem.cost) {
                     showNotification('Недостаточно билетов!', true);
-                    endTransaction(`case_${caseId}_${Date.now()}`);
+                    endTransaction(transactionId);
                     return;
                 }
 
                 const rewards = caseItem.rewards || [];
                 if (rewards.length === 0) {
                     showNotification('В кейсе нет наград', true);
-                    endTransaction(`case_${caseId}_${Date.now()}`);
+                    endTransaction(transactionId);
                     return;
                 }
 
@@ -2838,7 +2905,7 @@
                     showNotification('Ошибка открытия кейса', true);
                 }
             } finally {
-                endTransaction(`case_${caseId}_${Date.now()}`);
+                endTransaction(transactionId);
             }
         }
 
@@ -2980,11 +3047,15 @@
             });
         }
 
+        // ИСПРАВЛЕННЫЙ ИНВЕНТАРЬ - без серого экрана
         function updateInventoryUI() {
             const inventoryContainer = document.getElementById('inventoryItems');
             if (!inventoryContainer) return;
             
-            inventoryContainer.innerHTML = '';
+            // Очищаем контейнер
+            while (inventoryContainer.firstChild) {
+                inventoryContainer.removeChild(inventoryContainer.firstChild);
+            }
             
             if (!userData.nfts || userData.nfts.length === 0) {
                 inventoryContainer.innerHTML = '<div class="empty-state">🎁 Ваш инвентарь пуст</div>';
@@ -3019,6 +3090,11 @@
                 img.style.height = '100%';
                 img.style.objectFit = 'cover';
                 
+                // Предотвращаем серый экран при загрузке изображений
+                img.onerror = function() {
+                    this.src = 'https://via.placeholder.com/300';
+                };
+                
                 inventoryImage.appendChild(img);
                 
                 const inventoryInfo = document.createElement('div');
@@ -3046,6 +3122,13 @@
                 card.appendChild(inventoryInfo);
                 inventoryContainer.appendChild(card);
             });
+            
+            // Принудительный рефлоу для предотвращения бага с отображением
+            setTimeout(() => {
+                inventoryContainer.style.display = 'none';
+                inventoryContainer.offsetHeight; // trigger reflow
+                inventoryContainer.style.display = 'grid';
+            }, 50);
         }
 
         function showCaseReward(reward) {
@@ -3107,7 +3190,10 @@
             document.querySelector(`#${tabName}-content`).classList.add('active');
             
             if (tabName === 'inventory') {
-                updateInventoryUI();
+                // Принудительное обновление инвентаря при переключении
+                setTimeout(() => {
+                    updateInventoryUI();
+                }, 100);
             }
         }
 
@@ -3209,6 +3295,8 @@
         }
 
         async function sendNFT(nftId, recipientUsername) {
+            const transactionId = `send_${nftId}_${Date.now()}`;
+            
             if (!recipientUsername) {
                 showNotification('Введите никнейм получателя', true);
                 return;
@@ -3220,6 +3308,11 @@
                 return;
             }
             
+            if (!startTransaction(transactionId)) {
+                showNotification('Подождите, идет другая операция', true);
+                return;
+            }
+
             try {
                 const usersSnapshot = await db.collection('users')
                     .where('username', '==', recipientUsername)
@@ -3227,6 +3320,7 @@
                 
                 if (usersSnapshot.empty) {
                     showNotification('Пользователь с таким никнеймом не найден', true);
+                    endTransaction(transactionId);
                     return;
                 }
                 
@@ -3235,6 +3329,7 @@
                 
                 if (recipientId === USER_ID) {
                     showNotification('Нельзя отправить NFT самому себе', true);
+                    endTransaction(transactionId);
                     return;
                 }
                 
@@ -3281,6 +3376,8 @@
             } catch (error) {
                 console.error('Ошибка отправки NFT:', error);
                 showNotification('Ошибка отправки NFT', true);
+            } finally {
+                endTransaction(transactionId);
             }
         }
 
@@ -3394,6 +3491,13 @@
                     saveUserData();
                 }
             }, 30000);
+            
+            // Исправление бага с серым экраном при зуме
+            window.addEventListener('resize', () => {
+                if (currentInventoryFilter === 'all') {
+                    updateInventoryUI();
+                }
+            });
         });
 
         // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
