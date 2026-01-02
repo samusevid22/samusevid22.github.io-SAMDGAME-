@@ -3721,6 +3721,38 @@
                     }
                 }, 250);
             });
+            
+            // ==================== ИСПРАВЛЕНИЕ ДЛЯ ПОЛЯ ПРОМОКОДА ====================
+            const promoInput = document.getElementById('profilePromocodeInput');
+            const promoBtn = document.getElementById('profilePromocodeBtn');
+            
+            if (promoInput && promoBtn) {
+                // Функция проверки поля
+                function checkPromoInput() {
+                    if (promoInput.value.trim().length > 0) {
+                        promoBtn.disabled = false;
+                    } else {
+                        promoBtn.disabled = true;
+                    }
+                }
+                
+                // Проверяем при вводе
+                promoInput.addEventListener('input', checkPromoInput);
+                
+                // Проверяем при загрузке страницы
+                checkPromoInput();
+                
+                // Обработчик клика по кнопке
+                promoBtn.addEventListener('click', function() {
+                    const promocode = promoInput.value.trim().toUpperCase();
+                    if (promocode.length > 0) {
+                        showNotification(`Промокод "${promocode}" отправлен на проверку`);
+                        // Здесь можно добавить логику проверки промокода
+                        promoInput.value = '';
+                        checkPromoInput();
+                    }
+                });
+            }
         });
 
         // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
