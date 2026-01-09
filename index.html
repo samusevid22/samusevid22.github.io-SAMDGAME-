@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAMDCOIN - Новогодний Майнинг</title>
+    <title>SAMDCOIN - Крипто Майнинг Игра</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
-            --primary-dark: #0c1a2b;
-            --secondary-dark: #1a2f4d;
-            --accent-blue: #4dabf7;
-            --accent-red: #ff6b6b;
-            --accent-gold: #ffd93d;
-            --accent-green: #51cf66;
-            --accent-cyan: #3dc9d1;
-            --accent-purple: #9775fa;
+            --primary-dark: #0f172a;
+            --secondary-dark: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-gold: #f59e0b;
+            --accent-green: #10b981;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
             --glass-bg: rgba(255, 255, 255, 0.07);
             --glass-border: rgba(255, 255, 255, 0.12);
             --glass-shadow: 0 8px 32px rgba(0, 20, 60, 0.3);
-            --success-color: #40c057;
-            --danger-color: #ff6b6b;
-            --warning-color: #ffd93d;
-            --text-color: #f8f9fa;
-            --text-secondary: #adb5bd;
-            --border-radius: 20px;
-            --border-radius-sm: 14px;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-radius: 16px;
+            --border-radius-sm: 12px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -56,34 +56,10 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(77, 171, 247, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
                 linear-gradient(180deg, var(--primary-dark) 0%, #0a1427 100%);
             z-index: -2;
-        }
-
-        .snowflakes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .snowflake {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.8;
-            animation: fall linear infinite;
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-            }
         }
 
         .container {
@@ -96,8 +72,8 @@
 
         header {
             background: linear-gradient(135deg, 
-                rgba(26, 47, 77, 0.95) 0%, 
-                rgba(12, 26, 43, 0.98) 100%);
+                rgba(30, 41, 59, 0.95) 0%, 
+                rgba(15, 23, 42, 0.98) 100%);
             padding: 18px 0;
             position: sticky;
             top: 0;
@@ -124,19 +100,12 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 2px 10px rgba(77, 171, 247, 0.3);
+            text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
         }
 
         .logo i {
             font-size: 32px;
-            color: var(--accent-gold);
-            filter: drop-shadow(0 2px 4px rgba(255, 217, 61, 0.3));
-            animation: pulse-glow 2s infinite alternate;
-        }
-
-        @keyframes pulse-glow {
-            from { filter: drop-shadow(0 0 5px rgba(255, 217, 61, 0.5)); }
-            to { filter: drop-shadow(0 0 15px rgba(255, 217, 61, 0.8)); }
+            color: var(--accent-blue);
         }
 
         .user-info {
@@ -165,19 +134,19 @@
         .balance:hover {
             transform: translateY(-2px);
             border-color: var(--accent-blue);
-            box-shadow: 0 6px 20px rgba(77, 171, 247, 0.2);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
         }
 
         .balance:first-child {
             background: linear-gradient(135deg, 
-                rgba(77, 171, 247, 0.15), 
-                rgba(61, 201, 209, 0.1));
+                rgba(59, 130, 246, 0.15), 
+                rgba(6, 182, 212, 0.1));
         }
 
         .balance:last-child {
             background: linear-gradient(135deg, 
-                rgba(255, 217, 61, 0.15), 
-                rgba(255, 107, 107, 0.1));
+                rgba(245, 158, 11, 0.15), 
+                rgba(239, 68, 68, 0.1));
         }
 
         .nav-container {
@@ -205,14 +174,7 @@
             height: 2px;
             background: linear-gradient(90deg, 
                 var(--accent-blue), 
-                var(--accent-cyan), 
-                var(--accent-red));
-            animation: border-flow 3s linear infinite;
-        }
-
-        @keyframes border-flow {
-            0% { background-position: -100% 0; }
-            100% { background-position: 200% 0; }
+                var(--accent-cyan));
         }
 
         .nav-tab {
@@ -220,7 +182,7 @@
             text-align: center;
             padding: 20px 10px;
             cursor: pointer;
-            border-radius: 16px;
+            border-radius: 14px;
             transition: var(--transition);
             font-weight: 600;
             font-size: 15px;
@@ -249,16 +211,15 @@
         .nav-tab.active {
             color: var(--text-color);
             background: linear-gradient(135deg, 
-                rgba(77, 171, 247, 0.2), 
-                rgba(61, 201, 209, 0.15));
-            border: 1px solid rgba(77, 171, 247, 0.3);
+                rgba(59, 130, 246, 0.2), 
+                rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(59, 130, 246, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(77, 171, 247, 0.2);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
         }
 
         .nav-tab.active i {
-            color: var(--accent-gold);
-            filter: drop-shadow(0 2px 4px rgba(255, 217, 61, 0.3));
+            color: var(--accent-blue);
         }
 
         .tab-content {
@@ -294,15 +255,6 @@
             overflow: hidden;
         }
 
-        .mining-section::before {
-            content: '🎄';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            opacity: 0.3;
-        }
-
         .base-title {
             font-size: 28px;
             margin-bottom: 12px;
@@ -336,7 +288,7 @@
         .stat-card:hover {
             transform: translateY(-3px);
             border-color: var(--accent-blue);
-            box-shadow: 0 8px 25px rgba(77, 171, 247, 0.2);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
         }
 
         .stat-value {
@@ -373,13 +325,13 @@
         }
 
         .mine-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, #3d94e6, #31b9c1);
+            background: linear-gradient(135deg, #2563eb, #0891b2);
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(77, 171, 247, 0.3);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
 
         .mine-btn:disabled {
-            background: linear-gradient(135deg, #495057, #6c757d);
+            background: linear-gradient(135deg, #475569, #64748b);
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none !important;
@@ -391,7 +343,7 @@
         }
 
         .mine-btn.collect {
-            background: linear-gradient(135deg, var(--accent-green), #2ecc71);
+            background: linear-gradient(135deg, var(--accent-green), #059669);
         }
 
         @keyframes pulse {
@@ -430,8 +382,7 @@
             height: 3px;
             background: linear-gradient(90deg, 
                 var(--accent-blue), 
-                var(--accent-cyan), 
-                var(--accent-red));
+                var(--accent-cyan));
             opacity: 0;
             transition: var(--transition);
         }
@@ -488,7 +439,7 @@
 
         .buy-btn {
             width: 100%;
-            background: linear-gradient(135deg, var(--accent-green), #2ecc71);
+            background: linear-gradient(135deg, var(--accent-green), #059669);
             color: white;
             border: none;
             padding: 16px;
@@ -502,11 +453,11 @@
 
         .buy-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
         }
 
         .buy-btn:disabled {
-            background: linear-gradient(135deg, #495057, #6c757d);
+            background: linear-gradient(135deg, #475569, #64748b);
             cursor: not-allowed;
             transform: none !important;
         }
@@ -636,7 +587,7 @@
         .case-card:hover {
             transform: translateY(-8px);
             border-color: var(--accent-purple);
-            box-shadow: 0 15px 40px rgba(151, 117, 250, 0.2);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2);
         }
 
         .case-icon {
@@ -673,7 +624,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(12, 26, 43, 0.98);
+            background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(20px);
             z-index: 1000;
             display: none;
@@ -835,7 +786,7 @@
         .promocode-input-field:focus {
             outline: none;
             border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
         .promocode-activate-btn {
@@ -852,11 +803,11 @@
 
         .promocode-activate-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(151, 117, 250, 0.3);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
         }
 
         .promocode-activate-btn:disabled {
-            background: linear-gradient(135deg, #495057, #6c757d);
+            background: linear-gradient(135deg, #475569, #64748b);
             cursor: not-allowed;
         }
 
@@ -908,7 +859,7 @@
         }
 
         .filter-btn:hover {
-            background: rgba(77, 171, 247, 0.2);
+            background: rgba(59, 130, 246, 0.2);
             transform: translateY(-2px);
         }
 
@@ -916,7 +867,7 @@
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             color: white;
             border-color: transparent;
-            box-shadow: 0 4px 15px rgba(77, 171, 247, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
         /* НОВЫЙ ДИЗАЙН ГРИДА ИНВЕНТАРЯ */
@@ -955,17 +906,17 @@
 
         .inventory-card.rare {
             border-color: var(--accent-blue);
-            box-shadow: 0 0 20px rgba(77, 171, 247, 0.2);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
         }
 
         .inventory-card.epic {
             border-color: var(--accent-purple);
-            box-shadow: 0 0 20px rgba(151, 117, 250, 0.2);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
         }
 
         .inventory-card.legendary {
             border-color: var(--accent-gold);
-            box-shadow: 0 0 20px rgba(255, 217, 61, 0.3);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
         }
 
         /* Индикатор редкости в углу */
@@ -989,19 +940,19 @@
         }
 
         .rarity-badge.rare {
-            background: rgba(77, 171, 247, 0.3);
+            background: rgba(59, 130, 246, 0.3);
             color: var(--accent-blue);
             border: 1px solid var(--accent-blue);
         }
 
         .rarity-badge.epic {
-            background: rgba(151, 117, 250, 0.3);
+            background: rgba(139, 92, 246, 0.3);
             color: var(--accent-purple);
             border: 1px solid var(--accent-purple);
         }
 
         .rarity-badge.legendary {
-            background: rgba(255, 217, 61, 0.3);
+            background: rgba(245, 158, 11, 0.3);
             color: var(--accent-gold);
             border: 1px solid var(--accent-gold);
         }
@@ -1091,12 +1042,12 @@
 
         .send-nft-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .sell-nft-btn {
             flex: 1;
-            background: linear-gradient(135deg, var(--accent-gold), #ffa94d);
+            background: linear-gradient(135deg, var(--accent-gold), #f97316);
             color: #000;
             border: none;
             padding: 10px;
@@ -1114,7 +1065,7 @@
 
         .sell-nft-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 217, 61, 0.3);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
         /* Состояние пустого инвентаря */
@@ -1170,7 +1121,7 @@
         .inventory-loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(77, 171, 247, 0.2);
+            border: 3px solid rgba(59, 130, 246, 0.2);
             border-top-color: var(--accent-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -1207,8 +1158,8 @@
             left: 0;
             width: 100%;
             background: linear-gradient(135deg, 
-                rgba(26, 47, 77, 0.95), 
-                rgba(12, 26, 43, 0.98));
+                rgba(30, 41, 59, 0.95), 
+                rgba(15, 23, 42, 0.98));
             padding: 12px;
             border-top: 1px solid var(--glass-border);
             z-index: 99;
@@ -1238,7 +1189,7 @@
 
         .mobile-nav-item.active {
             color: var(--text-color);
-            background: rgba(77, 171, 247, 0.15);
+            background: rgba(59, 130, 246, 0.15);
             transform: translateY(-5px);
         }
 
@@ -1267,7 +1218,7 @@
             color: white;
             padding: 16px 24px;
             border-radius: var(--border-radius-sm);
-            box-shadow: 0 8px 25px rgba(56, 176, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
             transform: translateX(150%);
             transition: var(--transition);
             z-index: 1001;
@@ -1327,7 +1278,7 @@
         .spinner {
             width: 60px;
             height: 60px;
-            border: 4px solid rgba(77, 171, 247, 0.2);
+            border: 4px solid rgba(59, 130, 246, 0.2);
             border-top-color: var(--accent-blue);
             border-radius: 50%;
             margin: 0 auto;
@@ -1347,7 +1298,7 @@
         .disclaimer-title {
             font-size: 32px;
             margin-bottom: 20px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-red));
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -1402,7 +1353,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(12, 26, 43, 0.95);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             z-index: 10001;
             display: none;
@@ -1439,7 +1390,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), var(--accent-red));
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
         }
 
         .confirmation-icon, .promocode-icon {
@@ -1498,23 +1449,23 @@
         }
 
         .confirm-yes-btn, .promocode-submit-btn {
-            background: linear-gradient(135deg, var(--accent-green), #2ecc71);
+            background: linear-gradient(135deg, var(--accent-green), #059669);
             color: white;
         }
 
         .confirm-no-btn, .promocode-cancel-btn {
-            background: linear-gradient(135deg, var(--danger-color), #ff4757);
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
             color: white;
         }
 
         .confirm-yes-btn:hover, .promocode-submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
         }
 
         .confirm-no-btn:hover, .promocode-cancel-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
         }
 
         .promocode-input {
@@ -1536,7 +1487,7 @@
         .promocode-input:focus {
             outline: none;
             border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
         .buy-confirm-modal, .case-confirm-modal, .send-modal, .sell-modal {
@@ -1545,7 +1496,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(12, 26, 43, 0.95);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             z-index: 1000;
             display: none;
@@ -1589,7 +1540,7 @@
         .send-input:focus {
             outline: none;
             border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
         .modal-buttons {
@@ -1616,18 +1567,18 @@
         }
 
         .cancel-btn {
-            background: linear-gradient(135deg, var(--danger-color), #ff4757);
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
             color: white;
         }
 
         .confirm-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(77, 171, 247, 0.3);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
         }
 
         .cancel-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
         }
 
         .loading {
@@ -1792,24 +1743,22 @@
     </style>
 </head>
 <body>
-    <div class="snowflakes" id="snowflakes"></div>
-
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
             <div class="loading-spinner">
                 <div class="spinner"></div>
             </div>
             <div class="disclaimer-content">
-                <div class="disclaimer-icon">🎄</div>
-                <h2 class="disclaimer-title">SAMDCOIN НОВОГОДНИЙ</h2>
+                <div class="disclaimer-icon">🚀</div>
+                <h2 class="disclaimer-title">SAMDCOIN</h2>
                 <div class="disclaimer-text">
-                    <p>Добро пожаловать в зимнее обновление!</p>
-                    <p>Новый дизайн, исправления и праздничные сюрпризы.</p>
+                    <p>Добро пожаловать в крипто игру!</p>
+                    <p>Майните монеты, покупайте NFT и открывайте кейсы.</p>
                     <p>Все полученные NFT и монеты существуют только внутри игры.</p>
                 </div>
                 <div class="loading-progress">
                     <div class="progress-bar" id="progressBar"></div>
-                    <div class="progress-text" id="progressText">Загрузка зимнего чуда...</div>
+                    <div class="progress-text" id="progressText">Загрузка игры...</div>
                 </div>
             </div>
         </div>
@@ -1921,7 +1870,7 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-tree"></i>
+                    <i class="fas fa-coins"></i>
                     <span>SAMDCOIN</span>
                 </div>
                 <div class="user-info">
@@ -1970,8 +1919,8 @@
 
         <div class="tab-content active" id="base-content">
             <div class="mining-section">
-                <h2 class="base-title" id="baseTitle">🎄 Новогодняя База</h2>
-                <p class="base-subtitle">Майните SAMDCOIN в праздничной атмосфере</p>
+                <h2 class="base-title" id="baseTitle">🚀 Крипто База</h2>
+                <p class="base-subtitle">Майните SAMDCOIN и зарабатывайте монеты</p>
                 
                 <div class="mining-stats">
                     <div class="stat-card">
@@ -1997,7 +1946,7 @@
                     Майнить SAMD
                 </button>
                 <div style="margin-top: 10px; font-size: 13px; color: var(--text-secondary);">
-                    🎅 Майнинг работает даже когда приложение закрыто!
+                    ⚡ Майнинг работает даже когда приложение закрыто!
                 </div>
             </div>
         </div>
@@ -2016,7 +1965,7 @@
 
         <div class="tab-content" id="cases-content">
             <div class="cases-section">
-                <h2>🎁 Новогодние Кейсы</h2>
+                <h2>🎁 Кейсы</h2>
                 <p style="color: var(--text-secondary);">Открывайте кейсы за билеты 🎟️ и получайте редкие NFT!</p>
                 
                 <div class="cases-grid" id="casesGrid">
@@ -2028,7 +1977,7 @@
         <div class="tab-content" id="inventory-content">
             <div class="inventory-section">
                 <div class="inventory-header">
-                    <h2>🎄 Ваши NFT <span id="inventoryCount" style="font-size: 16px; color: var(--accent-blue); margin-left: 10px;">(0)</span></h2>
+                    <h2>📦 Ваши NFT <span id="inventoryCount" style="font-size: 16px; color: var(--accent-blue); margin-left: 10px;">(0)</span></h2>
                     <div class="inventory-filters">
                         <button class="filter-btn active" data-filter="common">Обычные</button>
                         <button class="filter-btn" data-filter="rare">Редкие</button>
@@ -2118,7 +2067,7 @@
                     <p style="color: var(--text-secondary); margin-bottom: 15px;">
                         ID пользователя: <span id="userId"></span>
                     </p>
-                    <button class="buy-btn" onclick="askConfirmation(resetProgress, 'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!')" style="background: linear-gradient(135deg, var(--danger-color), #ff4757);">
+                    <button class="buy-btn" onclick="askConfirmation(resetProgress, 'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!')" style="background: linear-gradient(135deg, var(--danger-color), #dc2626);">
                         Сбросить прогресс
                     </button>
                 </div>
@@ -2219,7 +2168,7 @@
         let cases = [];
         let promocodes = [];
         let lastSave = Date.now();
-        let currentInventoryFilter = 'common'; // ИЗМЕНЕНО: по умолчанию обычные
+        let currentInventoryFilter = 'common';
 
         // Модальные окна
         let selectedNFT = null;
@@ -2357,6 +2306,9 @@
                 progressText.textContent = 'Загрузка кейсов...';
                 await loadCases();
                 
+                progressText.textContent = 'Загрузка промокодов...';
+                await loadPromocodes();
+                
                 progressText.textContent = 'Настройка обновлений...';
                 setupRealtimeListeners();
                 
@@ -2420,6 +2372,22 @@
                 updateCasesUI();
             } catch (error) {
                 console.error('Ошибка загрузки кейсов:', error);
+            }
+        }
+
+        async function loadPromocodes() {
+            try {
+                const snapshot = await db.collection('promocodes').get();
+                promocodes = [];
+                snapshot.forEach(doc => {
+                    promocodes.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                console.log('Загружено промокодов:', promocodes.length);
+            } catch (error) {
+                console.error('Ошибка загрузки промокодов:', error);
             }
         }
 
@@ -2590,6 +2558,21 @@
                     updateCasesUI();
                 }, (error) => {
                     console.error('Ошибка слушателя кейсов:', error);
+                });
+
+            if (promocodesListener) promocodesListener();
+            promocodesListener = db.collection('promocodes')
+                .onSnapshot((snapshot) => {
+                    promocodes = [];
+                    snapshot.forEach(doc => {
+                        promocodes.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    console.log('Промокоды обновлены:', promocodes.length);
+                }, (error) => {
+                    console.error('Ошибка слушателя промокодов:', error);
                 });
 
             console.log('Realtime listeners настроены');
@@ -3081,6 +3064,217 @@
             }
         }
 
+        // ==================== ИСПРАВЛЕННАЯ ФУНКЦИЯ АКТИВАЦИИ ПРОМОКОДА ====================
+
+        async function activatePromocode(promocode) {
+            const transactionId = `promo_${promocode}_${Date.now()}`;
+            
+            if (activeTransactions.has(transactionId) && activeTransactions.get(transactionId) === 'in_progress') {
+                showNotification('Операция уже выполняется', true);
+                return;
+            }
+            
+            if (!startTransaction(transactionId)) {
+                showNotification('Подождите, идет другая операция', true);
+                return;
+            }
+
+            const promoInput = document.getElementById('profilePromocodeInput');
+            const promoBtn = document.getElementById('profilePromocodeBtn');
+            const originalHTML = lockButton(promoBtn);
+
+            try {
+                // Ищем промокод в базе
+                const promoDoc = await db.collection('promocodes').doc(promocode).get();
+                
+                if (!promoDoc.exists) {
+                    showNotification('Промокод не найден', true);
+                    endTransaction(transactionId);
+                    unlockButton(promoBtn, originalHTML);
+                    return;
+                }
+
+                const promoData = promoDoc.data();
+                
+                // Проверяем срок действия
+                if (promoData.expiresAt) {
+                    const expiresAt = new Date(promoData.expiresAt);
+                    if (expiresAt < new Date()) {
+                        showNotification('Промокод истек', true);
+                        endTransaction(transactionId);
+                        unlockButton(promoBtn, originalHTML);
+                        return;
+                    }
+                }
+                
+                // Проверяем количество использований
+                if (promoData.usageLimit && promoData.usedCount >= promoData.usageLimit) {
+                    showNotification('Промокод уже использован максимальное количество раз', true);
+                    endTransaction(transactionId);
+                    unlockButton(promoBtn, originalHTML);
+                    return;
+                }
+                
+                // Проверяем не активировал ли пользователь уже этот промокод
+                if (userData.activatedPromocodes && userData.activatedPromocodes.includes(promocode)) {
+                    showNotification('Вы уже активировали этот промокод', true);
+                    endTransaction(transactionId);
+                    unlockButton(promoBtn, originalHTML);
+                    return;
+                }
+
+                const userRef = db.collection('users').doc(USER_ID);
+                const promoRef = db.collection('promocodes').doc(promocode);
+
+                await db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    const promoDoc = await transaction.get(promoRef);
+
+                    if (!userDoc.exists || !promoDoc.exists) {
+                        throw new Error("Документ не найден");
+                    }
+
+                    const userDataInTrans = userDoc.data();
+                    const promoDataInTrans = promoDoc.data();
+
+                    // Проверяем еще раз в транзакции
+                    if (promoDataInTrans.usageLimit && promoDataInTrans.usedCount >= promoDataInTrans.usageLimit) {
+                        throw new Error("Промокод уже использован максимальное количество раз");
+                    }
+
+                    // Проверяем не активировал ли пользователь уже этот промокод
+                    const activatedPromos = userDataInTrans.activatedPromocodes || [];
+                    if (activatedPromos.includes(promocode)) {
+                        throw new Error("Вы уже активировали этот промокод");
+                    }
+
+                    // Добавляем награды пользователю
+                    const rewards = promoDataInTrans.rewards || {};
+                    
+                    if (rewards.samd) {
+                        transaction.update(userRef, {
+                            samd: firebase.firestore.FieldValue.increment(rewards.samd)
+                        });
+                        userData.samd += rewards.samd;
+                    }
+                    
+                    if (rewards.tickets) {
+                        transaction.update(userRef, {
+                            tickets: firebase.firestore.FieldValue.increment(rewards.tickets)
+                        });
+                        userData.tickets += rewards.tickets;
+                    }
+                    
+                    if (rewards.incomePerSecond) {
+                        transaction.update(userRef, {
+                            incomePerSecond: firebase.firestore.FieldValue.increment(rewards.incomePerSecond)
+                        });
+                        userData.incomePerSecond += rewards.incomePerSecond;
+                    }
+                    
+                    if (rewards.maxMining) {
+                        transaction.update(userRef, {
+                            maxMining: firebase.firestore.FieldValue.increment(rewards.maxMining)
+                        });
+                        userData.maxMining += rewards.maxMining;
+                    }
+                    
+                    // Добавляем NFT если есть
+                    if (rewards.nfts && rewards.nfts.length > 0) {
+                        const currentNFTs = userDataInTrans.nfts || [];
+                        const newNFTs = [...currentNFTs];
+                        
+                        rewards.nfts.forEach(nftReward => {
+                            newNFTs.push({
+                                nftId: `promo_${promocode}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+                                name: nftReward.name || 'NFT из промокода',
+                                imageUrl: nftReward.imageUrl || '',
+                                rarity: nftReward.rarity || 'common',
+                                basePrice: nftReward.price || 100,
+                                fromPromocode: promocode,
+                                receivedAt: new Date().toISOString(),
+                                createdAt: Date.now()
+                            });
+                            
+                            userData.nfts.push({
+                                nftId: `promo_${promocode}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+                                name: nftReward.name || 'NFT из промокода',
+                                imageUrl: nftReward.imageUrl || '',
+                                rarity: nftReward.rarity || 'common',
+                                basePrice: nftReward.price || 100,
+                                fromPromocode: promocode,
+                                receivedAt: new Date().toISOString(),
+                                createdAt: Date.now()
+                            });
+                        });
+                        
+                        transaction.update(userRef, {
+                            nfts: newNFTs
+                        });
+                    }
+                    
+                    // Добавляем промокод в список активированных
+                    const newActivatedPromos = [...activatedPromos, promocode];
+                    transaction.update(userRef, {
+                        activatedPromocodes: newActivatedPromos
+                    });
+                    
+                    userData.activatedPromocodes = newActivatedPromos;
+                    
+                    // Увеличиваем счетчик использований промокода
+                    transaction.update(promoRef, {
+                        usedCount: firebase.firestore.FieldValue.increment(1),
+                        lastUsedBy: USER_ID,
+                        lastUsedAt: new Date().toISOString()
+                    });
+
+                    return { rewards, promoName: promoDataInTrans.name };
+                });
+
+                // Очищаем поле ввода
+                promoInput.value = '';
+                
+                // Обновляем UI
+                updateUI();
+                updateInventoryUI();
+                
+                // Показываем уведомление
+                showNotification(`🎉 Промокод "${promocode}" активирован успешно!`);
+                
+                // Показываем подробности о наградах
+                const rewardDetails = [];
+                if (promoData.rewards.samd) rewardDetails.push(`${promoData.rewards.samd} SAMD`);
+                if (promoData.rewards.tickets) rewardDetails.push(`${promoData.rewards.tickets} билетов`);
+                if (promoData.rewards.incomePerSecond) rewardDetails.push(`+${promoData.rewards.incomePerSecond} SAMD/сек`);
+                if (promoData.rewards.maxMining) rewardDetails.push(`+${promoData.rewards.maxMining} макс. SAMD`);
+                if (promoData.rewards.nfts) rewardDetails.push(`${promoData.rewards.nfts.length} NFT`);
+                
+                if (rewardDetails.length > 0) {
+                    setTimeout(() => {
+                        showNotification(`Получено: ${rewardDetails.join(', ')}`);
+                    }, 1500);
+                }
+
+            } catch (error) {
+                console.error('Ошибка активации промокода:', error);
+                
+                if (error.message.includes("Промокод уже использован")) {
+                    showNotification('Промокод уже использован максимальное количество раз', true);
+                } else if (error.message.includes("Вы уже активировали")) {
+                    showNotification('Вы уже активировали этот промокод', true);
+                } else if (error.message.includes("Промокод не найден")) {
+                    showNotification('Промокод не найден', true);
+                } else if (error.message.includes("Промокод истек")) {
+                    showNotification('Промокод истек', true);
+                } else {
+                    showNotification('Ошибка активации промокода', true);
+                }
+            } finally {
+                unlockButton(promoBtn, originalHTML);
+                endTransaction(transactionId);
+            }
+        }
+
         // ==================== ПЕРЕРАБОТАННЫЙ ИНВЕНТАРЬ ====================
 
         function updateInventoryStats() {
@@ -3114,7 +3308,7 @@
                 inventoryContainer.innerHTML = `
                     <div class="inventory-empty">
                         <i class="fas fa-box-open"></i>
-                        <h3>🎁 Ваш инвентарь пуст</h3>
+                        <h3>📦 Ваш инвентарь пуст</h3>
                         <p>Купите NFT в магазине или откройте кейсы, чтобы получить первые предметы!</p>
                     </div>
                 `;
@@ -3122,7 +3316,7 @@
                 return;
             }
             
-            // Фильтруем NFT по редкости (ИЗМЕНЕНО: без проверки на 'all')
+            // Фильтруем NFT по редкости
             let filteredNFTs = userData.nfts.filter(nft => (nft.rarity || 'common') === currentInventoryFilter);
             
             console.log('Отфильтровано NFT:', filteredNFTs.length);
@@ -3225,7 +3419,7 @@
             document.getElementById('balanceSAMD').textContent = Math.floor(userData.samd);
             document.getElementById('balanceTickets').textContent = userData.tickets;
             
-            document.getElementById('baseTitle').textContent = `🎄 Новогодняя База |${USERNAME}|`;
+            document.getElementById('baseTitle').textContent = `🚀 Крипто База |${USERNAME}|`;
             document.getElementById('currentSAMD').textContent = userData.currentMining.toFixed(1);
             document.getElementById('maxSAMD').textContent = userData.maxMining;
             document.getElementById('incomePerSec').textContent = userData.incomePerSecond.toFixed(1);
@@ -3253,7 +3447,7 @@
             shopContainer.innerHTML = '';
             
             if (shopItems.length === 0) {
-                shopContainer.innerHTML = '<div class="empty-state">🎁 В магазине пока что ничего нет</div>';
+                shopContainer.innerHTML = '<div class="empty-state">🛒 В магазине пока что ничего нет</div>';
                 return;
             }
             
@@ -3287,7 +3481,7 @@
             nftContainer.innerHTML = '';
             
             if (nftItems.length === 0) {
-                nftContainer.innerHTML = '<div class="empty-state">✨ В NFT магазине пока что ничего нет</div>';
+                nftContainer.innerHTML = '<div class="empty-state">💎 В NFT магазине пока что ничего нет</div>';
                 return;
             }
             
@@ -3627,40 +3821,10 @@
             }, 'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!', 'Сброс прогресса');
         }
 
-        // ==================== СНЕГ ====================
-
-        function createSnow() {
-            const snowflakes = document.getElementById('snowflakes');
-            if (!snowflakes) return;
-            
-            snowflakes.innerHTML = '';
-            
-            for (let i = 0; i < 50; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake';
-                
-                const size = Math.random() * 5 + 3;
-                const startX = Math.random() * 100;
-                const duration = Math.random() * 10 + 10;
-                const delay = Math.random() * 5;
-                
-                snowflake.style.width = `${size}px`;
-                snowflake.style.height = `${size}px`;
-                snowflake.style.left = `${startX}vw`;
-                snowflake.style.animationDuration = `${duration}s`;
-                snowflake.style.animationDelay = `${delay}s`;
-                snowflake.style.opacity = Math.random() * 0.7 + 0.3;
-                
-                snowflakes.appendChild(snowflake);
-            }
-        }
-
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Инициализация приложения...');
-            
-            createSnow();
             
             const progressText = document.getElementById('progressText');
             
@@ -3675,7 +3839,7 @@
                 console.log('Приложение инициализировано');
                 
                 setTimeout(() => {
-                    showNotification(`🎄 С Новым Годом, ${FIRST_NAME}! 🎁`);
+                    showNotification(`🚀 Добро пожаловать в SAMDCOIN, ${FIRST_NAME}!`);
                 }, 1000);
                 
             } catch (error) {
@@ -3683,8 +3847,6 @@
                 progressText.textContent = 'Ошибка загрузки. Попробуйте обновить страницу.';
                 showNotification('Ошибка загрузки приложения', true);
             }
-            
-            setInterval(createSnow, 60000);
             
             setInterval(() => {
                 if (userData.isMining && userData.currentMining < userData.maxMining) {
@@ -3711,18 +3873,7 @@
                 }
             }, 30000);
             
-            // Исправление бага с зумированием
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    if (document.getElementById('inventory-content').classList.contains('active')) {
-                        updateInventoryUI();
-                    }
-                }, 250);
-            });
-            
-            // ==================== ИСПРАВЛЕНИЕ ДЛЯ ПОЛЯ ПРОМОКОДА ====================
+            // Обработка промокодов
             const promoInput = document.getElementById('profilePromocodeInput');
             const promoBtn = document.getElementById('profilePromocodeBtn');
             
@@ -3739,20 +3890,35 @@
                 // Проверяем при вводе
                 promoInput.addEventListener('input', checkPromoInput);
                 
-                // Проверяем при загрузке страницы
-                checkPromoInput();
+                // Обработчик нажатия Enter в поле промокода
+                promoInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && promoInput.value.trim().length > 0) {
+                        promoBtn.click();
+                    }
+                });
                 
                 // Обработчик клика по кнопке
                 promoBtn.addEventListener('click', function() {
                     const promocode = promoInput.value.trim().toUpperCase();
                     if (promocode.length > 0) {
-                        showNotification(`Промокод "${promocode}" отправлен на проверку`);
-                        // Здесь можно добавить логику проверки промокода
-                        promoInput.value = '';
-                        checkPromoInput();
+                        activatePromocode(promocode);
                     }
                 });
+                
+                // Проверяем при загрузке страницы
+                checkPromoInput();
             }
+            
+            // Исправление бага с зумированием
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (document.getElementById('inventory-content').classList.contains('active')) {
+                        updateInventoryUI();
+                    }
+                }, 250);
+            });
         });
 
         // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
