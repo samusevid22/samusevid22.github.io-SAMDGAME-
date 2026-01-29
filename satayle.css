@@ -1426,6 +1426,16 @@ header {
     border-radius: var(--border-radius-sm);
 }
 
+.empty-trade-selection {
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px dashed var(--glass-border);
+}
+
 .selected-nft {
     display: flex;
     justify-content: space-between;
@@ -1435,6 +1445,19 @@ header {
     background: rgba(59, 130, 246, 0.1);
     border-radius: 8px;
     border: 1px solid var(--accent-blue);
+    transition: var(--transition);
+}
+
+.selected-nft:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: translateX(5px);
+}
+
+.selected-nft span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .selected-nft button {
@@ -1446,6 +1469,14 @@ header {
     border-radius: 50%;
     cursor: pointer;
     font-weight: bold;
+    transition: var(--transition);
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.selected-nft button:hover {
+    background: #dc2626;
+    transform: scale(1.1);
 }
 
 .trade-resources {
@@ -1463,6 +1494,18 @@ header {
     border-radius: 8px;
 }
 
+.trade-resource span:first-child {
+    min-width: 70px;
+    color: var(--text-secondary);
+}
+
+.trade-buttons {
+    display: flex;
+    gap: 5px;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
 .small-btn {
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
     color: white;
@@ -1472,10 +1515,36 @@ header {
     cursor: pointer;
     font-size: 12px;
     transition: var(--transition);
+    min-width: 40px;
 }
 
 .small-btn:hover {
     transform: translateY(-2px);
+}
+
+.remove-btn {
+    background: linear-gradient(135deg, var(--danger-color), #dc2626) !important;
+}
+
+.trade-instructions {
+    background: rgba(59, 130, 246, 0.1);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin: 10px 0 15px 0;
+    font-size: 13px;
+    color: var(--accent-blue);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.trade-instructions p {
+    margin: 5px 0;
+}
+
+.trade-section-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 10px 0 5px 0;
+    font-weight: 600;
 }
 
 .trade-comment {
@@ -1490,6 +1559,7 @@ header {
     background: rgba(0, 0, 0, 0.2);
     color: var(--text-color);
     resize: vertical;
+    font-family: inherit;
 }
 
 .send-input {

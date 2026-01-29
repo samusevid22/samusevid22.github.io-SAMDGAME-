@@ -55,8 +55,15 @@
 
     let selectedNFT = null;
     let selectedCase = null;
-    let selectedTradeRequest = null;
     let selectedTradeUser = null;
+    let tradeSelection = {
+        myNFTs: [],
+        mySAMD: 0,
+        myTickets: 0,
+        theirNFTs: [],
+        theirSAMD: 0,
+        theirTickets: 0
+    };
     
     let userListener = null;
     let shopListener = null;
@@ -238,14 +245,13 @@
         try {
             const snapshot = await db.collection('tradeRequests')
                 .where('status', '==', 'pending')
-                .where('$or', [
-                    { fromUserId: USER_ID },
-                    { toUserId: USER_ID }
-                ])
                 .get();
             tradeRequests = [];
             snapshot.forEach(doc => {
-                tradeRequests.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                if (data.fromUserId === USER_ID || data.toUserId === USER_ID) {
+                    tradeRequests.push({ id: doc.id, ...data });
+                }
             });
             updateTradeUI();
         } catch (error) {
@@ -1175,15 +1181,17 @@
                         <div class="trade-request-offers">
                             <div class="trade-offer">
                                 <h4>Предлагает:</h4>
-                                ${request.fromOffer.nfts ? `<div>NFT: ${request.fromOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
-                                ${request.fromOffer.samd ? `<div>SAMD: ${request.fromOffer.samd}</div>` : ''}
-                                ${request.fromOffer.tickets ? `<div>Билеты: ${request.fromOffer.tickets}</div>` : ''}
+                                ${request.fromOffer.nfts && request.fromOffer.nfts.length > 0 ? `<div>NFT: ${request.fromOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
+                                ${request.fromOffer.samd > 0 ? `<div>SAMD: ${request.fromOffer.samd}</div>` : ''}
+                                ${request.fromOffer.tickets > 0 ? `<div>Билеты: ${request.fromOffer.tickets}</div>` : ''}
+                                ${!request.fromOffer.nfts?.length && request.fromOffer.samd === 0 && request.fromOffer.tickets === 0 ? '<div>Ничего</div>' : ''}
                             </div>
                             <div class="trade-offer">
                                 <h4>Просит:</h4>
-                                ${request.toOffer.nfts ? `<div>NFT: ${request.toOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
-                                ${request.toOffer.samd ? `<div>SAMD: ${request.toOffer.samd}</div>` : ''}
-                                ${request.toOffer.tickets ? `<div>Билеты: ${request.toOffer.tickets}</div>` : ''}
+                                ${request.toOffer.nfts && request.toOffer.nfts.length > 0 ? `<div>NFT: ${request.toOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
+                                ${request.toOffer.samd > 0 ? `<div>SAMD: ${request.toOffer.samd}</div>` : ''}
+                                ${request.toOffer.tickets > 0 ? `<div>Билеты: ${request.toOffer.tickets}</div>` : ''}
+                                ${!request.toOffer.nfts?.length && request.toOffer.samd === 0 && request.toOffer.tickets === 0 ? '<div>Ничего</div>' : ''}
                             </div>
                         </div>
                         <div class="trade-request-actions">
@@ -1213,15 +1221,17 @@
                         <div class="trade-request-offers">
                             <div class="trade-offer">
                                 <h4>Вы предлагаете:</h4>
-                                ${request.fromOffer.nfts ? `<div>NFT: ${request.fromOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
-                                ${request.fromOffer.samd ? `<div>SAMD: ${request.fromOffer.samd}</div>` : ''}
-                                ${request.fromOffer.tickets ? `<div>Билеты: ${request.fromOffer.tickets}</div>` : ''}
+                                ${request.fromOffer.nfts && request.fromOffer.nfts.length > 0 ? `<div>NFT: ${request.fromOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
+                                ${request.fromOffer.samd > 0 ? `<div>SAMD: ${request.fromOffer.samd}</div>` : ''}
+                                ${request.fromOffer.tickets > 0 ? `<div>Билеты: ${request.fromOffer.tickets}</div>` : ''}
+                                ${!request.fromOffer.nfts?.length && request.fromOffer.samd === 0 && request.fromOffer.tickets === 0 ? '<div>Ничего</div>' : ''}
                             </div>
                             <div class="trade-offer">
                                 <h4>Вы просите:</h4>
-                                ${request.toOffer.nfts ? `<div>NFT: ${request.toOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
-                                ${request.toOffer.samd ? `<div>SAMD: ${request.toOffer.samd}</div>` : ''}
-                                ${request.toOffer.tickets ? `<div>Билеты: ${request.toOffer.tickets}</div>` : ''}
+                                ${request.toOffer.nfts && request.toOffer.nfts.length > 0 ? `<div>NFT: ${request.toOffer.nfts.map(n => n.name).join(', ')}</div>` : ''}
+                                ${request.toOffer.samd > 0 ? `<div>SAMD: ${request.toOffer.samd}</div>` : ''}
+                                ${request.toOffer.tickets > 0 ? `<div>Билеты: ${request.toOffer.tickets}</div>` : ''}
+                                ${!request.toOffer.nfts?.length && request.toOffer.samd === 0 && request.toOffer.tickets === 0 ? '<div>Ничего</div>' : ''}
                             </div>
                         </div>
                         <div class="trade-request-actions">
@@ -1435,15 +1445,6 @@
         resetTradeSelection();
     }
 
-    let tradeSelection = {
-        myNFTs: [],
-        mySAMD: 0,
-        myTickets: 0,
-        theirNFTs: [],
-        theirSAMD: 0,
-        theirTickets: 0
-    };
-
     function resetTradeSelection() {
         tradeSelection = {
             myNFTs: [],
@@ -1478,34 +1479,53 @@
         const theirSelectedNFTs = document.getElementById('theirSelectedNFTs');
         const theirSelectedSAMD = document.getElementById('theirSelectedSAMD');
         const theirSelectedTickets = document.getElementById('theirSelectedTickets');
+        
         if (mySelectedNFTs) {
             mySelectedNFTs.innerHTML = '';
-            tradeSelection.myNFTs.forEach(nft => {
-                const nftEl = document.createElement('div');
-                nftEl.className = 'selected-nft';
-                nftEl.innerHTML = `
-                    <span>${nft.name}</span>
-                    <button onclick="window.removeMyNFT('${nft.nftId}')">×</button>
-                `;
-                mySelectedNFTs.appendChild(nftEl);
-            });
+            if (tradeSelection.myNFTs.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-trade-selection';
+                emptyMsg.textContent = 'NFT не выбраны';
+                mySelectedNFTs.appendChild(emptyMsg);
+            } else {
+                tradeSelection.myNFTs.forEach(nft => {
+                    const nftEl = document.createElement('div');
+                    nftEl.className = 'selected-nft';
+                    nftEl.innerHTML = `
+                        <span>${nft.name}</span>
+                        <button onclick="window.removeMyNFT('${nft.nftId}')">×</button>
+                    `;
+                    mySelectedNFTs.appendChild(nftEl);
+                });
+            }
         }
+        
         if (mySelectedSAMD) mySelectedSAMD.textContent = tradeSelection.mySAMD;
         if (mySelectedTickets) mySelectedTickets.textContent = tradeSelection.myTickets;
+        
         if (theirSelectedNFTs) {
             theirSelectedNFTs.innerHTML = '';
-            tradeSelection.theirNFTs.forEach(nft => {
-                const nftEl = document.createElement('div');
-                nftEl.className = 'selected-nft';
-                nftEl.innerHTML = `
-                    <span>${nft.name}</span>
-                    <button onclick="window.removeTheirNFT('${nft.nftId}')">×</button>
-                `;
-                theirSelectedNFTs.appendChild(nftEl);
-            });
+            if (tradeSelection.theirNFTs.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-trade-selection';
+                emptyMsg.textContent = 'NFT не выбраны';
+                theirSelectedNFTs.appendChild(emptyMsg);
+            } else {
+                tradeSelection.theirNFTs.forEach(nft => {
+                    const nftEl = document.createElement('div');
+                    nftEl.className = 'selected-nft';
+                    nftEl.innerHTML = `
+                        <span>${nft.name}</span>
+                        <button onclick="window.removeTheirNFT('${nft.nftId}')">×</button>
+                    `;
+                    theirSelectedNFTs.appendChild(nftEl);
+                });
+            }
         }
+        
         if (theirSelectedSAMD) theirSelectedSAMD.textContent = tradeSelection.theirSAMD;
         if (theirSelectedTickets) theirSelectedTickets.textContent = tradeSelection.theirTickets;
+        
         updateInventoryUI();
     }
 
@@ -1520,50 +1540,56 @@
     }
 
     function addMySAMD(amount) {
-        if (userData.samd >= tradeSelection.mySAMD + amount) {
-            tradeSelection.mySAMD += amount;
-            updateTradeSelectionUI();
-        } else {
+        const newAmount = tradeSelection.mySAMD + amount;
+        if (newAmount < 0) {
+            tradeSelection.mySAMD = 0;
+        } else if (userData.samd >= newAmount) {
+            tradeSelection.mySAMD = newAmount;
+        } else if (amount > 0) {
             showNotification('Недостаточно SAMD', true);
         }
+        updateTradeSelectionUI();
     }
 
     function addMyTickets(amount) {
-        if (userData.tickets >= tradeSelection.myTickets + amount) {
-            tradeSelection.myTickets += amount;
-            updateTradeSelectionUI();
-        } else {
+        const newAmount = tradeSelection.myTickets + amount;
+        if (newAmount < 0) {
+            tradeSelection.myTickets = 0;
+        } else if (userData.tickets >= newAmount) {
+            tradeSelection.myTickets = newAmount;
+        } else if (amount > 0) {
             showNotification('Недостаточно билетов', true);
         }
+        updateTradeSelectionUI();
     }
 
     function addTheirSAMD(amount) {
-        tradeSelection.theirSAMD += amount;
+        const newAmount = tradeSelection.theirSAMD + amount;
+        tradeSelection.theirSAMD = newAmount < 0 ? 0 : newAmount;
         updateTradeSelectionUI();
     }
 
     function addTheirTickets(amount) {
-        tradeSelection.theirTickets += amount;
+        const newAmount = tradeSelection.theirTickets + amount;
+        tradeSelection.theirTickets = newAmount < 0 ? 0 : newAmount;
         updateTradeSelectionUI();
     }
 
     async function sendTradeRequest() {
         if (!selectedTradeUser) return;
-        if (tradeSelection.myNFTs.length === 0 && tradeSelection.mySAMD === 0 && tradeSelection.myTickets === 0) {
-            showNotification('Выберите что-то для обмена', true);
-            return;
-        }
-        if (tradeSelection.theirNFTs.length === 0 && tradeSelection.theirSAMD === 0 && tradeSelection.theirTickets === 0) {
-            showNotification('Выберите что хотите получить', true);
-            return;
-        }
+        
         const commentInput = document.getElementById('tradeComment');
         const comment = commentInput ? commentInput.value.trim() : '';
+        
         const transactionId = `trade_${Date.now()}`;
         if (!startTransaction(transactionId)) {
             showNotification('Подождите, идет другая операция', true);
             return;
         }
+        
+        const sendTradeBtn = document.getElementById('sendTradeBtn');
+        const originalHTML = lockButton(sendTradeBtn);
+        
         try {
             const fromOffer = {
                 nfts: tradeSelection.myNFTs.map(nft => ({
@@ -1576,11 +1602,19 @@
                 samd: tradeSelection.mySAMD,
                 tickets: tradeSelection.myTickets
             };
+            
             const toOffer = {
-                nfts: tradeSelection.theirNFTs,
+                nfts: tradeSelection.theirNFTs.map(nft => ({
+                    nftId: nft.nftId,
+                    name: nft.name,
+                    imageUrl: nft.imageUrl || '',
+                    rarity: nft.rarity || 'common',
+                    basePrice: nft.basePrice || 100
+                })),
                 samd: tradeSelection.theirSAMD,
                 tickets: tradeSelection.theirTickets
             };
+            
             await db.collection('tradeRequests').add({
                 fromUserId: USER_ID,
                 fromUsername: USERNAME,
@@ -1593,13 +1627,16 @@
                 createdAt: new Date().toISOString(),
                 updatedAt: Date.now()
             });
+            
             closeTradeModal();
-            showNotification(`Запрос на обмен отправлен @${selectedTradeUser.username}`);
+            showNotification(`✅ Запрос на обмен отправлен @${selectedTradeUser.username}`);
             resetTradeSelection();
+            
         } catch (error) {
             console.error('Ошибка отправки трейда:', error);
-            showNotification('Ошибка отправки трейда', true);
+            showNotification('Ошибка отправки трейда: ' + error.message, true);
         } finally {
+            unlockButton(sendTradeBtn, originalHTML);
             endTransaction(transactionId);
         }
     }
@@ -1647,13 +1684,13 @@
                 }
                 const fromUserNFTs = fromUserData.nfts || [];
                 const toUserNFTs = toUserData.nfts || [];
-                for (const nft of tradeData.fromOffer.nfts) {
+                for (const nft of tradeData.fromOffer.nfts || []) {
                     const nftIndex = fromUserNFTs.findIndex(n => n.nftId === nft.nftId);
                     if (nftIndex === -1) {
                         throw new Error(`NFT ${nft.name} не найдено у отправителя`);
                     }
                 }
-                for (const nft of tradeData.toOffer.nfts) {
+                for (const nft of tradeData.toOffer.nfts || []) {
                     const nftIndex = toUserNFTs.findIndex(n => n.nftId === nft.nftId);
                     if (nftIndex === -1) {
                         throw new Error(`NFT ${nft.name} не найдено у вас`);
@@ -1661,7 +1698,7 @@
                 }
                 let newFromUserNFTs = [...fromUserNFTs];
                 let newToUserNFTs = [...toUserNFTs];
-                for (const nft of tradeData.fromOffer.nfts) {
+                for (const nft of tradeData.fromOffer.nfts || []) {
                     const nftIndex = newFromUserNFTs.findIndex(n => n.nftId === nft.nftId);
                     const nftToMove = newFromUserNFTs[nftIndex];
                     newFromUserNFTs.splice(nftIndex, 1);
@@ -1669,7 +1706,7 @@
                     nftToMove.receivedAt = new Date().toISOString();
                     newToUserNFTs.push(nftToMove);
                 }
-                for (const nft of tradeData.toOffer.nfts) {
+                for (const nft of tradeData.toOffer.nfts || []) {
                     const nftIndex = newToUserNFTs.findIndex(n => n.nftId === nft.nftId);
                     const nftToMove = newToUserNFTs[nftIndex];
                     newToUserNFTs.splice(nftIndex, 1);
@@ -1679,13 +1716,13 @@
                 }
                 transaction.update(fromUserRef, {
                     nfts: newFromUserNFTs,
-                    samd: firebase.firestore.FieldValue.increment(tradeData.toOffer.samd - tradeData.fromOffer.samd),
-                    tickets: firebase.firestore.FieldValue.increment(tradeData.toOffer.tickets - tradeData.fromOffer.tickets)
+                    samd: firebase.firestore.FieldValue.increment((tradeData.toOffer.samd || 0) - (tradeData.fromOffer.samd || 0)),
+                    tickets: firebase.firestore.FieldValue.increment((tradeData.toOffer.tickets || 0) - (tradeData.fromOffer.tickets || 0))
                 });
                 transaction.update(toUserRef, {
                     nfts: newToUserNFTs,
-                    samd: firebase.firestore.FieldValue.increment(tradeData.fromOffer.samd - tradeData.toOffer.samd),
-                    tickets: firebase.firestore.FieldValue.increment(tradeData.fromOffer.tickets - tradeData.toOffer.tickets)
+                    samd: firebase.firestore.FieldValue.increment((tradeData.fromOffer.samd || 0) - (tradeData.toOffer.samd || 0)),
+                    tickets: firebase.firestore.FieldValue.increment((tradeData.fromOffer.tickets || 0) - (tradeData.toOffer.tickets || 0))
                 });
                 transaction.update(tradeRef, {
                     status: 'accepted',
@@ -1694,7 +1731,7 @@
                 });
                 return true;
             });
-            showNotification('Обмен успешно завершен!');
+            showNotification('✅ Обмен успешно завершен!');
             updateTradeUI();
         } catch (error) {
             console.error('Ошибка принятия трейда:', error);
