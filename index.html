@@ -124,6 +124,9 @@
                                 <button class="small-btn" onclick="window.addMySAMD(10)">+10</button>
                                 <button class="small-btn" onclick="window.addMySAMD(100)">+100</button>
                                 <button class="small-btn remove-btn" onclick="window.addMySAMD(-10)">-10</button>
+                                <input type="number" class="trade-input-number" min="0" max="999999" 
+       oninput="window.setMySAMD(this.value)" 
+       placeholder="Введите число">
                             </div>
                         </div>
                         <div class="trade-resource">
@@ -133,6 +136,9 @@
                                 <button class="small-btn" onclick="window.addMyTickets(1)">+1</button>
                                 <button class="small-btn" onclick="window.addMyTickets(5)">+5</button>
                                 <button class="small-btn remove-btn" onclick="window.addMyTickets(-1)">-1</button>
+                                <input type="number" class="trade-input-number" min="0" max="999" 
+       oninput="window.setMyTickets(this.value)" 
+       placeholder="Введите число">
                             </div>
                         </div>
                     </div>
@@ -159,6 +165,9 @@
                                 <button class="small-btn" onclick="window.addTheirSAMD(10)">+10</button>
                                 <button class="small-btn" onclick="window.addTheirSAMD(100)">+100</button>
                                 <button class="small-btn remove-btn" onclick="window.addTheirSAMD(-10)">-10</button>
+                                <input type="number" class="trade-input-number" min="0" max="999999" 
+       oninput="window.setTheirSAMD(this.value)" 
+       placeholder="Введите число">
                             </div>
                         </div>
                         <div class="trade-resource">
@@ -168,6 +177,9 @@
                                 <button class="small-btn" onclick="window.addTheirTickets(1)">+1</button>
                                 <button class="small-btn" onclick="window.addTheirTickets(5)">+5</button>
                                 <button class="small-btn remove-btn" onclick="window.addTheirTickets(-1)">-1</button>
+                                <input type="number" class="trade-input-number" min="0" max="999" 
+       oninput="window.setTheirTickets(this.value)" 
+       placeholder="Введите число">
                             </div>
                         </div>
                     </div>

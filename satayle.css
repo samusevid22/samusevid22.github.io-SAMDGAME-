@@ -2028,4 +2028,50 @@ header {
         font-size: 12px;
         padding: 10px;
     }
+
+    .trade-modal.active {
+    overflow: hidden;
+}
+
+.trade-modal-content {
+    overflow-y: auto;
+    max-height: 90vh;
+}
+}
+
+
+.trade-input-number {
+    width: 100px;
+    padding: 6px 10px;
+    margin-left: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-color);
+    font-size: 14px;
+    text-align: center;
+}
+
+.trade-input-number:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+@media (max-width: 768px) {
+    .trade-input-number {
+        width: 80px;
+        margin-left: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .trade-input-number {
+        width: 60px;
+        margin-top: 5px;
+        margin-left: 0;
+    }
+    .trade-resource {
+        flex-wrap: wrap;
+    }
 }

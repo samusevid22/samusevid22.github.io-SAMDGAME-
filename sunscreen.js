@@ -2150,6 +2150,42 @@
         }
     }
 
+    function setMySAMD(value) {
+    const num = parseInt(value) || 0;
+    if (num >= 0 && num <= userData.samd) {
+        tradeSelection.mySAMD = num;
+        updateTradeSelectionUI();
+    } else if (num > userData.samd) {
+        showNotification('Недостаточно SAMD', true);
+    }
+}
+
+function setMyTickets(value) {
+    const num = parseInt(value) || 0;
+    if (num >= 0 && num <= userData.tickets) {
+        tradeSelection.myTickets = num;
+        updateTradeSelectionUI();
+    } else if (num > userData.tickets) {
+        showNotification('Недостаточно билетов', true);
+    }
+}
+
+function setTheirSAMD(value) {
+    const num = parseInt(value) || 0;
+    if (num >= 0) {
+        tradeSelection.theirSAMD = num;
+        updateTradeSelectionUI();
+    }
+}
+
+function setTheirTickets(value) {
+    const num = parseInt(value) || 0;
+    if (num >= 0) {
+        tradeSelection.theirTickets = num;
+        updateTradeSelectionUI();
+    }
+}
+
     window.openSendModal = openSendModal;
     window.closeSendModal = closeSendModal;
     window.closeCaseConfirmModal = closeCaseConfirmModal;
@@ -2180,6 +2216,10 @@
     window.closeTradeModal = closeTradeModal;
     window.updateInventoryFilter = updateInventoryFilter;
     window.activatePromocode = activatePromocode;
+    window.setMySAMD = setMySAMD;
+window.setMyTickets = setMyTickets;
+window.setTheirSAMD = setTheirSAMD;
+window.setTheirTickets = setTheirTickets;
 
     document.addEventListener('DOMContentLoaded', function() {
         const promoBtn = document.getElementById('profilePromocodeBtn');
