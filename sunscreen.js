@@ -72,9 +72,6 @@
     let promocodesListener = null;
     let tradesListener = null;
 
-    let pendingAction = null;
-    let pendingActionData = null;
-
     let isTransactionInProgress = false;
     let activeTransactions = new Map();
 
@@ -182,10 +179,28 @@
             progressText.textContent = 'Настройка обновлений...';
             setupRealtimeListeners();
             showOfflineEarnings();
+            
+            // Скрываем экран загрузки
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
+                }
+            }, 500);
+            
             return true;
         } catch (error) {
             console.error('Ошибка загрузки данных:', error);
             showNotification('Ошибка загрузки данных', true);
+            
+            // Все равно скрываем экран загрузки при ошибке
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
+                }
+            }, 500);
+            
             return false;
         }
     }
@@ -351,6 +366,11 @@
                     updateUI();
                     updateMiningStatus();
                     updateInventoryStats();
+                    
+                    // Обновляем доступные NFT в трейде
+                    if (selectedTradeUser) {
+                        updateMyNFTsSelection();
+                    }
                 }
             });
 
@@ -461,6 +481,14 @@
             showNotification('Майнинг уже идет!', false, true);
         }
     }
+
+    // Привязываем обработчик майнинга
+    document.addEventListener('DOMContentLoaded', function() {
+        const mineBtn = document.getElementById('mineBtn');
+        if (mineBtn) {
+            mineBtn.addEventListener('click', handleMiningClick);
+        }
+    });
 
     async function buyNFTItem(nftId) {
         const transactionId = `nft_${nftId}_${Date.now()}`;
@@ -995,12 +1023,11 @@
             }
             const card = document.createElement('div');
             card.className = `inventory-card ${rarity}`;
+            
             card.innerHTML = `
                 <div class="rarity-badge ${rarity}">${rarityName}</div>
                 <div class="inventory-image">
-                    <img src="${nft.imageUrl || ''}" 
-                         alt="${nft.name}"
-                         onerror="this.style.display='none'">
+                    ${nft.imageUrl ? `<img src="${nft.imageUrl}" alt="${nft.name}">` : '<div class="no-image">🖼️</div>'}
                 </div>
                 <div class="inventory-info">
                     <div class="inventory-name">${nft.name}</div>
@@ -1010,7 +1037,7 @@
                         ${nft.basePrice ? `<div>💰 ${nft.basePrice} SAMD</div>` : ''}
                     </div>
                     <div class="inventory-actions">
-                        <button class="send-nft-btn" onclick="openSendModal('${nft.nftId}')">
+                        <button class="send-nft-btn" onclick="window.openSendModal('${nft.nftId}')">
                             📤 Отправить
                         </button>
                         <button class="trade-nft-btn" onclick="window.addToTrade('${nft.nftId}')">
@@ -1110,30 +1137,27 @@
         nftItems.forEach(nft => {
             const card = document.createElement('div');
             card.className = 'nft-card';
-            const nftImageContainer = document.createElement('div');
-            nftImageContainer.className = 'nft-image';
-            const nftImage = document.createElement('img');
-            nftImage.src = nft.imageUrl || '';
-            nftImage.alt = nft.name;
-            nftImage.style.width = '100%';
-            nftImage.style.height = '100%';
-            nftImage.style.objectFit = 'cover';
-            nftImage.onerror = function() { this.style.display = 'none'; };
-            nftImageContainer.appendChild(nftImage);
-            const nftInfo = document.createElement('div');
-            nftInfo.className = 'nft-info';
-            nftInfo.innerHTML = `
-                <div class="nft-name">${nft.name}</div>
-                <div class="nft-price">
-                    <div class="nft-stock">Осталось: ${nft.currentStock || 0}</div>
+            
+            const nftImageHTML = nft.imageUrl ? 
+                `<img src="${nft.imageUrl}" alt="${nft.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : 
+                '';
+            
+            card.innerHTML = `
+                <div class="nft-image">
+                    ${nftImageHTML}
+                    ${!nft.imageUrl ? '<div class="no-image">🖼️</div>' : ''}
                 </div>
-                <button class="buy-btn" onclick="window.buyNFTItem('${nft.id}')" 
-                        ${userData.samd < nft.price || (nft.currentStock || 0) <= 0 ? 'disabled' : ''}>
-                    Купить ${nft.price} SAMD
-                </button>
+                <div class="nft-info">
+                    <div class="nft-name">${nft.name}</div>
+                    <div class="nft-price">
+                        <div class="nft-stock">Осталось: ${nft.currentStock || 0}</div>
+                    </div>
+                    <button class="buy-btn" onclick="window.buyNFTItem('${nft.id}')" 
+                            ${userData.samd < nft.price || (nft.currentStock || 0) <= 0 ? 'disabled' : ''}>
+                        Купить ${nft.price} SAMD
+                    </button>
+                </div>
             `;
-            card.appendChild(nftImageContainer);
-            card.appendChild(nftInfo);
             nftContainer.appendChild(card);
         });
     }
@@ -1177,7 +1201,7 @@
                             <div class="trade-request-from">От: @${request.fromUsername}</div>
                             <div class="trade-request-time">${new Date(request.createdAt).toLocaleDateString()}</div>
                         </div>
-                        <div class="trade-request-comment">${request.comment || 'Без комментария'}</div>
+                        ${request.comment ? `<div class="trade-request-comment">${request.comment}</div>` : ''}
                         <div class="trade-request-offers">
                             <div class="trade-offer">
                                 <h4>Предлагает:</h4>
@@ -1217,7 +1241,7 @@
                             <div class="trade-request-to">Кому: @${request.toUsername}</div>
                             <div class="trade-request-time">${new Date(request.createdAt).toLocaleDateString()}</div>
                         </div>
-                        <div class="trade-request-comment">${request.comment || 'Без комментария'}</div>
+                        ${request.comment ? `<div class="trade-request-comment">${request.comment}</div>` : ''}
                         <div class="trade-request-offers">
                             <div class="trade-offer">
                                 <h4>Вы предлагаете:</h4>
@@ -1267,10 +1291,17 @@
         const caseConfirmCost = document.getElementById('caseConfirmCost');
         const remainingTicketsCase = document.getElementById('remainingTicketsCase');
         const caseConfirmModal = document.getElementById('caseConfirmModal');
+        const confirmCaseBtn = document.getElementById('confirmCaseBtn');
         if (caseConfirmName) caseConfirmName.textContent = caseItem.name;
         if (caseConfirmCost) caseConfirmCost.textContent = caseItem.cost;
         if (remainingTicketsCase) remainingTicketsCase.textContent = userData.tickets - caseItem.cost;
         if (caseConfirmModal) caseConfirmModal.classList.add('active');
+        if (confirmCaseBtn) {
+            confirmCaseBtn.onclick = () => {
+                closeCaseConfirmModal();
+                openCase(caseId);
+            };
+        }
     }
 
     function closeCaseConfirmModal() {
@@ -1293,10 +1324,17 @@
         const buyNftPrice = document.getElementById('buyNftPrice');
         const userCurrentBalance = document.getElementById('userCurrentBalance');
         const buyConfirmModal = document.getElementById('buyConfirmModal');
+        const confirmBuyBtn = document.getElementById('confirmBuyBtn');
         if (buyNftName) buyNftName.textContent = nft.name;
         if (buyNftPrice) buyNftPrice.textContent = nft.price;
         if (userCurrentBalance) userCurrentBalance.textContent = Math.floor(userData.samd);
         if (buyConfirmModal) buyConfirmModal.classList.add('active');
+        if (confirmBuyBtn) {
+            confirmBuyBtn.onclick = () => {
+                closeBuyConfirmModal();
+                buyNFTItem(nftId);
+            };
+        }
     }
 
     function closeBuyConfirmModal() {
@@ -1312,9 +1350,19 @@
         const sendNftName = document.getElementById('sendNftName');
         const sendUsername = document.getElementById('sendUsername');
         const sendModal = document.getElementById('sendModal');
+        const confirmSendBtn = document.getElementById('confirmSendBtn');
         if (sendNftName) sendNftName.textContent = nft.name;
         if (sendUsername) sendUsername.value = '';
         if (sendModal) sendModal.classList.add('active');
+        if (confirmSendBtn) {
+            confirmSendBtn.onclick = () => {
+                if (sendUsername && sendUsername.value.trim()) {
+                    sendNFT(nftId, sendUsername.value.trim());
+                } else {
+                    showNotification('Введите никнейм получателя', true);
+                }
+            };
+        }
     }
 
     function closeSendModal() {
@@ -1394,32 +1442,41 @@
     async function findUserForTrade() {
         const usernameInput = document.getElementById('tradeUsernameInput');
         const findBtn = document.getElementById('findUserBtn');
-        if (!usernameInput) return;
+        if (!usernameInput || !findBtn) return;
+        
         const username = usernameInput.value.trim();
         if (!username) {
             showNotification('Введите никнейм пользователя', true);
             return;
         }
+        
         if (username === USERNAME) {
             showNotification('Нельзя отправить трейд самому себе', true);
             return;
         }
+        
         const originalHTML = lockButton(findBtn);
         try {
             const usersSnapshot = await db.collection('users')
                 .where('username', '==', username)
                 .get();
+            
             if (usersSnapshot.empty) {
                 showNotification('Пользователь не найден', true);
                 unlockButton(findBtn, originalHTML);
                 return;
             }
+            
             const userDoc = usersSnapshot.docs[0];
+            const otherUserData = userDoc.data();
+            
             selectedTradeUser = {
                 id: userDoc.id,
-                username: userDoc.data().username,
-                firstName: userDoc.data().firstName || 'Пользователь'
+                username: otherUserData.username,
+                firstName: otherUserData.firstName || 'Пользователь',
+                nfts: otherUserData.nfts || []
             };
+            
             openTradeModal();
         } catch (error) {
             console.error('Ошибка поиска пользователя:', error);
@@ -1431,10 +1488,26 @@
 
     function openTradeModal() {
         if (!selectedTradeUser) return;
+        
         const tradeModal = document.getElementById('tradeModal');
         const tradeToUser = document.getElementById('tradeToUser');
+        const closeTradeBtn = document.getElementById('closeTradeBtn');
+        const sendTradeBtn = document.getElementById('sendTradeBtn');
+        
         if (tradeToUser) tradeToUser.textContent = `@${selectedTradeUser.username}`;
         if (tradeModal) tradeModal.classList.add('active');
+        
+        if (closeTradeBtn) {
+            closeTradeBtn.onclick = closeTradeModal;
+        }
+        if (sendTradeBtn) {
+            sendTradeBtn.onclick = sendTradeRequest;
+        }
+        
+        // Сбрасываем выбор перед обновлением
+        resetTradeSelection();
+        updateMyNFTsSelection();
+        updateTheirNFTsSelection();
         updateTradeSelectionUI();
     }
 
@@ -1445,31 +1518,90 @@
         resetTradeSelection();
     }
 
-    function resetTradeSelection() {
-        tradeSelection = {
-            myNFTs: [],
-            mySAMD: 0,
-            myTickets: 0,
-            theirNFTs: [],
-            theirSAMD: 0,
-            theirTickets: 0
-        };
-        updateTradeSelectionUI();
-    }
-
-    function addToTrade(nftId) {
-        if (!selectedTradeUser) {
-            showNotification('Сначала найдите пользователя для трейда', true);
+    function updateMyNFTsSelection() {
+        const myNFTsContainer = document.getElementById('myAvailableNFTs');
+        if (!myNFTsContainer) return;
+        
+        myNFTsContainer.innerHTML = '';
+        
+        if (!userData.nfts || userData.nfts.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'empty-trade-selection';
+            emptyMsg.textContent = 'У вас нет NFT';
+            myNFTsContainer.appendChild(emptyMsg);
             return;
         }
-        const nft = userData.nfts.find(n => n.nftId === nftId);
-        if (!nft) return;
-        if (tradeSelection.myNFTs.find(n => n.nftId === nftId)) {
-            tradeSelection.myNFTs = tradeSelection.myNFTs.filter(n => n.nftId !== nftId);
-        } else {
-            tradeSelection.myNFTs.push(nft);
+        
+        const availableNFTs = userData.nfts.filter(nft => 
+            !tradeSelection.myNFTs.find(selected => selected.nftId === nft.nftId)
+        );
+        
+        if (availableNFTs.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'empty-trade-selection';
+            emptyMsg.textContent = 'Все NFT уже выбраны';
+            myNFTsContainer.appendChild(emptyMsg);
+            return;
         }
-        updateTradeSelectionUI();
+        
+        availableNFTs.forEach(nft => {
+            const nftCard = document.createElement('div');
+            nftCard.className = 'available-nft-card';
+            nftCard.innerHTML = `
+                <div class="available-nft-info">
+                    <div class="available-nft-name">${nft.name}</div>
+                    <div class="available-nft-rarity">${getRarityName(nft.rarity || 'common')}</div>
+                </div>
+                <button class="small-btn add-btn" onclick="window.addMyNFT('${nft.nftId}')">
+                    Добавить
+                </button>
+            `;
+            myNFTsContainer.appendChild(nftCard);
+        });
+    }
+
+    function updateTheirNFTsSelection() {
+        if (!selectedTradeUser || !selectedTradeUser.nfts) return;
+        
+        const theirNFTsContainer = document.getElementById('theirAvailableNFTs');
+        if (!theirNFTsContainer) return;
+        
+        theirNFTsContainer.innerHTML = '';
+        
+        if (selectedTradeUser.nfts.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'empty-trade-selection';
+            emptyMsg.textContent = 'У пользователя нет NFT';
+            theirNFTsContainer.appendChild(emptyMsg);
+            return;
+        }
+        
+        const availableNFTs = selectedTradeUser.nfts.filter(nft => 
+            !tradeSelection.theirNFTs.find(selected => selected.nftId === nft.nftId)
+        );
+        
+        if (availableNFTs.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'empty-trade-selection';
+            emptyMsg.textContent = 'Все NFT уже выбраны';
+            theirNFTsContainer.appendChild(emptyMsg);
+            return;
+        }
+        
+        availableNFTs.forEach(nft => {
+            const nftCard = document.createElement('div');
+            nftCard.className = 'available-nft-card';
+            nftCard.innerHTML = `
+                <div class="available-nft-info">
+                    <div class="available-nft-name">${nft.name}</div>
+                    <div class="available-nft-rarity">${getRarityName(nft.rarity || 'common')}</div>
+                </div>
+                <button class="small-btn add-btn" onclick="window.addTheirNFT('${nft.nftId}')">
+                    Добавить
+                </button>
+            `;
+            theirNFTsContainer.appendChild(nftCard);
+        });
     }
 
     function updateTradeSelectionUI() {
@@ -1525,18 +1657,76 @@
         
         if (theirSelectedSAMD) theirSelectedSAMD.textContent = tradeSelection.theirSAMD;
         if (theirSelectedTickets) theirSelectedTickets.textContent = tradeSelection.theirTickets;
+    }
+
+    function resetTradeSelection() {
+        tradeSelection = {
+            myNFTs: [],
+            mySAMD: 0,
+            myTickets: 0,
+            theirNFTs: [],
+            theirSAMD: 0,
+            theirTickets: 0
+        };
+        updateTradeSelectionUI();
+        if (selectedTradeUser) {
+            updateMyNFTsSelection();
+            updateTheirNFTsSelection();
+        }
+    }
+
+    function addToTrade(nftId) {
+        if (!selectedTradeUser) {
+            showNotification('Сначала найдите пользователя для трейда', true);
+            return;
+        }
         
-        updateInventoryUI();
+        const nft = userData.nfts.find(n => n.nftId === nftId);
+        if (!nft) return;
+        
+        addMyNFT(nftId);
+    }
+
+    function addMyNFT(nftId) {
+        const nft = userData.nfts.find(n => n.nftId === nftId);
+        if (!nft) return;
+        
+        if (tradeSelection.myNFTs.find(n => n.nftId === nftId)) {
+            showNotification('Это NFT уже добавлено', true);
+            return;
+        }
+        
+        tradeSelection.myNFTs.push(nft);
+        updateTradeSelectionUI();
+        updateMyNFTsSelection();
     }
 
     function removeMyNFT(nftId) {
         tradeSelection.myNFTs = tradeSelection.myNFTs.filter(n => n.nftId !== nftId);
         updateTradeSelectionUI();
+        updateMyNFTsSelection();
+    }
+
+    function addTheirNFT(nftId) {
+        if (!selectedTradeUser || !selectedTradeUser.nfts) return;
+        
+        const nft = selectedTradeUser.nfts.find(n => n.nftId === nftId);
+        if (!nft) return;
+        
+        if (tradeSelection.theirNFTs.find(n => n.nftId === nftId)) {
+            showNotification('Это NFT уже добавлено', true);
+            return;
+        }
+        
+        tradeSelection.theirNFTs.push(nft);
+        updateTradeSelectionUI();
+        updateTheirNFTsSelection();
     }
 
     function removeTheirNFT(nftId) {
         tradeSelection.theirNFTs = tradeSelection.theirNFTs.filter(n => n.nftId !== nftId);
         updateTradeSelectionUI();
+        updateTheirNFTsSelection();
     }
 
     function addMySAMD(amount) {
@@ -1581,7 +1771,23 @@
         const commentInput = document.getElementById('tradeComment');
         const comment = commentInput ? commentInput.value.trim() : '';
         
-        const transactionId = `trade_${Date.now()}`;
+        if (tradeSelection.myNFTs.length === 0 && tradeSelection.mySAMD === 0 && tradeSelection.myTickets === 0 &&
+            tradeSelection.theirNFTs.length === 0 && tradeSelection.theirSAMD === 0 && tradeSelection.theirTickets === 0) {
+            showNotification('Выберите предметы для обмена', true);
+            return;
+        }
+        
+        if (tradeSelection.mySAMD > userData.samd) {
+            showNotification('Недостаточно SAMD', true);
+            return;
+        }
+        
+        if (tradeSelection.myTickets > userData.tickets) {
+            showNotification('Недостаточно билетов', true);
+            return;
+        }
+        
+        const transactionId = `trade_request_${Date.now()}`;
         if (!startTransaction(transactionId)) {
             showNotification('Подождите, идет другая операция', true);
             return;
@@ -1595,7 +1801,6 @@
                 nfts: tradeSelection.myNFTs.map(nft => ({
                     nftId: nft.nftId,
                     name: nft.name,
-                    imageUrl: nft.imageUrl || '',
                     rarity: nft.rarity || 'common',
                     basePrice: nft.basePrice || 100
                 })),
@@ -1607,7 +1812,6 @@
                 nfts: tradeSelection.theirNFTs.map(nft => ({
                     nftId: nft.nftId,
                     name: nft.name,
-                    imageUrl: nft.imageUrl || '',
                     rarity: nft.rarity || 'common',
                     basePrice: nft.basePrice || 100
                 })),
@@ -1642,97 +1846,132 @@
     }
 
     async function acceptTrade(tradeId) {
-        const transactionId = `accept_trade_${tradeId}_${Date.now()}`;
+        const transactionId = `accept_trade_${tradeId}`;
         if (!startTransaction(transactionId)) {
             showNotification('Подождите, идет другая операция', true);
             return;
         }
+        
         try {
             const tradeRef = db.collection('tradeRequests').doc(tradeId);
             const tradeDoc = await tradeRef.get();
+            
             if (!tradeDoc.exists) {
-                throw new Error("Трейд не найден");
+                showNotification('Запрос на обмен не найден', true);
+                endTransaction(transactionId);
+                return;
             }
+            
             const tradeData = tradeDoc.data();
+            
             if (tradeData.toUserId !== USER_ID) {
-                throw new Error("Этот трейд не для вас");
+                showNotification('Это не ваш запрос на обмен', true);
+                endTransaction(transactionId);
+                return;
             }
-            if (tradeData.status !== 'pending') {
-                throw new Error("Трейд уже обработан");
-            }
+            
             const fromUserRef = db.collection('users').doc(tradeData.fromUserId);
-            const toUserRef = db.collection('users').doc(tradeData.toUserId);
+            const toUserRef = db.collection('users').doc(USER_ID);
+            
             await db.runTransaction(async (transaction) => {
                 const fromUserDoc = await transaction.get(fromUserRef);
                 const toUserDoc = await transaction.get(toUserRef);
+                
                 if (!fromUserDoc.exists || !toUserDoc.exists) {
                     throw new Error("Пользователь не найден");
                 }
+                
                 const fromUserData = fromUserDoc.data();
                 const toUserData = toUserDoc.data();
-                if (fromUserData.samd < tradeData.fromOffer.samd) {
+                
+                if (fromUserData.samd < (tradeData.fromOffer.samd || 0)) {
                     throw new Error("У отправителя недостаточно SAMD");
                 }
-                if (fromUserData.tickets < tradeData.fromOffer.tickets) {
+                
+                if (fromUserData.tickets < (tradeData.fromOffer.tickets || 0)) {
                     throw new Error("У отправителя недостаточно билетов");
                 }
-                if (toUserData.samd < tradeData.toOffer.samd) {
+                
+                if (toUserData.samd < (tradeData.toOffer.samd || 0)) {
                     throw new Error("У вас недостаточно SAMD");
                 }
-                if (toUserData.tickets < tradeData.toOffer.tickets) {
+                
+                if (toUserData.tickets < (tradeData.toOffer.tickets || 0)) {
                     throw new Error("У вас недостаточно билетов");
                 }
+                
                 const fromUserNFTs = fromUserData.nfts || [];
+                const fromNFTIds = tradeData.fromOffer.nfts?.map(n => n.nftId) || [];
+                
+                for (const nftId of fromNFTIds) {
+                    if (!fromUserNFTs.find(n => n.nftId === nftId)) {
+                        throw new Error("У отправителя нет одного из NFT");
+                    }
+                }
+                
                 const toUserNFTs = toUserData.nfts || [];
-                for (const nft of tradeData.fromOffer.nfts || []) {
-                    const nftIndex = fromUserNFTs.findIndex(n => n.nftId === nft.nftId);
-                    if (nftIndex === -1) {
-                        throw new Error(`NFT ${nft.name} не найдено у отправителя`);
+                const toNFTIds = tradeData.toOffer.nfts?.map(n => n.nftId) || [];
+                
+                for (const nftId of toNFTIds) {
+                    if (!toUserNFTs.find(n => n.nftId === nftId)) {
+                        throw new Error("У вас нет одного из NFT");
                     }
                 }
-                for (const nft of tradeData.toOffer.nfts || []) {
-                    const nftIndex = toUserNFTs.findIndex(n => n.nftId === nft.nftId);
-                    if (nftIndex === -1) {
-                        throw new Error(`NFT ${nft.name} не найдено у вас`);
-                    }
-                }
-                let newFromUserNFTs = [...fromUserNFTs];
-                let newToUserNFTs = [...toUserNFTs];
-                for (const nft of tradeData.fromOffer.nfts || []) {
-                    const nftIndex = newFromUserNFTs.findIndex(n => n.nftId === nft.nftId);
-                    const nftToMove = newFromUserNFTs[nftIndex];
-                    newFromUserNFTs.splice(nftIndex, 1);
-                    nftToMove.receivedFrom = tradeData.fromUsername;
-                    nftToMove.receivedAt = new Date().toISOString();
-                    newToUserNFTs.push(nftToMove);
-                }
-                for (const nft of tradeData.toOffer.nfts || []) {
-                    const nftIndex = newToUserNFTs.findIndex(n => n.nftId === nft.nftId);
-                    const nftToMove = newToUserNFTs[nftIndex];
-                    newToUserNFTs.splice(nftIndex, 1);
-                    nftToMove.receivedFrom = USERNAME;
-                    nftToMove.receivedAt = new Date().toISOString();
-                    newFromUserNFTs.push(nftToMove);
-                }
+                
                 transaction.update(fromUserRef, {
-                    nfts: newFromUserNFTs,
-                    samd: firebase.firestore.FieldValue.increment((tradeData.toOffer.samd || 0) - (tradeData.fromOffer.samd || 0)),
-                    tickets: firebase.firestore.FieldValue.increment((tradeData.toOffer.tickets || 0) - (tradeData.fromOffer.tickets || 0))
+                    samd: firebase.firestore.FieldValue.increment(
+                        (tradeData.toOffer.samd || 0) - (tradeData.fromOffer.samd || 0)
+                    ),
+                    tickets: firebase.firestore.FieldValue.increment(
+                        (tradeData.toOffer.tickets || 0) - (tradeData.fromOffer.tickets || 0)
+                    )
                 });
+                
                 transaction.update(toUserRef, {
-                    nfts: newToUserNFTs,
-                    samd: firebase.firestore.FieldValue.increment((tradeData.fromOffer.samd || 0) - (tradeData.toOffer.samd || 0)),
-                    tickets: firebase.firestore.FieldValue.increment((tradeData.fromOffer.tickets || 0) - (tradeData.toOffer.tickets || 0))
+                    samd: firebase.firestore.FieldValue.increment(
+                        (tradeData.fromOffer.samd || 0) - (tradeData.toOffer.samd || 0)
+                    ),
+                    tickets: firebase.firestore.FieldValue.increment(
+                        (tradeData.fromOffer.tickets || 0) - (tradeData.toOffer.tickets || 0)
+                    )
                 });
+                
+                const newFromUserNFTs = fromUserNFTs.filter(n => !fromNFTIds.includes(n.nftId));
+                const newToUserNFTs = toUserNFTs.filter(n => !toNFTIds.includes(n.nftId));
+                
+                const fromNFTsToReceive = tradeData.toOffer.nfts || [];
+                fromNFTsToReceive.forEach(nft => {
+                    newFromUserNFTs.push({
+                        ...nft,
+                        receivedFrom: USERNAME,
+                        receivedAt: new Date().toISOString()
+                    });
+                });
+                
+                const toNFTsToReceive = tradeData.fromOffer.nfts || [];
+                toNFTsToReceive.forEach(nft => {
+                    newToUserNFTs.push({
+                        ...nft,
+                        receivedFrom: tradeData.fromUsername,
+                        receivedAt: new Date().toISOString()
+                    });
+                });
+                
+                transaction.update(fromUserRef, { nfts: newFromUserNFTs });
+                transaction.update(toUserRef, { nfts: newToUserNFTs });
+                
+                // Обновляем статус трейда
                 transaction.update(tradeRef, {
                     status: 'accepted',
                     acceptedAt: new Date().toISOString(),
                     updatedAt: Date.now()
                 });
+                
                 return true;
             });
-            showNotification('✅ Обмен успешно завершен!');
-            updateTradeUI();
+            
+            showNotification(`✅ Обмен с @${tradeData.fromUsername} завершен успешно!`);
+            
         } catch (error) {
             console.error('Ошибка принятия трейда:', error);
             showNotification('Ошибка принятия трейда: ' + error.message, true);
@@ -1742,19 +1981,21 @@
     }
 
     async function declineTrade(tradeId) {
-        const transactionId = `decline_trade_${tradeId}_${Date.now()}`;
+        const transactionId = `decline_trade_${tradeId}`;
         if (!startTransaction(transactionId)) {
             showNotification('Подождите, идет другая операция', true);
             return;
         }
+        
         try {
             await db.collection('tradeRequests').doc(tradeId).update({
                 status: 'declined',
                 declinedAt: new Date().toISOString(),
                 updatedAt: Date.now()
             });
-            showNotification('Запрос на обмен отклонен');
-            updateTradeUI();
+            
+            showNotification('❌ Запрос на обмен отклонен');
+            
         } catch (error) {
             console.error('Ошибка отклонения трейда:', error);
             showNotification('Ошибка отклонения трейда', true);
@@ -1764,19 +2005,21 @@
     }
 
     async function cancelTrade(tradeId) {
-        const transactionId = `cancel_trade_${tradeId}_${Date.now()}`;
+        const transactionId = `cancel_trade_${tradeId}`;
         if (!startTransaction(transactionId)) {
             showNotification('Подождите, идет другая операция', true);
             return;
         }
+        
         try {
             await db.collection('tradeRequests').doc(tradeId).update({
                 status: 'cancelled',
                 cancelledAt: new Date().toISOString(),
                 updatedAt: Date.now()
             });
-            showNotification('Запрос на обмен отменен');
-            updateTradeUI();
+            
+            showNotification('🗑️ Запрос на обмен отменен');
+            
         } catch (error) {
             console.error('Ошибка отмены трейда:', error);
             showNotification('Ошибка отмены трейда', true);
@@ -1785,8 +2028,103 @@
         }
     }
 
-    function resetProgress() {
-        window.askConfirmation(async () => {
+    function showNotification(message, isError = false, isWarning = false) {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        if (!notification || !notificationText) return;
+        
+        notificationText.textContent = message;
+        notification.className = 'notification';
+        
+        if (isError) {
+            notification.classList.add('error');
+        } else if (isWarning) {
+            notification.classList.add('warning');
+        }
+        
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+
+    function getItemUnit(type) {
+        switch(type) {
+            case 'income': return 'SAMD/сек';
+            case 'max': return 'макс. SAMD';
+            case 'tickets': return '🎟️';
+            default: return '';
+        }
+    }
+
+    function getRarityName(rarity) {
+        switch(rarity) {
+            case 'common': return 'Обычный';
+            case 'rare': return 'Редкий';
+            case 'epic': return 'Эпический';
+            case 'legendary': return 'Легендарный';
+            default: return 'Обычный';
+        }
+    }
+
+    function updateInventoryFilter(filter) {
+        currentInventoryFilter = filter;
+        updateInventoryUI();
+    }
+
+    function askConfirmation(callback, message) {
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationTitle = document.getElementById('confirmationTitle');
+        const confirmationText = document.getElementById('confirmationText');
+        const confirmYesBtn = document.getElementById('confirmYesBtn');
+        const confirmNoBtn = document.getElementById('confirmNoBtn');
+        
+        if (!confirmationModal || !confirmationText || !confirmYesBtn || !confirmNoBtn) return;
+        
+        confirmationText.textContent = message;
+        confirmationModal.style.display = 'flex';
+        
+        const handleYes = () => {
+            confirmationModal.style.display = 'none';
+            if (callback) callback();
+            confirmYesBtn.removeEventListener('click', handleYes);
+            confirmNoBtn.removeEventListener('click', handleNo);
+        };
+        
+        const handleNo = () => {
+            confirmationModal.style.display = 'none';
+            confirmYesBtn.removeEventListener('click', handleYes);
+            confirmNoBtn.removeEventListener('click', handleNo);
+        };
+        
+        confirmYesBtn.addEventListener('click', handleYes);
+        confirmNoBtn.addEventListener('click', handleNo);
+    }
+
+    async function resetProgress() {
+        const transactionId = `reset_${Date.now()}`;
+        if (!startTransaction(transactionId)) {
+            showNotification('Подождите, идет другая операция', true);
+            return;
+        }
+        
+        try {
+            await db.collection('users').doc(USER_ID).update({
+                samd: 0,
+                tickets: 0,
+                currentMining: 0,
+                maxMining: 500,
+                incomePerSecond: 0.1,
+                lastMiningUpdate: Date.now(),
+                isMining: false,
+                upgrades: [],
+                nfts: [],
+                activatedPromocodes: [],
+                updatedAt: Date.now()
+            });
+            
             userData = {
                 samd: 0,
                 tickets: 0,
@@ -1799,253 +2137,18 @@
                 nfts: [],
                 activatedPromocodes: []
             };
-            await saveUserData();
+            
             updateUI();
-            showNotification('Прогресс сброшен');
-        }, 'Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить!', 'Сброс прогресса');
-    }
-
-    function getRarityName(rarity) {
-        switch(rarity) {
-            case 'common': return 'Обычная';
-            case 'rare': return 'Редкая';
-            case 'epic': return 'Эпическая';
-            case 'legendary': return 'Легендарная';
-            default: return rarity;
-        }
-    }
-
-    function getItemUnit(type) {
-        switch(type) {
-            case 'income': return 'SAMD/сек';
-            case 'max': return 'SAMD макс';
-            case 'tickets': return '🎟️';
-            default: return '';
-        }
-    }
-
-    function showNotification(message, isError = false, isWarning = false) {
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        if (!notification || !notificationText) return;
-        notificationText.textContent = message;
-        notification.className = 'notification';
-        if (isError) {
-            notification.className += ' error';
-        } else if (isWarning) {
-            notification.className += ' warning';
-        }
-        notification.classList.add('show');
-        setTimeout(() => {
-            notification.classList.remove('show');
-        }, 3000);
-    }
-
-    function switchTab(tabName) {
-        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
-        const tabContents = document.querySelectorAll('.tab-content');
-        mobileNavItems.forEach(item => item.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-        const selectedMobileTab = document.querySelector(`.mobile-nav-item[data-tab="${tabName}"]`);
-        const selectedContent = document.querySelector(`#${tabName}-content`);
-        if (selectedMobileTab) selectedMobileTab.classList.add('active');
-        if (selectedContent) selectedContent.classList.add('active');
-        if (tabName === 'inventory') {
-            setTimeout(() => {
-                updateInventoryUI();
-            }, 50);
-            setTimeout(() => {
-                updateInventoryUI();
-            }, 200);
-        }
-        if (tabName === 'trade') {
-            setTimeout(() => {
-                updateTradeUI();
-            }, 50);
-        }
-    }
-
-    function filterInventory(filter) {
-        currentInventoryFilter = filter;
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => {
-            btn.classList.remove('active');
-        });
-        const selectedFilterBtn = document.querySelector(`[data-filter="${filter}"]`);
-        if (selectedFilterBtn) selectedFilterBtn.classList.add('active');
-        updateInventoryUI();
-    }
-
-    function askConfirmation(action, message, title = "Вы уверены?", data = null) {
-        pendingAction = action;
-        pendingActionData = data;
-        const confirmationTitle = document.getElementById('confirmationTitle');
-        const confirmationText = document.getElementById('confirmationText');
-        const confirmationModal = document.getElementById('confirmationModal');
-        if (confirmationTitle) confirmationTitle.textContent = title;
-        if (confirmationText) confirmationText.textContent = message;
-        if (confirmationModal) confirmationModal.style.display = 'flex';
-    }
-
-    function executePendingAction() {
-        if (pendingAction) {
-            if (pendingActionData) {
-                pendingAction(pendingActionData);
-            } else {
-                pendingAction();
-            }
-            pendingAction = null;
-            pendingActionData = null;
-        }
-    }
-
-    function closeConfirmationModal() {
-        const confirmationModal = document.getElementById('confirmationModal');
-        if (confirmationModal) confirmationModal.style.display = 'none';
-        pendingAction = null;
-        pendingActionData = null;
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        const progressText = document.getElementById('progressText');
-        try {
-            if (progressText) progressText.textContent = 'Загрузка пользователя...';
-            await loadUserData();
-            if (progressText) progressText.textContent = 'Загрузка завершена!';
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) loadingScreen.style.display = 'none';
-            setTimeout(() => {
-                showNotification(`🚀 Добро пожаловать в SAMDCOIN, ${FIRST_NAME}!`);
-            }, 1000);
+            updateInventoryUI();
+            showNotification('Прогресс сброшен успешно!');
+            
         } catch (error) {
-            console.error('Критическая ошибка инициализации:', error);
-            if (progressText) progressText.textContent = 'Ошибка загрузки. Попробуйте обновить страницу.';
-            showNotification('Ошибка загрузки приложения', true);
+            console.error('Ошибка сброса прогресса:', error);
+            showNotification('Ошибка сброса прогресса', true);
+        } finally {
+            endTransaction(transactionId);
         }
-        
-        setInterval(() => {
-            if (userData.isMining && userData.currentMining < userData.maxMining) {
-                userData.currentMining += userData.incomePerSecond;
-                if (userData.currentMining >= userData.maxMining) {
-                    userData.currentMining = userData.maxMining;
-                    userData.isMining = false;
-                    showNotification(`Майнинг завершен! Намайнено: ${userData.maxMining.toFixed(1)} SAMD`);
-                }
-                updateUI();
-                if (Date.now() - lastSave > 10000) {
-                    saveUserData();
-                    lastSave = Date.now();
-                }
-            }
-        }, 1000);
-        
-        setInterval(() => {
-            if (userData.isMining || userData.currentMining > 0) {
-                saveUserData();
-            }
-        }, 30000);
-        
-        const promoInput = document.getElementById('profilePromocodeInput');
-        const promoBtn = document.getElementById('profilePromocodeBtn');
-        if (promoInput && promoBtn) {
-            function checkPromoInput() {
-                if (promoInput.value.trim().length > 0) {
-                    promoBtn.disabled = false;
-                } else {
-                    promoBtn.disabled = true;
-                }
-            }
-            promoInput.addEventListener('input', checkPromoInput);
-            promoInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && promoInput.value.trim().length > 0) {
-                    promoBtn.click();
-                }
-            });
-            promoBtn.addEventListener('click', function() {
-                const promocode = promoInput.value.trim().toUpperCase();
-                if (promocode.length > 0) {
-                    activatePromocode(promocode);
-                }
-            });
-            checkPromoInput();
-        }
-        
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                const inventoryContent = document.getElementById('inventory-content');
-                if (inventoryContent && inventoryContent.classList.contains('active')) {
-                    updateInventoryUI();
-                }
-            }, 250);
-        });
-        
-        const mineBtn = document.getElementById('mineBtn');
-        if (mineBtn) {
-            mineBtn.addEventListener('click', handleMiningClick);
-        }
-        const confirmBuyBtn = document.getElementById('confirmBuyBtn');
-        if (confirmBuyBtn) {
-            confirmBuyBtn.addEventListener('click', () => {
-                if (selectedNFT) {
-                    buyNFTItem(selectedNFT.id);
-                    closeBuyConfirmModal();
-                }
-            });
-        }
-        const confirmCaseBtn = document.getElementById('confirmCaseBtn');
-        if (confirmCaseBtn) {
-            confirmCaseBtn.addEventListener('click', () => {
-                if (selectedCase) {
-                    openCase(selectedCase.id);
-                }
-            });
-        }
-        const confirmSendBtn = document.getElementById('confirmSendBtn');
-        if (confirmSendBtn) {
-            confirmSendBtn.addEventListener('click', () => {
-                const recipientUsername = document.getElementById('sendUsername').value.trim();
-                if (selectedNFT && recipientUsername) {
-                    sendNFT(selectedNFT.nftId, recipientUsername);
-                }
-            });
-        }
-        const confirmYesBtn = document.getElementById('confirmYesBtn');
-        if (confirmYesBtn) {
-            confirmYesBtn.addEventListener('click', () => {
-                executePendingAction();
-                closeConfirmationModal();
-            });
-        }
-        const confirmNoBtn = document.getElementById('confirmNoBtn');
-        if (confirmNoBtn) {
-            confirmNoBtn.addEventListener('click', () => {
-                closeConfirmationModal();
-            });
-        }
-        const findUserBtn = document.getElementById('findUserBtn');
-        if (findUserBtn) {
-            findUserBtn.addEventListener('click', findUserForTrade);
-        }
-        const sendTradeBtn = document.getElementById('sendTradeBtn');
-        if (sendTradeBtn) {
-            sendTradeBtn.addEventListener('click', () => {
-                askConfirmation(sendTradeRequest, 'Отправить запрос на обмен?');
-            });
-        }
-        const closeTradeBtn = document.getElementById('closeTradeBtn');
-        if (closeTradeBtn) {
-            closeTradeBtn.addEventListener('click', closeTradeModal);
-        }
-        document.querySelectorAll('.mobile-nav-item').forEach(element => {
-            element.addEventListener('click', () => switchTab(element.dataset.tab));
-        });
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => filterInventory(btn.dataset.filter));
-        });
-    });
+    }
 
     window.openSendModal = openSendModal;
     window.closeSendModal = closeSendModal;
@@ -2068,9 +2171,49 @@
     window.addMyTickets = (amount) => addMyTickets(amount);
     window.addTheirSAMD = (amount) => addTheirSAMD(amount);
     window.addTheirTickets = (amount) => addTheirTickets(amount);
+    window.addMyNFT = (nftId) => addMyNFT(nftId);
+    window.addTheirNFT = (nftId) => addTheirNFT(nftId);
     window.sendTradeRequest = sendTradeRequest;
     window.acceptTrade = acceptTrade;
     window.declineTrade = declineTrade;
     window.cancelTrade = cancelTrade;
     window.closeTradeModal = closeTradeModal;
+    window.updateInventoryFilter = updateInventoryFilter;
+    window.activatePromocode = activatePromocode;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const promoBtn = document.getElementById('profilePromocodeBtn');
+        const promoInput = document.getElementById('profilePromocodeInput');
+        
+        if (promoBtn && promoInput) {
+            promoBtn.addEventListener('click', function() {
+                activatePromocode(promoInput.value);
+            });
+            
+            promoInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    activatePromocode(promoInput.value);
+                }
+            });
+        }
+        
+        // Добавляем обработчик для кнопки поиска пользователя
+        const findUserBtn = document.getElementById('findUserBtn');
+        if (findUserBtn) {
+            findUserBtn.addEventListener('click', findUserForTrade);
+        }
+        
+        // Добавляем обработчик Enter для поля поиска пользователя
+        const tradeUsernameInput = document.getElementById('tradeUsernameInput');
+        if (tradeUsernameInput) {
+            tradeUsernameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    findUserForTrade();
+                }
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadUserData);
+
 })();

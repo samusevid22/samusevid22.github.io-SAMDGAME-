@@ -101,13 +101,21 @@
                 <p>💡 Выберите что отдаете и что хотите получить</p>
                 <p>💎 Можно оставить поле пустым, чтобы предлагать/просить только ресурсы</p>
             </div>
+            
             <div class="trade-container">
+                <!-- Ваши предметы -->
                 <div class="trade-column">
                     <h4>Вы отдаете:</h4>
+                    
                     <div class="trade-section-title">Ваши NFT:</div>
+                    <div class="available-nfts-container" id="myAvailableNFTs">
+                        <div class="loading">Загрузка ваших NFT...</div>
+                    </div>
+                    
                     <div class="selected-items" id="mySelectedNFTs">
                         <div class="empty-trade-selection">NFT не выбраны</div>
                     </div>
+                    
                     <div class="trade-resources">
                         <div class="trade-resource">
                             <span>SAMD:</span>
@@ -129,12 +137,20 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Предметы другого игрока -->
                 <div class="trade-column">
                     <h4>Вы получаете:</h4>
+                    
                     <div class="trade-section-title">NFT партнера:</div>
+                    <div class="available-nfts-container" id="theirAvailableNFTs">
+                        <div class="loading">Загрузка NFT партнера...</div>
+                    </div>
+                    
                     <div class="selected-items" id="theirSelectedNFTs">
                         <div class="empty-trade-selection">NFT не выбраны</div>
                     </div>
+                    
                     <div class="trade-resources">
                         <div class="trade-resource">
                             <span>SAMD:</span>
@@ -157,9 +173,11 @@
                     </div>
                 </div>
             </div>
+            
             <div class="trade-comment">
                 <textarea id="tradeComment" placeholder="Комментарий к обмену (необязательно)" rows="2"></textarea>
             </div>
+            
             <div class="modal-buttons">
                 <button class="confirm-btn" id="sendTradeBtn">Отправить запрос</button>
                 <button class="cancel-btn" id="closeTradeBtn">Отмена</button>
@@ -402,5 +420,66 @@
         <i class="fas fa-check-circle"></i>
         <span id="notificationText"></span>
     </div>
+
+    <script>
+        // Инициализация событий для мобильного меню
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.mobile-nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    
+                    // Убираем активный класс у всех
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Добавляем активный класс текущему
+                    this.classList.add('active');
+                    document.getElementById(tab + '-content').classList.add('active');
+                });
+            });
+            
+            // Инициализация фильтров инвентаря
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Убираем активный класс у всех
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Добавляем активный класс текущему
+                    this.classList.add('active');
+                    
+                    // Обновляем инвентарь с новым фильтром
+                    if (window.updateInventoryFilter) {
+                        window.updateInventoryFilter(filter);
+                    }
+                });
+            });
+            
+            // Инициализация кнопки поиска пользователя для трейда
+            const findUserBtn = document.getElementById('findUserBtn');
+            if (findUserBtn) {
+                findUserBtn.addEventListener('click', function() {
+                    if (window.findUserForTrade) {
+                        window.findUserForTrade();
+                    }
+                });
+            }
+            
+            // Обработка нажатия Enter в поле поиска пользователя
+            const tradeUsernameInput = document.getElementById('tradeUsernameInput');
+            if (tradeUsernameInput) {
+                tradeUsernameInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && window.findUserForTrade) {
+                        window.findUserForTrade();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

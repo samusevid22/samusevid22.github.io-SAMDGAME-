@@ -18,7 +18,7 @@
     --border-radius: 16px;
     --border-radius-sm: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+}   
 
 * {
     margin: 0;
@@ -1393,7 +1393,7 @@ header {
 }
 
 .trade-modal-content {
-    max-width: 800px;
+    max-width: 900px;
     text-align: left;
 }
 
@@ -1409,6 +1409,8 @@ header {
     padding: 20px;
     border-radius: var(--border-radius-sm);
     border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
 }
 
 .trade-column h4 {
@@ -1416,14 +1418,82 @@ header {
     color: var(--accent-blue);
 }
 
-.selected-items {
-    min-height: 100px;
+/* Контейнеры для доступных NFT */
+.available-nfts-container {
+    min-height: 120px;
     max-height: 200px;
     overflow-y: auto;
     margin-bottom: 15px;
     padding: 10px;
     background: rgba(0, 0, 0, 0.1);
     border-radius: var(--border-radius-sm);
+    border: 1px dashed var(--glass-border);
+}
+
+.available-nft-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    transition: var(--transition);
+}
+
+.available-nft-card:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: translateX(5px);
+}
+
+.available-nft-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.available-nft-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.available-nft-rarity {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.available-nft-card .add-btn {
+    background: linear-gradient(135deg, var(--accent-green), #059669) !important;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: var(--transition);
+    min-width: 70px;
+    height: 30px;
+}
+
+.available-nft-card .add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.selected-items {
+    min-height: 80px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--glass-border);
 }
 
 .empty-trade-selection {
@@ -1442,14 +1512,14 @@ header {
     align-items: center;
     padding: 8px 12px;
     margin-bottom: 8px;
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(139, 92, 246, 0.1);
     border-radius: 8px;
-    border: 1px solid var(--accent-blue);
+    border: 1px solid var(--accent-purple);
     transition: var(--transition);
 }
 
 .selected-nft:hover {
-    background: rgba(59, 130, 246, 0.2);
+    background: rgba(139, 92, 246, 0.2);
     transform: translateX(5px);
 }
 
@@ -1458,6 +1528,8 @@ header {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .selected-nft button {
@@ -1472,6 +1544,10 @@ header {
     transition: var(--transition);
     margin-left: 10px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
 }
 
 .selected-nft button:hover {
@@ -1483,6 +1559,7 @@ header {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-top: auto;
 }
 
 .trade-resource {
@@ -1497,6 +1574,14 @@ header {
 .trade-resource span:first-child {
     min-width: 70px;
     color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.trade-resource span:nth-child(2) {
+    font-weight: 700;
+    color: var(--accent-gold);
+    min-width: 40px;
+    text-align: right;
 }
 
 .trade-buttons {
@@ -1510,20 +1595,30 @@ header {
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
+    font-weight: 600;
     transition: var(--transition);
-    min-width: 40px;
+    min-width: 45px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .small-btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
 
 .remove-btn {
     background: linear-gradient(135deg, var(--danger-color), #dc2626) !important;
+}
+
+.remove-btn:hover {
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3) !important;
 }
 
 .trade-instructions {
@@ -1560,6 +1655,7 @@ header {
     color: var(--text-color);
     resize: vertical;
     font-family: inherit;
+    font-size: 14px;
 }
 
 .send-input {
@@ -1677,6 +1773,12 @@ header {
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
+    transition: var(--transition);
+}
+
+.trade-find-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
 .trade-requests-section {
@@ -1823,12 +1925,31 @@ header {
         grid-template-columns: 1fr;
         gap: 20px;
     }
+    .available-nfts-container {
+        min-height: 100px;
+        max-height: 150px;
+    }
+    .selected-items {
+        min-height: 70px;
+        max-height: 150px;
+    }
     .trade-request-offers {
         grid-template-columns: 1fr;
     }
     .trade-modal-content {
         max-width: 95%;
         padding: 20px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .trade-resource {
+        flex-wrap: wrap;
+    }
+    .trade-buttons {
+        width: 100%;
+        justify-content: center;
+        margin-top: 5px;
+        margin-left: 0;
     }
 }
 
@@ -1877,5 +1998,34 @@ header {
     }
     .trade-request-actions {
         flex-direction: column;
+    }
+    .available-nft-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .available-nft-card .add-btn {
+        align-self: flex-end;
+        width: 100%;
+        margin-top: 5px;
+    }
+    .selected-nft {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .selected-nft button {
+        align-self: flex-end;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    .small-btn {
+        padding: 5px 8px;
+        min-width: 40px;
+        font-size: 11px;
+    }
+    .trade-instructions {
+        font-size: 12px;
+        padding: 10px;
     }
 }
